@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useState } from "react"
+import { FC, useEffect, useMemo, useState } from "react"
 import PrivateRoute from "../components/PrivateRoute"
 import { AppBar, Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material"
 import AgricultureIcon from '@mui/icons-material/Agriculture';
@@ -14,6 +14,7 @@ import { JwtField, JwtRole } from "../models/Jwt";
 import { jwtUtil } from "../helpers/JwtUtil"
 import { Breadcrumbinator } from "../components/Breadcruminator";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const drawerWidth = 200
 
@@ -60,10 +61,16 @@ const menuOptions: DrawerMenuItem[] = [
 
 type Props = {
     children?: React.ReactNode
-  };
+};
 
-const LeftDrawer: FC<Props> = ({children}) => {
-    const [pageTitle, setPageTitle] = useState('')
+const LeftDrawer: FC<Props> = ({ children }) => {
+    const [pageTitle, setPageTitle] = useState('Title Goes Here')
+    const pathname = usePathname()
+
+    const selectedMenuOption = useMemo(() => menuOptions.find(menuOption =>
+        menuOption !== divider
+        && ((menuOption as MenuOption).Route === pathname
+            || (menuOption as MenuOption).ChildRoutes?.some(cr => pathname.startsWith(cr)))) ?? menuOptions[0], [pathname])
 
     return (
         <PrivateRoute>
@@ -109,8 +116,7 @@ const LeftDrawer: FC<Props> = ({children}) => {
 
                             return jwtUtil.hasRole(menuOption.Role) ? (
                                 <ListItem disablePadding component={Link} href={menuOption.Route} key={menuOption.Text}>
-                                    <ListItemButton selected={menuOption.Route === window.location.pathname
-                                        || menuOption.ChildRoutes?.some(cr => window.location.pathname.startsWith(cr))}>
+                                    <ListItemButton selected={menuOption === selectedMenuOption}>
                                         <ListItemIcon>
                                             <menuOption.Icon />
                                         </ListItemIcon>

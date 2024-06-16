@@ -99,11 +99,6 @@ const Layout: FC = () => {
                     autoHideDuration={3000}
                     message="The Email or Password was incorrect."
                 />                
-                <Grid item>
-                    <p>
-                        This is the React frontend.  Go to the <a href="http://brettdrake.org:8008/">Angular frontend</a>.
-                    </p>
-                </Grid>
             </Grid>
         </Box>
     )
