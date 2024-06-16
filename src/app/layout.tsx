@@ -9,13 +9,16 @@ import { CssBaseline } from "@mui/material";
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="en">
+            <head>
+                {/* process.env.NODE_ENV === 'development' && <script src="http://localhost:8097"></script> */}
+            </head>
             <body>
                 <AppRouterCacheProvider>
                     <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <ErrorBoundary>
-                        <PleaseWait />
-                        {children}
+                        <CssBaseline />
+                        <ErrorBoundary>
+                            <PleaseWait />
+                            {children}
                         </ErrorBoundary>
                     </ThemeProvider>
                 </AppRouterCacheProvider>
