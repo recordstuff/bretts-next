@@ -1,14 +1,14 @@
 'use client'
 
 import { ChangeEvent, FC, useCallback, useEffect, useState } from "react"
-import { roleClient } from "../../../clients/RoleClient"
-import { userClient } from "../../../clients/UserClient"
-import { UserDetail, emptyUserDetail } from "../../../models/UserDetail"
+import { roleClient } from "../../../../clients/RoleClient"
+import { userClient } from "../../../../clients/UserClient"
+import { UserDetail, emptyUserDetail } from "../../../../models/UserDetail"
 import { Button, Stack, TextField } from "@mui/material"
-import { NameGuidPair } from "../../../models/NameGuidPair"
-import { UserNew } from "../../../models/UserNew"
+import { NameGuidPair } from "../../../../models/NameGuidPair"
+import { UserNew } from "../../../../models/UserNew"
 import { AxiosError } from "axios"
-import { HTTP_STATUS_CODES } from "../../../clients/HttpClient"
+import { HTTP_STATUS_CODES } from "../../../../clients/HttpClient"
 import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 
