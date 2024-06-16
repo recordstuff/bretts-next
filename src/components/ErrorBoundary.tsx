@@ -1,10 +1,12 @@
+'use client'
+
 import React, { ErrorInfo } from "react";
 import { AxiosError } from "axios";
 import { HTTP_STATUS_CODES } from "../clients/HttpClient";
+import { Typography } from "@mui/material";
 
 interface Props {
-    children?: React.ReactNode,
-    clearAllWaits: () => void
+    children?: React.ReactNode
 }
 
 interface State {
@@ -49,10 +51,10 @@ class ErrorBoundary extends React.PureComponent<Props, State> {
             
             return (
                 <>
-                    <h1>Unfortunate Occurance</h1>
-                    <p>The application experienced a problem.</p>
-                    <p>Unhandled Error {this.state.name !== "Error" ? `: ${this.state.name}` : ''}</p>
-                    <p>{this.state.message}</p>
+                    <Typography variant='h1'>Unfortunate Occurance</Typography>
+                    <Typography paragraph>The application experienced a problem.</Typography>
+                    <Typography paragraph>Unhandled Error {this.state.name !== "Error" ? `: ${this.state.name}` : ''}</Typography>
+                    <Typography paragraph>{this.state.message}</Typography>
                 </>
             )
         }
