@@ -5,6 +5,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { PleaseWait } from "@/components/PleaseWait";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { CssBaseline } from "@mui/material";
+import { PleaseWaitProvider } from "@/components/PleaseWaitProvider";
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
@@ -17,8 +18,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                     <ThemeProvider theme={theme}>
                         <CssBaseline />
                         <ErrorBoundary>
-                            <PleaseWait />
-                            {children}
+                            <PleaseWaitProvider>
+                                    <PleaseWait />
+                                    {children}
+                            </PleaseWaitProvider>
                         </ErrorBoundary>
                     </ThemeProvider>
                 </AppRouterCacheProvider>

@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useCallback, useEffect, useState } from "react"
+import { FC, useCallback, useContext, useEffect, useState } from "react"
 import { userClient } from "../../../clients/UserClient"
 import { PaginationResult, emptyPaginationResult } from "../../../models/PaginationResult"
 import { UserSummary } from "../../../models/UserSummary"
@@ -12,6 +12,7 @@ import TwoElementGuide from "@/components/TwoElementGuide"
 import TextFilter from "@/components/TextFilter"
 import OptionFilter from "@/components/OptionFilter"
 import Paginator from "@/components/Paginator"
+import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 
 const PAGE_SIZE = 5
 
@@ -20,15 +21,16 @@ const Users: FC = () => {
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
     const [roleFilter, setRoleFilter] = useState<JwtRole>(JwtRole.Any)
+    const { pleaseWait, doneWaiting } = useContext(PleaseWaitContext)
 
     const getUsers = useCallback(async (): Promise<void> => {
-        //dispatch(pleaseWait())
+        pleaseWait()
 
         const response = await userClient.getUsers(page, PAGE_SIZE, searchText, roleFilter)
 
         setPaginationResult(response)
 
-        //dispatch(doneWaiting())
+        doneWaiting()
     }, [page, searchText, roleFilter])
 
     useEffect(() => {

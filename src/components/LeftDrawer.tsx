@@ -59,9 +59,9 @@ const menuOptions: DrawerMenuItem[] = [
     },
 ]
 
-type Props = {
+interface Props {
     children?: React.ReactNode
-};
+}
 
 const LeftDrawer: FC<Props> = ({ children }) => {
     const [pageTitle, setPageTitle] = useState('Title Goes Here')

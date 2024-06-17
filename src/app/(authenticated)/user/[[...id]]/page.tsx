@@ -1,6 +1,6 @@
 'use client'
 
-import { ChangeEvent, FC, useCallback, useEffect, useState } from "react"
+import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from "react"
 import { roleClient } from "../../../../clients/RoleClient"
 import { userClient } from "../../../../clients/UserClient"
 import { UserDetail, emptyUserDetail } from "../../../../models/UserDetail"
@@ -11,6 +11,7 @@ import { AxiosError } from "axios"
 import { HTTP_STATUS_CODES } from "../../../../clients/HttpClient"
 import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
+import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 
 const User: FC = () => {
 
@@ -18,26 +19,27 @@ const User: FC = () => {
     const [user, setUser] = useState<UserDetail>(emptyUserDetail())
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
+    const { pleaseWait, doneWaiting } = useContext(PleaseWaitContext)
 
     const { id } = useParams<{id: string}>()
     const router = useRouter()
 
     const getRoles = useCallback(async (): Promise<void> => {
-        //dispatch(pleaseWait())
+        pleaseWait()
 
         setRoles(await roleClient.getRoles())
 
-        //dispatch(doneWaiting())
+        doneWaiting()
     }, [])
 
     const getUser = useCallback(async (): Promise<void> => {
         if (id === undefined) return
 
-        //dispatch(pleaseWait())
+        pleaseWait()
 
         setUser(await userClient.getUser(id))
 
-        //dispatch(doneWaiting())
+        doneWaiting()
     }, [id])
 
     useEffect(() => {

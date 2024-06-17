@@ -1,4 +1,6 @@
-import { Dispatch, SetStateAction, useId } from 'react';
+'use client'
+
+import { Dispatch, JSX, SetStateAction, useId } from 'react';
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { NameValuePair } from '../models/NameValuePair';
 

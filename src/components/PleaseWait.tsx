@@ -1,10 +1,11 @@
 'use client'
 
 import { Backdrop, CircularProgress } from "@mui/material"
-import { FC } from "react"
+import { FC, useContext } from "react"
+import { PleaseWaitContext } from "./PleaseWaitProvider"
 
 export const PleaseWait: FC = () => {
-    const waitCount: number = 0 // useSelector((state: RootState) => state.waitSpinner.waitCount)
+    const {waitCount} = useContext(PleaseWaitContext)
 
     return (
         <Backdrop

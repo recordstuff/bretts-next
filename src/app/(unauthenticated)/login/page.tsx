@@ -1,13 +1,14 @@
 'use client'
 
 import { Box, Button, Grid, Snackbar, TextField } from "@mui/material"
-import { ChangeEvent, FC, useEffect, useState } from "react"
+import { ChangeEvent, FC, useContext, useEffect, useState } from "react"
 import { HTTP_STATUS_CODES } from "../../../clients/HttpClient"
 import { jwtUtil } from "../../../helpers/JwtUtil"
 import { defaultUserCredentials, UserCredentials } from "../../../models/UserCredentials"
 import { AxiosError } from "axios"
 import { userClient } from "../../../clients/UserClient"
 import { useRouter } from "next/navigation"
+import { PleaseWaitContext } from "../../../components/PleaseWaitProvider"
 
 const Layout: FC = () => {
 
@@ -15,6 +16,7 @@ const Layout: FC = () => {
     const [useErrorCondition, setUseErrorCondition] = useState<boolean>(false)
     const [isInvalidCredentials, setIsInvalidCredentials] = useState<boolean>(false)
     const router = useRouter()
+    const { pleaseWait, doneWaiting, clearAllWaits } = useContext(PleaseWaitContext)
 
     const login = async (): Promise<void> => {
         try {
@@ -22,20 +24,20 @@ const Layout: FC = () => {
 
             if (userCredentials.Email.length === 0 || userCredentials.Password.length === 0) return
 
-            // dispatch(pleaseWait())
+            pleaseWait()
 
             const result = await userClient.login(userCredentials)
 
             jwtUtil.token = result.Token
 
-            // dispatch(doneWaiting())
+            doneWaiting()
 
             if (!jwtUtil.isExpired) {
                 router.push('/')
             }
         }
         catch (ex: unknown) {
-            // dispatch(clearAllWaits())
+            clearAllWaits()
             if (ex instanceof AxiosError && ex.response?.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
                 setIsInvalidCredentials(true)
                 return
