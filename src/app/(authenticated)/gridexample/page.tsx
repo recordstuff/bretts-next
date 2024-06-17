@@ -1,13 +1,16 @@
 'use client'
 
+import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import { Grid, TextField, Typography } from "@mui/material"
-import { FC, useEffect } from "react"
+import { FC, useContext, useEffect } from "react"
 
 const GridExample: FC = () => {
+    const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     useEffect(() => {
-//        setPageTitle('Grid Example')
-    }, [])
+        setPageTitle('Grid Example')
+        firstBreadcrumb({title:'Grid Example', url: 'gridexample'})
+    }, [setPageTitle, firstBreadcrumb])
 
     return (
             <Grid container>

@@ -17,12 +17,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <AppRouterCacheProvider>
                     <ThemeProvider theme={theme}>
                         <CssBaseline />
-                        <ErrorBoundary>
+                        {/*<ErrorBoundary>*/}
                             <PleaseWaitProvider>
                                     <PleaseWait />
                                     {children}
                             </PleaseWaitProvider>
-                        </ErrorBoundary>
+                        {/*</ErrorBoundary>*/}
                     </ThemeProvider>
                 </AppRouterCacheProvider>
             </body>

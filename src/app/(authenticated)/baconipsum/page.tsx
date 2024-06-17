@@ -1,13 +1,16 @@
 'use client'
 
+import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import { Typography } from "@mui/material"
-import { FC, useEffect } from "react"
+import { FC, useContext, useEffect } from "react"
 
 const BaconIpsum: FC = () => {
+    const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
+    
     useEffect(() => {
-        //setPageTitle('Bacon Ipsum')
-        //dispatch(firstBreadcrumb({title:'Bacon Ipsum', url: 'baconipsum'}))
-    }, [])
+        setPageTitle('Bacon Ipsum')
+        firstBreadcrumb({title:'Bacon Ipsum', url: 'baconipsum'})
+    }, [firstBreadcrumb, setPageTitle])
 
     return (
         <>

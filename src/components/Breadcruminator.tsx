@@ -1,20 +1,20 @@
-import { FC } from "react"
+import { FC, useContext, useMemo } from "react"
 import { Breadcrumbs, Typography } from "@mui/material"
-import { VisitedPage } from "@/models/VisitedPage"
 import Link from "next/link"
+import { LeftDrawerContext, VisitedPage } from "./LeftDrawerProvider"
 
 export const Breadcrumbinator: FC = () => {
-//    const breadcrumbs = useSelector((state: RootState) => state.breadcrumbs.visitedPages)
+    const { breadcrumbsJSON } = useContext(LeftDrawerContext)
+    // https://stackoverflow.com/questions/59467758/passing-array-to-useeffect-dependency-list    
+    const memorized: VisitedPage[] = useMemo(() => JSON.parse(breadcrumbsJSON), [breadcrumbsJSON])
 
-    const breadcrumbs: VisitedPage[] = []
-
-    return (    
-        <Breadcrumbs sx={{paddingBottom: 1}}>
+    return (
+        <Breadcrumbs sx={{ paddingBottom: 1 }}>
             <Link href='/'>
                 Home
             </Link>
-            {breadcrumbs.map((page, index) => {
-                if (index === breadcrumbs.length - 1) {
+            {memorized.map((page, index) => {
+                if (index === memorized.length - 1) {
                     return (
                         <Typography key={index}>
                             {page.title}

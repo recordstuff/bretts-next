@@ -13,6 +13,7 @@ import TextFilter from "@/components/TextFilter"
 import OptionFilter from "@/components/OptionFilter"
 import Paginator from "@/components/Paginator"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
+import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 
 const PAGE_SIZE = 5
 
@@ -21,7 +22,8 @@ const Users: FC = () => {
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
     const [roleFilter, setRoleFilter] = useState<JwtRole>(JwtRole.Any)
-    const { pleaseWait, doneWaiting } = useContext(PleaseWaitContext)
+    const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
+    const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     const getUsers = useCallback(async (): Promise<void> => {
         pleaseWait()
@@ -31,13 +33,13 @@ const Users: FC = () => {
         setPaginationResult(response)
 
         doneWaiting()
-    }, [page, searchText, roleFilter])
+    }, [page, searchText, roleFilter, pleaseWait, doneWaiting])
 
     useEffect(() => {
-        //setPageTitle('Users')
-        //dispatch(firstBreadcrumb({title:'Users', url: '/users'}))
+        setPageTitle('Users')
+        firstBreadcrumb({ title: 'Users', url: '/users' })
         getUsers()
-    }, [getUsers])
+    }, [setPageTitle, firstBreadcrumb, getUsers])
 
     return (
         <>

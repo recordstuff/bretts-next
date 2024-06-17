@@ -16,7 +16,7 @@ const Layout: FC = () => {
     const [useErrorCondition, setUseErrorCondition] = useState<boolean>(false)
     const [isInvalidCredentials, setIsInvalidCredentials] = useState<boolean>(false)
     const router = useRouter()
-    const { pleaseWait, doneWaiting, clearAllWaits } = useContext(PleaseWaitContext)
+    const { actions: {pleaseWait, doneWaiting, clearAllWaits} } = useContext(PleaseWaitContext)
 
     const login = async (): Promise<void> => {
         try {

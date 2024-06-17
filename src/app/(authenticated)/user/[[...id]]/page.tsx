@@ -12,6 +12,7 @@ import { HTTP_STATUS_CODES } from "../../../../clients/HttpClient"
 import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
+import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 
 const User: FC = () => {
 
@@ -19,7 +20,8 @@ const User: FC = () => {
     const [user, setUser] = useState<UserDetail>(emptyUserDetail())
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
-    const { pleaseWait, doneWaiting } = useContext(PleaseWaitContext)
+    const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
+    const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     const { id } = useParams<{id: string}>()
     const router = useRouter()
@@ -30,7 +32,7 @@ const User: FC = () => {
         setRoles(await roleClient.getRoles())
 
         doneWaiting()
-    }, [])
+    }, [pleaseWait, doneWaiting])
 
     const getUser = useCallback(async (): Promise<void> => {
         if (id === undefined) return
@@ -40,7 +42,7 @@ const User: FC = () => {
         setUser(await userClient.getUser(id))
 
         doneWaiting()
-    }, [id])
+    }, [id, pleaseWait, doneWaiting])
 
     useEffect(() => {
         let pageTitle
@@ -54,11 +56,11 @@ const User: FC = () => {
             url = `${url}/${id}`
         }
 
-        //setPageTitle(pageTitle)
-        //dispatch(addBreadcrumb({ title: pageTitle, url }))
+        setPageTitle(pageTitle)
+        addBreadcrumb({ title: pageTitle, url })
         getRoles()
         getUser()
-    }, [id, getRoles, getUser])
+    }, [id, setPageTitle, addBreadcrumb, getRoles, getUser])
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         if (event.target.name === 'Password') {

@@ -1,15 +1,17 @@
 'use client'
 
+import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import { Typography } from "@mui/material"
-import { FC, useEffect } from "react"
+import { FC, useContext, useEffect } from "react"
 
 const Home: FC = () => {
+    const { atHome, setPageTitle } = useContext(LeftDrawerContext)
 
     useEffect(() => {
-        // setPageTitle('Home')
-        // dispatch(atHome())
+        setPageTitle('Home')
+        //atHome()
         
-    }, [/* setPageTitle, dispatch */])
+    }, [setPageTitle, atHome])
 
     return (
         <>

@@ -15,6 +15,8 @@ import { jwtUtil } from "../helpers/JwtUtil"
 import { Breadcrumbinator } from "../components/Breadcruminator";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useContext } from "react";
+import { LeftDrawerContext } from "./LeftDrawerProvider";
 
 const drawerWidth = 200
 
@@ -64,8 +66,8 @@ interface Props {
 }
 
 const LeftDrawer: FC<Props> = ({ children }) => {
-    const [pageTitle, setPageTitle] = useState('Title Goes Here')
     const pathname = usePathname()
+    const { pageTitle } = useContext(LeftDrawerContext)
 
     const selectedMenuOption = useMemo(() => menuOptions.find(menuOption =>
         menuOption !== divider
