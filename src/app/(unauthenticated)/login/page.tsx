@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, Grid, Snackbar, TextField } from "@mui/material"
+import { Box, Button, ButtonGroup, Grid, Snackbar, TextField } from "@mui/material"
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react"
 import { HTTP_STATUS_CODES } from "../../../clients/HttpClient"
 import { jwtUtil } from "../../../helpers/JwtUtil"
@@ -54,6 +54,18 @@ const Layout: FC = () => {
         setUserCredentials(newCreds)
     }
 
+    const populateWithAdminCreds = (): void => {
+        setUserCredentials({Email: 'adminonly@brettdrake.org', Password: 'test123'})
+    }
+
+    const populateWithUserCreds = (): void => {
+        setUserCredentials({Email: 'useronly@brettdrake.org', Password: 'test123'})
+    }
+
+    const populateWithAdminAndUserCreds = (): void => {
+        setUserCredentials(defaultUserCredentials())
+    }
+
     useEffect(() => {
         jwtUtil.clear();
     }, []);
@@ -62,15 +74,27 @@ const Layout: FC = () => {
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
             <Grid item lg={4} container direction="column" margin={2} spacing={2}>
                 <Grid item>
+                    To login, you may populate with valid credentials.
+                </Grid>
+                <Grid item sx={{textAlign: 'center'}}>
+                    <ButtonGroup variant="text" aria-label="Populate with Credentials">
+                        <Button onClick={populateWithAdminAndUserCreds}> Admin and User rights</Button>
+                        <Button onClick={populateWithAdminCreds}>Admin rights only</Button>
+                        <Button onClick={populateWithUserCreds}>User rights only</Button>
+                    </ButtonGroup>
+                </Grid>
+                <Grid item>
                     <TextField
                         fullWidth
                         name="Email"
                         label="Email"
                         type="email"
+                        value={userCredentials.Email}
                         onChange={credentialsChanged}
                         required
                         error={useErrorCondition && userCredentials.Email.length === 0}
                         helperText={useErrorCondition && userCredentials.Email.length === 0 && "Email cannot be blank."}
+                        InputLabelProps={{shrink: true}} /* "fix" issue with chrome autofill */
                     />
                 </Grid>
                 <Grid item>
@@ -79,10 +103,12 @@ const Layout: FC = () => {
                         name="Password"
                         label="Password"
                         type="password"
+                        value={userCredentials.Password}
                         onChange={credentialsChanged}
                         required
                         error={useErrorCondition && userCredentials.Password.length === 0}
                         helperText={useErrorCondition && userCredentials.Password.length === 0 && "Password cannot be blank."}
+                        InputLabelProps={{shrink: true}} /* "fix" issue with chrome autofill */
                     />
                 </Grid>
                 <Grid item>
