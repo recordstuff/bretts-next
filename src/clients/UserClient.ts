@@ -36,6 +36,10 @@ class UserClient extends HttpClient {
     public insertUser(userNew: UserNew): Promise<UserDetail> {
         return this.post<UserNew, UserDetail>('insert', userNew)
     }
+
+    public deleteUser(id: string): Promise<boolean> {
+        return this.delete(`delete/${id}`)
+    }
 }
 
 export const userClient = new UserClient()

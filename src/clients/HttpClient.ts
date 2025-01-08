@@ -78,4 +78,10 @@ export abstract class HttpClient extends HttpBase {
 
         return response.data
     }
+
+    protected async delete<Body, Response>(url: string): Promise<Response> {
+        const response = await this.client.delete<Response>(`${this._basePath}/${url}`)
+
+        return response.data
+    }
 }

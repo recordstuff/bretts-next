@@ -20,7 +20,7 @@ const User: FC = () => {
     const [user, setUser] = useState<UserDetail>(emptyUserDetail())
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
-    const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
+    const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     const { id } = useParams<{id: string}>()
@@ -74,7 +74,7 @@ const User: FC = () => {
     }
 
     const upsert = async (): Promise<void> => {
-        // dispatch(pleaseWait())
+        pleaseWait()
 
         if (id === undefined) {
             const newUser: UserNew = { ...user, Password: password }
@@ -85,7 +85,7 @@ const User: FC = () => {
                 router.push(`/user/${userDetail.Guid}`)
             }
             catch (ex: unknown) {
-                //dispatch(clearAllWaits())
+                clearAllWaits()
                 if (ex instanceof AxiosError 
                  && ex.response?.status === HTTP_STATUS_CODES.CONFLICT) {
                     // email already exists
@@ -102,7 +102,7 @@ const User: FC = () => {
             setUser(await userClient.updateUser(newUser))
         }
 
-        // dispatch(doneWaiting())
+        doneWaiting()
     }
 
     const handleCancel = (): void => {
@@ -114,7 +114,18 @@ const User: FC = () => {
         }
     }
 
-    const handleDelete = (): void => {
+    const handleDelete = async (): Promise<void> => {
+        if (id === undefined) {
+            return
+        }
+        
+        pleaseWait()
+
+        await userClient.deleteUser(id)
+
+        doneWaiting()
+
+        router.back()
     }
 
     return (
