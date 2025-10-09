@@ -7,7 +7,7 @@ services:
   react-app:
 # build from Dockerfile
     build: .
-# expose 80 and 443 as hosting and container ports
+# we need https. http is 3000
     ports:
-    - 80:3000
+    - 3000:3000
     
