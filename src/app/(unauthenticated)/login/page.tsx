@@ -74,7 +74,7 @@ const Layout: FC = () => {
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
             <Grid item lg={4} container direction="column" margin={2} spacing={2}>
                 <Grid item>
-                    To login, you may populate with valid credentials.
+                    This is a React sample using NextJS.  Log in with Admin and User rights to see all the options including Users CRUD operations.
                 </Grid>
                 <Grid item sx={{textAlign: 'center'}}>
                     <ButtonGroup variant="text" aria-label="Populate with Credentials">
