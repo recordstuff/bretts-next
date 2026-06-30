@@ -89,7 +89,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
                             {pageTitle}
                         </Typography>
                         <Box sx={{ marginLeft: 'auto' }}>
-                            {localStorage.getItem(JwtField.DisplayName)}
+                            {sessionStorage.getItem(JwtField.DisplayName)}
                             <a href="/login" title='Go back to the login screen.'>
                                 <Typography sx={{ fontSize: '.9em' }}>Logout</Typography>
                             </a>

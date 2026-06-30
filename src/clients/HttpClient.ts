@@ -35,7 +35,7 @@ abstract class HttpBase {
     }
 
     private injectToken(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
-        const token = localStorage.getItem(ENCODED_TOKEN_NAME)
+        const token = sessionStorage.getItem(ENCODED_TOKEN_NAME)
 
         if (token && config?.headers) {
             config.headers.Authorization = `Bearer ${token}`

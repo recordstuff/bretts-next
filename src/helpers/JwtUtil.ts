@@ -2,7 +2,7 @@ import { ENCODED_TOKEN_NAME, JwtField, JwtRole } from "../models/Jwt"
 
 class JwtUtil {
     public get isExpired() : boolean {
-        const expirationSecondsStr = localStorage.getItem(JwtField.ExpirationSeconds)
+        const expirationSecondsStr = sessionStorage.getItem(JwtField.ExpirationSeconds)
 
         if (expirationSecondsStr === null) return true
 
@@ -14,7 +14,7 @@ class JwtUtil {
     public hasMultipleRoles(): boolean {
         if (this.isExpired) return false
 
-        const rolesStr = localStorage.getItem(JwtField.Roles)
+        const rolesStr = sessionStorage.getItem(JwtField.Roles)
 
         if (rolesStr === null) return false
 
@@ -28,7 +28,7 @@ class JwtUtil {
         
         if (role === JwtRole.Any) return true
 
-        const rolesStr = localStorage.getItem(JwtField.Roles)
+        const rolesStr = sessionStorage.getItem(JwtField.Roles)
 
         if (rolesStr === null) return false
 
@@ -61,10 +61,10 @@ class JwtUtil {
                 }
 
                 if (expirationSeconds !== undefined && roles !== undefined && displayName !== undefined) {
-                    localStorage.setItem(ENCODED_TOKEN_NAME, encodedToken)
-                    localStorage.setItem(JwtField.DisplayName, displayName)                    
-                    localStorage.setItem(JwtField.ExpirationSeconds, expirationSeconds)
-                    localStorage.setItem(JwtField.Roles, JSON.stringify(roles))         
+                    sessionStorage.setItem(ENCODED_TOKEN_NAME, encodedToken)
+                    sessionStorage.setItem(JwtField.DisplayName, displayName)                    
+                    sessionStorage.setItem(JwtField.ExpirationSeconds, expirationSeconds)
+                    sessionStorage.setItem(JwtField.Roles, JSON.stringify(roles))         
                     return
                 }
             }
@@ -77,10 +77,10 @@ class JwtUtil {
     }
 
     public clear(): void {
-        localStorage.removeItem(ENCODED_TOKEN_NAME)
-        localStorage.removeItem(JwtField.DisplayName)        
-        localStorage.removeItem(JwtField.ExpirationSeconds)
-        localStorage.removeItem(JwtField.Roles)
+        sessionStorage.removeItem(ENCODED_TOKEN_NAME)
+        sessionStorage.removeItem(JwtField.DisplayName)        
+        sessionStorage.removeItem(JwtField.ExpirationSeconds)
+        sessionStorage.removeItem(JwtField.Roles)
     }
 }
 

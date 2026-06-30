@@ -24,7 +24,7 @@ export const LeftDrawerProvider: FC<Props> = ({ children }) => {
     const SESSION_KEY = 'OurBreadcrumbs'
 
     const initialState = (): string => {
-        const persistedBreadcrumbs = localStorage.getItem(SESSION_KEY)
+        const persistedBreadcrumbs = sessionStorage.getItem(SESSION_KEY)
 
         if (persistedBreadcrumbs !== null) {
             return persistedBreadcrumbs
@@ -44,7 +44,7 @@ export const LeftDrawerProvider: FC<Props> = ({ children }) => {
 
     const persist = (visitedPage: VisitedPage[]): void => {
         const state = JSON.stringify(visitedPage)
-        localStorage.setItem(SESSION_KEY, state)
+        sessionStorage.setItem(SESSION_KEY, state)
         setBreadcrumbsJSON(state)
     }
 
@@ -61,7 +61,7 @@ export const LeftDrawerProvider: FC<Props> = ({ children }) => {
             persist(newState)
         },
         addBreadcrumb: (visitedPage: VisitedPage) => { 
-            const persistedBreadcrumbs = localStorage.getItem(SESSION_KEY)
+            const persistedBreadcrumbs = sessionStorage.getItem(SESSION_KEY)
 
             if (persistedBreadcrumbs === null) {
                 return // should never happen
