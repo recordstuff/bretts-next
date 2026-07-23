@@ -7,3 +7,21 @@
         text-wrap: balance;
     }
 }
+
+.user-id-link,
+.user-id-link:visited {
+    color: #9dffb4;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+}
+
+.user-id-link:hover {
+    text-decoration-thickness: 2px;
+}
+
+.user-id-link:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid #9dffb4;
+    outline-offset: 2px;
+}

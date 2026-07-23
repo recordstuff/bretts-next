@@ -87,7 +87,7 @@ const Users: FC = () => {
                             {paginationResult.Items.map((row, index) => (
                                 <TableRow key={index}>
                                     <TableCell>
-                                        <Link href={`/user/${row.Guid}`}>{row.Guid}</Link>
+                                        <Link className="user-id-link" href={`/user/${row.Guid}`}>{row.Guid}</Link>
                                     </TableCell>
                                     <TableCell>
                                         {row.DisplayName}
