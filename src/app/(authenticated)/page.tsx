@@ -1,7 +1,7 @@
 'use client'
 
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import { Stack, Typography } from "@mui/material"
+import { Paper, Stack, Typography } from "@mui/material"
 import { FC, useContext, useEffect } from "react"
 
 const Home: FC = () => {
@@ -43,12 +43,16 @@ const Home: FC = () => {
                 </Typography>
             </div>
 
-            <div>
-                <Typography variant="h6" gutterBottom>Users</Typography>
+            <Paper
+                variant="outlined"
+                sx={{ borderColor: 'primary.main', borderWidth: 2, p: 3 }}
+            >
+                <Typography color="primary" variant="overline">Featured working example</Typography>
+                <Typography variant="h5" gutterBottom>Users</Typography>
                 <Typography>
-                    Available to administrators for finding, filtering, adding, editing, and deleting user accounts, including assigning user roles.
+                    The project&apos;s most complete working feature manages real user data through a full set of CRUD operations. Administrators can search and filter users, create accounts, edit user details and role assignments, and delete users.
                 </Typography>
-            </div>
+            </Paper>
 
             <div>
                 <Typography variant="h6" gutterBottom>Settings</Typography>
