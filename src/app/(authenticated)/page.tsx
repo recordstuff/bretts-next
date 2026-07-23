@@ -53,7 +53,7 @@ const Home: FC = () => {
                     <Typography variant="h6">Bacon Ipsum</Typography>
                 </Stack>
                 <Typography>
-                    Provides a text-heavy sample page. Use it to review typography, paragraph spacing, links, and how longer content reads within the application shell.
+                    A placeholder page for now. Its sample text keeps the navigation route and application layout represented until this area is replaced with a functional feature.
                 </Typography>
             </div>
 
@@ -77,7 +77,7 @@ const Home: FC = () => {
                     <Typography variant="h6">Settings</Typography>
                 </Stack>
                 <Typography>
-                    Available to administrators as the location for application-level configuration and future administrative options.
+                    An administrator-only placeholder for now. It reserves a location for future application-level configuration, but it does not currently provide working settings.
                 </Typography>
             </div>
         </Stack>
