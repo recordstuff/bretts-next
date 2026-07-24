@@ -6,8 +6,30 @@ import PeopleIcon from '@mui/icons-material/People'
 import SettingsIcon from '@mui/icons-material/Settings'
 import TableChartIcon from '@mui/icons-material/TableChart'
 import TableRowsIcon from '@mui/icons-material/TableRows'
-import { Paper, Stack, Typography } from "@mui/material"
+import { Card, CardActionArea, Stack, Typography } from "@mui/material"
+import Link from "next/link"
 import { FC, useContext, useEffect } from "react"
+
+interface OptionCardProps {
+    children: React.ReactNode
+    featured?: boolean
+    href: string
+}
+
+const OptionCard: FC<OptionCardProps> = ({ children, featured = false, href }) => (
+    <Card
+        variant="outlined"
+        sx={featured ? { borderColor: 'primary.main', borderWidth: 2 } : undefined}
+    >
+        <CardActionArea
+            component={Link}
+            href={href}
+            sx={{ p: featured ? 3 : 2 }}
+        >
+            {children}
+        </CardActionArea>
+    </Card>
+)
 
 const Home: FC = () => {
     const { atHome, setPageTitle } = useContext(LeftDrawerContext)
@@ -27,7 +49,7 @@ const Home: FC = () => {
                 </Typography>
             </div>
 
-            <div>
+            <OptionCard href="/gridexample">
                 <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                     <TableRowsIcon />
                     <Typography variant="h6">Grid Example</Typography>
@@ -35,9 +57,9 @@ const Home: FC = () => {
                 <Typography>
                     Demonstrates a responsive two-column form. Use it as a reference for grouping related fields and adapting a form to different screen sizes.
                 </Typography>
-            </div>
+            </OptionCard>
 
-            <div>
+            <OptionCard href="/exampletwo">
                 <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                     <TableChartIcon />
                     <Typography variant="h6">Example Two</Typography>
@@ -45,9 +67,9 @@ const Home: FC = () => {
                 <Typography>
                     Shows a larger responsive form split into two sections. Use it when comparing field spacing, section headings, and multi-row layouts.
                 </Typography>
-            </div>
+            </OptionCard>
 
-            <div>
+            <OptionCard href="/baconipsum">
                 <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                     <AgricultureIcon />
                     <Typography variant="h6">Bacon Ipsum</Typography>
@@ -55,12 +77,9 @@ const Home: FC = () => {
                 <Typography>
                     A placeholder page for now. Its sample text keeps the navigation route and application layout represented until this area is replaced with a functional feature.
                 </Typography>
-            </div>
+            </OptionCard>
 
-            <Paper
-                variant="outlined"
-                sx={{ borderColor: 'primary.main', borderWidth: 2, p: 3 }}
-            >
+            <OptionCard featured href="/users">
                 <Typography color="primary" variant="overline">Featured working example</Typography>
                 <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                     <PeopleIcon color="primary" />
@@ -69,9 +88,9 @@ const Home: FC = () => {
                 <Typography>
                     The project&apos;s most complete working feature manages real user data through a full set of CRUD operations. Administrators can search and filter users, create accounts, edit user details and role assignments, and delete users.
                 </Typography>
-            </Paper>
+            </OptionCard>
 
-            <div>
+            <OptionCard href="/settings">
                 <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                     <SettingsIcon />
                     <Typography variant="h6">Settings</Typography>
@@ -79,7 +98,7 @@ const Home: FC = () => {
                 <Typography>
                     An administrator-only placeholder for now. It reserves a location for future application-level configuration, but it does not currently provide working settings.
                 </Typography>
-            </div>
+            </OptionCard>
         </Stack>
     )
 }
