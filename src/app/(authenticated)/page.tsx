@@ -55,7 +55,7 @@ const Home: FC = () => {
                     <Typography variant="h6">Grid Example</Typography>
                 </Stack>
                 <Typography>
-                    Demonstrates a responsive two-column form. Use it as a reference for grouping related fields and adapting a form to different screen sizes.
+                    Contains two groups of fields: Contact and Address. They appear side by side on larger screens, then move into one column on smaller screens with Contact first and Address below it.
                 </Typography>
             </OptionCard>
 
@@ -65,7 +65,7 @@ const Home: FC = () => {
                     <Typography variant="h6">Example Two</Typography>
                 </Stack>
                 <Typography>
-                    Shows a larger responsive form split into two sections. Use it when comparing field spacing, section headings, and multi-row layouts.
+                    Shows a different responsive two-column pattern. Instead of moving whole field groups like Grid Example, its individual fields flow from two columns into a single column as the screen narrows.
                 </Typography>
             </OptionCard>
 
