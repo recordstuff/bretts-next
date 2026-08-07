@@ -4,7 +4,7 @@ import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from "r
 import { roleClient } from "../../../../clients/RoleClient"
 import { userClient } from "../../../../clients/UserClient"
 import { UserDetail, emptyUserDetail } from "../../../../models/UserDetail"
-import { Alert, Button, Snackbar, Stack, TextField } from "@mui/material"
+import { Button, Stack, TextField } from "@mui/material"
 import { NameGuidPair } from "../../../../models/NameGuidPair"
 import { UserNew } from "../../../../models/UserNew"
 import { AxiosError } from "axios"
@@ -13,9 +13,9 @@ import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
+import SuccessSnackbar from "@/components/SuccessSnackbar"
 import YesNoDialog from "@/components/YesNoDialog"
-
-const USER_CREATED_STORAGE_KEY = 'bretts-next-user-created'
+import { storeSuccessMessage, takeSuccessMessage } from "@/utils/successMessageStorage"
 
 const User: FC = () => {
 
@@ -24,7 +24,7 @@ const User: FC = () => {
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
     const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
-    const [createdSnackbarOpen, setCreatedSnackbarOpen] = useState<boolean>(false)
+    const [successMessage, setSuccessMessage] = useState<string | null>(null)
     const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -68,12 +68,15 @@ const User: FC = () => {
     }, [id, setPageTitle, addBreadcrumb, getRoles, getUser])
 
     useEffect(() => {
-        if (id === undefined || sessionStorage.getItem(USER_CREATED_STORAGE_KEY) !== 'true') {
+        if (id === undefined) {
             return
         }
 
-        sessionStorage.removeItem(USER_CREATED_STORAGE_KEY)
-        setCreatedSnackbarOpen(true)
+        const storedSuccessMessage = takeSuccessMessage()
+
+        if (storedSuccessMessage !== null) {
+            setSuccessMessage(storedSuccessMessage)
+        }
     }, [id])
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
@@ -96,7 +99,7 @@ const User: FC = () => {
 
             try {
                 const userDetail = await userClient.insertUser(newUser)
-                sessionStorage.setItem(USER_CREATED_STORAGE_KEY, 'true')
+                storeSuccessMessage('This user was created.')
                 router.push(`/user/${userDetail.Guid}`)
             }
             catch (ex: unknown) {
@@ -115,6 +118,7 @@ const User: FC = () => {
             newUser.Roles = selectedRoles
             
             setUser(await userClient.updateUser(newUser))
+            setSuccessMessage('This user was saved.')
         }
 
         doneWaiting()
@@ -141,7 +145,8 @@ const User: FC = () => {
 
         doneWaiting()
 
-        router.back()
+        storeSuccessMessage('This user was deleted.')
+        router.push('/users')
     }
 
     return (
@@ -169,21 +174,7 @@ const User: FC = () => {
                 onNo={() => setDeleteDialogOpen(false)}
                 onYes={handleDelete}
             />
-            <Snackbar
-                open={createdSnackbarOpen}
-                autoHideDuration={6000}
-                onClose={() => setCreatedSnackbarOpen(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert
-                    severity="success"
-                    variant="filled"
-                    onClose={() => setCreatedSnackbarOpen(false)}
-                    sx={{ width: '100%' }}
-                >
-                    This users was created.
-                </Alert>
-            </Snackbar>
+            <SuccessSnackbar message={successMessage} onClose={() => setSuccessMessage(null)} />
         </Stack>
     )
 }
