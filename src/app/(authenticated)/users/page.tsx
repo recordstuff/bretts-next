@@ -5,6 +5,7 @@ import { userClient } from "../../../clients/UserClient"
 import { PaginationResult, emptyPaginationResult } from "../../../models/PaginationResult"
 import { UserSummary } from "../../../models/UserSummary"
 import { Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from "@mui/material"
+import { alpha } from "@mui/material/styles"
 import { JwtRole } from "../../../models/Jwt"
 import AddIcon from '@mui/icons-material/Add';
 import Link from "next/link"
@@ -123,11 +124,38 @@ const Users: FC = () => {
                                                 active={active}
                                                 direction={active ? direction : 'asc'}
                                                 onClick={() => handleSort(column)}
-                                                sx={{
+                                                sx={(theme) => ({
                                                     textDecoration: 'underline',
                                                     textDecorationThickness: '1px',
                                                     textUnderlineOffset: '0.2em',
-                                                }}
+                                                    borderRadius: 1,
+                                                    px: 0.75,
+                                                    py: 0.25,
+                                                    mx: -0.75,
+                                                    my: -0.25,
+                                                    transition: theme.transitions.create([
+                                                        'background-color',
+                                                        'color',
+                                                        'text-shadow',
+                                                        'transform',
+                                                    ], {
+                                                        duration: theme.transitions.duration.shortest,
+                                                    }),
+                                                    '&:hover': {
+                                                        color: theme.palette.common.white,
+                                                        backgroundColor: alpha(theme.palette.common.white, 0.1),
+                                                        textShadow: `0 0 8px ${alpha(theme.palette.common.white, 0.4)}`,
+                                                    },
+                                                    '&:active': {
+                                                        color: theme.palette.common.white,
+                                                        backgroundColor: alpha(theme.palette.common.white, 0.18),
+                                                        transform: 'translateY(1px) scale(0.98)',
+                                                    },
+                                                    '&.Mui-focusVisible': {
+                                                        outline: `2px solid ${theme.palette.common.white}`,
+                                                        outlineOffset: 2,
+                                                    },
+                                                })}
                                             >
                                                 {label}
                                             </TableSortLabel>
