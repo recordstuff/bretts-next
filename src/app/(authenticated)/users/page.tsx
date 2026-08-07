@@ -123,6 +123,11 @@ const Users: FC = () => {
                                                 active={active}
                                                 direction={active ? direction : 'asc'}
                                                 onClick={() => handleSort(column)}
+                                                sx={{
+                                                    textDecoration: 'underline',
+                                                    textDecorationThickness: '1px',
+                                                    textUnderlineOffset: '0.2em',
+                                                }}
                                             >
                                                 {label}
                                             </TableSortLabel>
