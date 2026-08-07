@@ -13,6 +13,9 @@ import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
+import AppSnackbar from "@/components/AppSnackbar"
+import YesNoDialog from "@/components/YesNoDialog"
+import { storeSuccessMessage, takeSuccessMessage } from "@/utils/successMessageStorage"
 
 const User: FC = () => {
 
@@ -20,6 +23,8 @@ const User: FC = () => {
     const [user, setUser] = useState<UserDetail>(emptyUserDetail())
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
+    const [successMessage, setSuccessMessage] = useState<string | null>(null)
     const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -62,6 +67,18 @@ const User: FC = () => {
         getUser()
     }, [id, setPageTitle, addBreadcrumb, getRoles, getUser])
 
+    useEffect(() => {
+        if (id === undefined) {
+            return
+        }
+
+        const storedSuccessMessage = takeSuccessMessage()
+
+        if (storedSuccessMessage !== null) {
+            setSuccessMessage(storedSuccessMessage)
+        }
+    }, [id])
+
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         if (event.target.name === 'Password') {
             setPassword(event.target.value)
@@ -82,6 +99,7 @@ const User: FC = () => {
 
             try {
                 const userDetail = await userClient.insertUser(newUser)
+                storeSuccessMessage('This user was created.')
                 router.push(`/user/${userDetail.Guid}`)
             }
             catch (ex: unknown) {
@@ -100,6 +118,7 @@ const User: FC = () => {
             newUser.Roles = selectedRoles
             
             setUser(await userClient.updateUser(newUser))
+            setSuccessMessage('This user was saved.')
         }
 
         doneWaiting()
@@ -118,14 +137,16 @@ const User: FC = () => {
         if (id === undefined) {
             return
         }
-        
+
+        setDeleteDialogOpen(false)
         pleaseWait()
 
         await userClient.deleteUser(id)
 
         doneWaiting()
 
-        router.back()
+        storeSuccessMessage('This user was deleted.')
+        router.push('/users')
     }
 
     return (
@@ -144,9 +165,20 @@ const User: FC = () => {
             />
             <Stack direction='row' spacing={2}>
                 <Button onClick={upsert} color='primary' variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
-                <Button color="secondary" onClick={handleCancel}>Cancel</Button>
-                {id !== undefined && <Button variant="contained" color="error" onClick={handleDelete}>Delete</Button>}
+                <Button color="secondary" onClick={handleCancel}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
+                {id !== undefined && <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>}
             </Stack>
+            <YesNoDialog
+                open={deleteDialogOpen}
+                question="Are you sure you want to delete this user?"
+                onNo={() => setDeleteDialogOpen(false)}
+                onYes={handleDelete}
+            />
+            <AppSnackbar
+                message={successMessage}
+                severity="success"
+                onClose={() => setSuccessMessage(null)}
+            />
         </Stack>
     )
 }
