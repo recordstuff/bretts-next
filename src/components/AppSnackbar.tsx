@@ -2,22 +2,24 @@
 
 import { Alert, Fade, Snackbar } from '@mui/material'
 import { FC } from 'react'
+import type { AlertColor } from '@mui/material'
 
-interface SuccessSnackbarProps {
+interface AppSnackbarProps {
     message: string | null
+    severity: AlertColor
     onClose: () => void
 }
 
-const SuccessSnackbar: FC<SuccessSnackbarProps> = ({ message, onClose }) => (
+const AppSnackbar: FC<AppSnackbarProps> = ({ message, severity, onClose }) => (
     <Snackbar
         open={message !== null}
         autoHideDuration={4000}
         TransitionComponent={Fade}
         onClose={onClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >
         <Alert
-            severity="success"
+            severity={severity}
             variant="filled"
             onClose={onClose}
             sx={{ width: '100%' }}
@@ -27,4 +29,4 @@ const SuccessSnackbar: FC<SuccessSnackbarProps> = ({ message, onClose }) => (
     </Snackbar>
 )
 
-export default SuccessSnackbar
+export default AppSnackbar

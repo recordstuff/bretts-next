@@ -13,7 +13,7 @@ import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import SuccessSnackbar from "@/components/SuccessSnackbar"
+import AppSnackbar from "@/components/AppSnackbar"
 import YesNoDialog from "@/components/YesNoDialog"
 import { storeSuccessMessage, takeSuccessMessage } from "@/utils/successMessageStorage"
 
@@ -174,7 +174,11 @@ const User: FC = () => {
                 onNo={() => setDeleteDialogOpen(false)}
                 onYes={handleDelete}
             />
-            <SuccessSnackbar message={successMessage} onClose={() => setSuccessMessage(null)} />
+            <AppSnackbar
+                message={successMessage}
+                severity="success"
+                onClose={() => setSuccessMessage(null)}
+            />
         </Stack>
     )
 }

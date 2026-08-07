@@ -14,7 +14,7 @@ import OptionFilter from "@/components/OptionFilter"
 import Paginator from "@/components/Paginator"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import SuccessSnackbar from "@/components/SuccessSnackbar"
+import AppSnackbar from "@/components/AppSnackbar"
 import { takeSuccessMessage } from "@/utils/successMessageStorage"
 
 const PAGE_SIZE = 5
@@ -112,7 +112,11 @@ const Users: FC = () => {
                     setPage={setPage}
                 />
             </Stack>
-            <SuccessSnackbar message={successMessage} onClose={() => setSuccessMessage(null)} />
+            <AppSnackbar
+                message={successMessage}
+                severity="success"
+                onClose={() => setSuccessMessage(null)}
+            />
         </>
     )
 }
