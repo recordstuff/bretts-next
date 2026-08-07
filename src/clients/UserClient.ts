@@ -6,6 +6,8 @@ import { HttpClient } from "./HttpClient";
 import { UserDetail } from "../models/UserDetail";
 import { UserNew } from "../models/UserNew";
 import { LoginSession } from "../models/LoginSession";
+import { UsersSortColumn } from "../models/UsersSortColumn";
+import { SortDirection } from "../models/SortDirection";
 
 class UserClient extends HttpClient {
     constructor() {
@@ -20,9 +22,18 @@ class UserClient extends HttpClient {
         page: number,
         pageSize: number,
         searchText: string | null = null,
-        roleFilter: JwtRole = JwtRole.Any
+        roleFilter: JwtRole = JwtRole.Any,
+        sortColumn: UsersSortColumn = UsersSortColumn.DisplayName,
+        sortDirection: SortDirection = SortDirection.Ascending
     ): Promise<PaginationResult<UserSummary>> {
-        return this.get<PaginationResult<UserSummary>>('users', {page, pageSize, searchText, roleFilter})
+        return this.get<PaginationResult<UserSummary>>('users', {
+            page,
+            pageSize,
+            searchText,
+            roleFilter,
+            sortColumn,
+            sortDirection,
+        })
     }
 
     public getUser(id: string): Promise<UserDetail> {
