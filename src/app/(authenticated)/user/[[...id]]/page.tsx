@@ -4,7 +4,7 @@ import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from "r
 import { roleClient } from "../../../../clients/RoleClient"
 import { userClient } from "../../../../clients/UserClient"
 import { UserDetail, emptyUserDetail } from "../../../../models/UserDetail"
-import { Button, Stack, TextField } from "@mui/material"
+import { Alert, Button, Snackbar, Stack, TextField } from "@mui/material"
 import { NameGuidPair } from "../../../../models/NameGuidPair"
 import { UserNew } from "../../../../models/UserNew"
 import { AxiosError } from "axios"
@@ -13,6 +13,9 @@ import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
+import YesNoDialog from "@/components/YesNoDialog"
+
+const USER_CREATED_STORAGE_KEY = 'bretts-next-user-created'
 
 const User: FC = () => {
 
@@ -20,6 +23,8 @@ const User: FC = () => {
     const [user, setUser] = useState<UserDetail>(emptyUserDetail())
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
+    const [createdSnackbarOpen, setCreatedSnackbarOpen] = useState<boolean>(false)
     const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -62,6 +67,15 @@ const User: FC = () => {
         getUser()
     }, [id, setPageTitle, addBreadcrumb, getRoles, getUser])
 
+    useEffect(() => {
+        if (id === undefined || sessionStorage.getItem(USER_CREATED_STORAGE_KEY) !== 'true') {
+            return
+        }
+
+        sessionStorage.removeItem(USER_CREATED_STORAGE_KEY)
+        setCreatedSnackbarOpen(true)
+    }, [id])
+
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         if (event.target.name === 'Password') {
             setPassword(event.target.value)
@@ -82,6 +96,7 @@ const User: FC = () => {
 
             try {
                 const userDetail = await userClient.insertUser(newUser)
+                sessionStorage.setItem(USER_CREATED_STORAGE_KEY, 'true')
                 router.push(`/user/${userDetail.Guid}`)
             }
             catch (ex: unknown) {
@@ -118,7 +133,8 @@ const User: FC = () => {
         if (id === undefined) {
             return
         }
-        
+
+        setDeleteDialogOpen(false)
         pleaseWait()
 
         await userClient.deleteUser(id)
@@ -144,9 +160,30 @@ const User: FC = () => {
             />
             <Stack direction='row' spacing={2}>
                 <Button onClick={upsert} color='primary' variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
-                <Button color="secondary" onClick={handleCancel}>Cancel</Button>
-                {id !== undefined && <Button variant="contained" color="error" onClick={handleDelete}>Delete</Button>}
+                <Button color="secondary" onClick={handleCancel}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
+                {id !== undefined && <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>}
             </Stack>
+            <YesNoDialog
+                open={deleteDialogOpen}
+                question="Are you sure you want to delete this user?"
+                onNo={() => setDeleteDialogOpen(false)}
+                onYes={handleDelete}
+            />
+            <Snackbar
+                open={createdSnackbarOpen}
+                autoHideDuration={6000}
+                onClose={() => setCreatedSnackbarOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    severity="success"
+                    variant="filled"
+                    onClose={() => setCreatedSnackbarOpen(false)}
+                    sx={{ width: '100%' }}
+                >
+                    This users was created.
+                </Alert>
+            </Snackbar>
         </Stack>
     )
 }
