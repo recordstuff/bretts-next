@@ -12,6 +12,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <html lang="en">
             <head>
                 {/* process.env.NODE_ENV === 'development' && <script src="http://localhost:8097"></script> */}
+                <title>Brett's NextJS React App</title>
             </head>
             <body>
                 <AppRouterCacheProvider>
