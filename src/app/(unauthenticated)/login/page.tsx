@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, ButtonGroup, Grid, Snackbar, TextField } from "@mui/material"
+import { Box, Button, ButtonGroup, Grid, TextField } from "@mui/material"
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react"
 import { HTTP_STATUS_CODES } from "../../../clients/HttpClient"
 import { jwtUtil } from "../../../helpers/JwtUtil"
@@ -9,6 +9,7 @@ import { AxiosError } from "axios"
 import { userClient } from "../../../clients/UserClient"
 import { useRouter } from "next/navigation"
 import { PleaseWaitContext } from "../../../components/PleaseWaitProvider"
+import AppSnackbar from "@/components/AppSnackbar"
 
 const Layout: FC = () => {
 
@@ -121,12 +122,11 @@ const Layout: FC = () => {
                         Login
                     </Button>
                 </Grid>
-                <Snackbar
-                    open={isInvalidCredentials}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                    autoHideDuration={3000}
-                    message="The Email or Password was incorrect."
-                />                
+                <AppSnackbar
+                    message={isInvalidCredentials ? 'The Email or Password was incorrect.' : null}
+                    severity="warning"
+                    onClose={() => setIsInvalidCredentials(false)}
+                />
             </Grid>
         </Box>
     )

@@ -14,6 +14,8 @@ import OptionFilter from "@/components/OptionFilter"
 import Paginator from "@/components/Paginator"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
+import AppSnackbar from "@/components/AppSnackbar"
+import { takeSuccessMessage } from "@/utils/successMessageStorage"
 
 const PAGE_SIZE = 5
 
@@ -22,6 +24,7 @@ const Users: FC = () => {
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
     const [roleFilter, setRoleFilter] = useState<JwtRole>(JwtRole.Any)
+    const [successMessage, setSuccessMessage] = useState<string | null>(null)
     const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -40,6 +43,14 @@ const Users: FC = () => {
         firstBreadcrumb({ title: 'Users', url: '/users' })
         getUsers()
     }, [setPageTitle, firstBreadcrumb, getUsers])
+
+    useEffect(() => {
+        const storedSuccessMessage = takeSuccessMessage()
+
+        if (storedSuccessMessage !== null) {
+            setSuccessMessage(storedSuccessMessage)
+        }
+    }, [])
 
     return (
         <>
@@ -105,6 +116,11 @@ const Users: FC = () => {
                     setPage={setPage}
                 />
             </Stack>
+            <AppSnackbar
+                message={successMessage}
+                severity="success"
+                onClose={() => setSuccessMessage(null)}
+            />
         </>
     )
 }
