@@ -45,7 +45,11 @@ const Users: FC = () => {
     }, [setPageTitle, firstBreadcrumb, getUsers])
 
     useEffect(() => {
-        setSuccessMessage(takeSuccessMessage())
+        const storedSuccessMessage = takeSuccessMessage()
+
+        if (storedSuccessMessage !== null) {
+            setSuccessMessage(storedSuccessMessage)
+        }
     }, [])
 
     return (
