@@ -41,12 +41,11 @@ class JwtUtil {
         try {
             if (encodedToken.length > 0) {
                 const parts = encodedToken.split('.')
-                let body = parts[1].replace('-', '+').replace('_', '/')
-                const padding = 4 - (body.length % 4)
-    
-                if (padding > 0) {
-                    body = body.padEnd(padding)
-                }
+                let body = parts[1]
+                    .replaceAll('-', '+')
+                    .replaceAll('_', '/')
+                const padding = (4 - body.length % 4) % 4
+                body = body.padEnd(body.length + padding, '=')
 
                 const jwt: Record<JwtField, string | number | string[]> = JSON.parse(atob(body))
                 
