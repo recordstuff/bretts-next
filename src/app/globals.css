@@ -1,3 +1,8 @@
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
 .user-id-link,
 .user-id-link:visited {
     color: #9dffb4;
