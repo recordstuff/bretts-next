@@ -95,7 +95,7 @@ const Home: FC = () => {
                     <Typography variant="h6">Settings</Typography>
                 </Stack>
                 <Typography>
-                    An administrator-only page for testing the global exception handler, writing a structured test log entry, and shutting down the sandbox backend (for the more mischievous users).
+                    An administrator-only page for testing the global exception handler, writing a structured test log entry, and shutting down the sandbox backend for the more mischievous admins. <span aria-hidden="true">😈</span>
                 </Typography>
             </OptionCard>
         </Stack>
