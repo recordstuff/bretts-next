@@ -7,7 +7,7 @@ export interface MenuOption {
     Route: string
     Icon: ComponentType
     Role: JwtRole
-    Breadcrumb?: VisitedPage
+    Breadcrumb: VisitedPage
     ChildRoutes?: string[]
 }
 

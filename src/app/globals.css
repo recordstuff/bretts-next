@@ -3,6 +3,31 @@ a {
     text-decoration: inherit;
 }
 
+.logout-link {
+    color: inherit;
+    display: block;
+    font-size: .9em;
+    text-decoration: none;
+    transition: color 120ms ease, font-weight 120ms ease, transform 80ms ease;
+}
+
+.logout-link:hover {
+    color: #d0d0d0;
+    font-weight: 700;
+}
+
+.logout-link:active {
+    color: #a8a8a8;
+    font-weight: 700;
+    transform: translateY(1px);
+}
+
+.logout-link:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
 .user-id-link,
 .user-id-link:visited {
     color: #9dffb4;

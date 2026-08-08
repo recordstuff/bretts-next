@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const LeftDrawerContext = createContext({
-    firstBreadcrumb: (_visitedPage?: VisitedPage) => { },
+    firstBreadcrumb: (_visitedPage: VisitedPage) => { },
     addBreadcrumb: (visitedPage: VisitedPage) => { },
     breadcrumbsJSON: JSON.stringify([]),
     pageTitle: '',
@@ -51,8 +51,8 @@ export const LeftDrawerProvider: FC<Props> = ({ children }) => {
     const [breadcrumbsJSON, setBreadcrumbsJSON] = useState<string>(initialState())
 
     const memorized = useMemo(() => ({
-        firstBreadcrumb: (visitedPage?: VisitedPage) => {
-            const newState: VisitedPage[] = visitedPage === undefined ? [] : [visitedPage]
+        firstBreadcrumb: (visitedPage: VisitedPage) => {
+            const newState: VisitedPage[] = [visitedPage]
             persist(newState)
         },
         addBreadcrumb: (visitedPage: VisitedPage) => { 

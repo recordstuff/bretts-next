@@ -10,9 +10,6 @@ export const Breadcrumbinator: FC = () => {
 
     return (
         <Breadcrumbs sx={{ paddingBottom: 1 }}>
-            <Link href='/'>
-                Home
-            </Link>
             {memorized.map((page, index) => {
                 if (index === memorized.length - 1) {
                     return (

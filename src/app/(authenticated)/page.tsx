@@ -32,11 +32,12 @@ const OptionCard: FC<OptionCardProps> = ({ children, featured = false, href }) =
 )
 
 const Home: FC = () => {
-    const { setPageTitle } = useContext(LeftDrawerContext)
+    const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     useEffect(() => {
         setPageTitle('Home')
-    }, [setPageTitle])
+        firstBreadcrumb({ title: 'Home', url: '/' })
+    }, [firstBreadcrumb, setPageTitle])
 
     return (
         <Stack spacing={3}>
