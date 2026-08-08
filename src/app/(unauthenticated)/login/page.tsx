@@ -89,7 +89,7 @@ const Layout: FC = () => {
                     width: '100%',
                     maxWidth: '36rem',
                     padding: { xs: 2, sm: 3 },
-                    borderColor: 'divider',
+                    borderColor: 'primary.main',
                     transform: { xl: 'translateY(-4rem)' },
                 }}>
                 <Grid container direction="column" spacing={2}>
