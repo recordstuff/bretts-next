@@ -146,9 +146,34 @@ const LeftDrawer: FC<Props> = ({ children }) => {
                         </Typography>
                         <Box sx={{ marginLeft: 'auto' }}>
                             {sessionStorage.getItem(JwtField.DisplayName)}
-                            <a href="/login" title='Go back to the login screen.'>
-                                <Typography sx={{ fontSize: '.9em' }}>Logout</Typography>
-                            </a>
+                            <Typography
+                                component={Link}
+                                href="/login"
+                                title='Go back to the login screen.'
+                                sx={{
+                                    color: 'inherit',
+                                    display: 'block',
+                                    fontSize: '.9em',
+                                    textDecoration: 'none',
+                                    transition: 'color 120ms ease, font-weight 120ms ease, transform 80ms ease',
+                                    '&:hover': {
+                                        color: 'grey.300',
+                                        fontWeight: 500,
+                                    },
+                                    '&:active': {
+                                        color: 'grey.400',
+                                        fontWeight: 700,
+                                        transform: 'translateY(1px)',
+                                    },
+                                    '&:focus-visible': {
+                                        borderRadius: 0.5,
+                                        outline: '2px solid currentColor',
+                                        outlineOffset: '2px',
+                                    },
+                                }}
+                            >
+                                Logout
+                            </Typography>
                         </Box>
                     </Toolbar>
                 </AppBar>
