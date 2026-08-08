@@ -4,7 +4,8 @@ import { FC, useCallback, useContext, useEffect, useState } from "react"
 import { userClient } from "../../../clients/UserClient"
 import { PaginationResult, emptyPaginationResult } from "../../../models/PaginationResult"
 import { UserSummary } from "../../../models/UserSummary"
-import { Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
+import { Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from "@mui/material"
+import { alpha } from "@mui/material/styles"
 import { JwtRole } from "../../../models/Jwt"
 import AddIcon from '@mui/icons-material/Add';
 import Link from "next/link"
@@ -16,14 +17,23 @@ import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import AppSnackbar from "@/components/AppSnackbar"
 import { takeSuccessMessage } from "@/utils/successMessageStorage"
+import { UsersSortColumn } from "@/models/UsersSortColumn"
+import { SortDirection } from "@/models/SortDirection"
 
 const PAGE_SIZE = 5
+const USER_SORT_COLUMNS = [
+    { label: 'Id', column: UsersSortColumn.Id },
+    { label: 'Display Name', column: UsersSortColumn.DisplayName },
+    { label: 'Email', column: UsersSortColumn.Email },
+] as const
 
 const Users: FC = () => {
     const [paginationResult, setPaginationResult] = useState<PaginationResult<UserSummary>>(emptyPaginationResult())
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
     const [roleFilter, setRoleFilter] = useState<JwtRole>(JwtRole.Any)
+    const [sortColumn, setSortColumn] = useState<UsersSortColumn>(UsersSortColumn.DisplayName)
+    const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Ascending)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
     const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
@@ -31,12 +41,33 @@ const Users: FC = () => {
     const getUsers = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        const response = await userClient.getUsers(page, PAGE_SIZE, searchText, roleFilter)
+        const response = await userClient.getUsers(
+            page,
+            PAGE_SIZE,
+            searchText,
+            roleFilter,
+            sortColumn,
+            sortDirection
+        )
 
         setPaginationResult(response)
 
         doneWaiting()
-    }, [page, searchText, roleFilter, pleaseWait, doneWaiting])
+    }, [page, searchText, roleFilter, sortColumn, sortDirection, pleaseWait, doneWaiting])
+
+    const handleSort = (column: UsersSortColumn): void => {
+        setPage(1)
+
+        if (column === sortColumn) {
+            setSortDirection(sortDirection === SortDirection.Ascending
+                ? SortDirection.Descending
+                : SortDirection.Ascending)
+            return
+        }
+
+        setSortColumn(column)
+        setSortDirection(SortDirection.Ascending)
+    }
 
     useEffect(() => {
         setPageTitle('Users')
@@ -83,15 +114,54 @@ const Users: FC = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>
-                                    Id
-                                </TableCell>
-                                <TableCell>
-                                    Display Name
-                                </TableCell>
-                                <TableCell>
-                                    Email
-                                </TableCell>
+                                {USER_SORT_COLUMNS.map(({ label, column }) => {
+                                    const active = sortColumn === column
+                                    const direction = sortDirection === SortDirection.Ascending ? 'asc' : 'desc'
+
+                                    return (
+                                        <TableCell key={column} sortDirection={active ? direction : false}>
+                                            <TableSortLabel
+                                                active={active}
+                                                direction={active ? direction : 'asc'}
+                                                onClick={() => handleSort(column)}
+                                                sx={(theme) => ({
+                                                    textDecoration: 'underline',
+                                                    textDecorationThickness: '1px',
+                                                    textUnderlineOffset: '0.2em',
+                                                    borderRadius: 1,
+                                                    px: 0.75,
+                                                    py: 0.25,
+                                                    mx: -0.75,
+                                                    my: -0.25,
+                                                    transition: theme.transitions.create([
+                                                        'background-color',
+                                                        'color',
+                                                        'text-shadow',
+                                                        'transform',
+                                                    ], {
+                                                        duration: theme.transitions.duration.shortest,
+                                                    }),
+                                                    '&:hover': {
+                                                        color: theme.palette.common.white,
+                                                        backgroundColor: alpha(theme.palette.common.white, 0.1),
+                                                        textShadow: `0 0 8px ${alpha(theme.palette.common.white, 0.4)}`,
+                                                    },
+                                                    '&:active': {
+                                                        color: theme.palette.common.white,
+                                                        backgroundColor: alpha(theme.palette.common.white, 0.18),
+                                                        transform: 'translateY(1px) scale(0.98)',
+                                                    },
+                                                    '&.Mui-focusVisible': {
+                                                        outline: `2px solid ${theme.palette.common.white}`,
+                                                        outlineOffset: 2,
+                                                    },
+                                                })}
+                                            >
+                                                {label}
+                                            </TableSortLabel>
+                                        </TableCell>
+                                    )
+                                })}
                             </TableRow>
                         </TableHead>
                         <TableBody>
