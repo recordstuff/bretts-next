@@ -13,13 +13,13 @@ a {
 }
 
 .logout-link:hover {
-    color: #1a1a1a;
+    color: #ce93d8;
     font-weight: 800;
     transform: scale(1.05);
 }
 
 .logout-link:active {
-    color: #000;
+    color: #ab47bc;
     font-weight: 800;
     transform: translateY(1px) scale(.97);
 }
