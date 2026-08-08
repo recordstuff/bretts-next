@@ -95,7 +95,7 @@ const Home: FC = () => {
                     <Typography variant="h6">Settings</Typography>
                 </Stack>
                 <Typography>
-                    An administrator-only placeholder for now. It reserves a location for future application-level configuration, but it does not currently provide working settings.
+                    An administrator-only page for testing the global exception handler, writing a structured test log entry, and shutting down the sandbox backend (for the more mischievous users).
                 </Typography>
             </OptionCard>
         </Stack>
