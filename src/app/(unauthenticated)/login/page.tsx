@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, ButtonGroup, Grid, TextField } from "@mui/material"
+import { Box, Button, Grid, Link, Paper, TextField } from "@mui/material"
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react"
 import { HTTP_STATUS_CODES } from "../../../clients/HttpClient"
 import { jwtUtil } from "../../../helpers/JwtUtil"
@@ -72,62 +72,97 @@ const Layout: FC = () => {
     }, []);
 
     return (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-            <Grid item lg={4} container direction="column" margin={2} spacing={2}>
-                <Grid item>
-                    This is a React sample using NextJS.  Log in with Admin and User rights to see all the options including Users CRUD operations.
-                </Grid>
-                <Grid item sx={{textAlign: 'center'}}>
-                    <ButtonGroup variant="text" aria-label="Populate with Credentials">
-                        <Button onClick={populateWithAdminAndUserCreds}> Admin and User rights</Button>
-                        <Button onClick={populateWithAdminCreds}>Admin rights only</Button>
-                        <Button onClick={populateWithUserCreds}>User rights only</Button>
-                    </ButtonGroup>
-                </Grid>
-                <Grid item>
-                    <TextField
-                        fullWidth
-                        name="Email"
-                        label="Email"
-                        type="email"
-                        value={userCredentials.Email}
-                        onChange={credentialsChanged}
-                        required
-                        error={useErrorCondition && userCredentials.Email.length === 0}
-                        helperText={useErrorCondition && userCredentials.Email.length === 0 && "Email cannot be blank."}
-                        InputLabelProps={{shrink: true}} /* "fix" issue with chrome autofill */
+        <Box
+            component="main"
+            sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: { xs: '50vh', xl: '100dvh' },
+                boxSizing: 'border-box',
+                padding: 2,
+                paddingTop: { xs: 4, sm: 2 },
+            }}>
+            <Paper
+                variant="outlined"
+                sx={{
+                    width: '100%',
+                    maxWidth: '36rem',
+                    padding: { xs: 2, sm: 3 },
+                    borderColor: 'primary.main',
+                    transform: { xl: 'translateY(-4rem)' },
+                }}>
+                <Grid container direction="column" spacing={2}>
+                    <Grid item>
+                        This is a React sample using NextJS.  Log in with Admin and User rights to see all the options including Users CRUD operations.
+                    </Grid>
+                    <Grid item>
+                        <Box
+                            role="group"
+                            aria-label="Populate with Credentials"
+                            sx={{
+                                display: 'grid',
+                                gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+                            }}>
+                            <Button onClick={populateWithAdminAndUserCreds}> Admin and User rights</Button>
+                            <Button onClick={populateWithAdminCreds}>Admin rights only</Button>
+                            <Button onClick={populateWithUserCreds}>User rights only</Button>
+                        </Box>
+                    </Grid>
+                    <Grid item>
+                        <TextField
+                            fullWidth
+                            name="Email"
+                            label="Email"
+                            type="email"
+                            value={userCredentials.Email}
+                            onChange={credentialsChanged}
+                            required
+                            error={useErrorCondition && userCredentials.Email.length === 0}
+                            helperText={useErrorCondition && userCredentials.Email.length === 0 && "Email cannot be blank."}
+                            InputLabelProps={{shrink: true}} /* "fix" issue with chrome autofill */
+                        />
+                    </Grid>
+                    <Grid item>
+                        <TextField
+                            fullWidth
+                            name="Password"
+                            label="Password"
+                            type="password"
+                            value={userCredentials.Password}
+                            onChange={credentialsChanged}
+                            required
+                            error={useErrorCondition && userCredentials.Password.length === 0}
+                            helperText={useErrorCondition && userCredentials.Password.length === 0 && "Password cannot be blank."}
+                            InputLabelProps={{shrink: true}} /* "fix" issue with chrome autofill */
+                        />
+                    </Grid>
+                    <Grid item>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            color="primary"
+                            onClick={login}
+                            disabled={useErrorCondition && (userCredentials.Email.length === 0 || userCredentials.Password.length === 0)}>
+                            Login
+                        </Button>
+                    </Grid>
+                    <Grid item sx={{textAlign: 'right'}}>
+                        <Link
+                            href="https://brettdrake.org/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            color="primary">
+                            brettdrake.org
+                        </Link>
+                    </Grid>
+                    <AppSnackbar
+                        message={isInvalidCredentials ? 'The Email or Password was incorrect.' : null}
+                        severity="warning"
+                        onClose={() => setIsInvalidCredentials(false)}
                     />
                 </Grid>
-                <Grid item>
-                    <TextField
-                        fullWidth
-                        name="Password"
-                        label="Password"
-                        type="password"
-                        value={userCredentials.Password}
-                        onChange={credentialsChanged}
-                        required
-                        error={useErrorCondition && userCredentials.Password.length === 0}
-                        helperText={useErrorCondition && userCredentials.Password.length === 0 && "Password cannot be blank."}
-                        InputLabelProps={{shrink: true}} /* "fix" issue with chrome autofill */
-                    />
-                </Grid>
-                <Grid item>
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        color="primary"
-                        onClick={login}
-                        disabled={useErrorCondition && (userCredentials.Email.length === 0 || userCredentials.Password.length === 0)}>
-                        Login
-                    </Button>
-                </Grid>
-                <AppSnackbar
-                    message={isInvalidCredentials ? 'The Email or Password was incorrect.' : null}
-                    severity="warning"
-                    onClose={() => setIsInvalidCredentials(false)}
-                />
-            </Grid>
+            </Paper>
         </Box>
     )
 }
