@@ -1,13 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer utilities {
-    .text-balance {
-        text-wrap: balance;
-    }
-}
-
 .user-id-link,
 .user-id-link:visited {
     color: #9dffb4;

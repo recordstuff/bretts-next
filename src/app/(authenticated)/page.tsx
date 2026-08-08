@@ -32,13 +32,11 @@ const OptionCard: FC<OptionCardProps> = ({ children, featured = false, href }) =
 )
 
 const Home: FC = () => {
-    const { atHome, setPageTitle } = useContext(LeftDrawerContext)
+    const { setPageTitle } = useContext(LeftDrawerContext)
 
     useEffect(() => {
         setPageTitle('Home')
-        //atHome()
-        
-    }, [setPageTitle, atHome])
+    }, [setPageTitle])
 
     return (
         <Stack spacing={3}>

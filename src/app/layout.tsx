@@ -1,5 +1,4 @@
 import theme from "@/theme";
-import "./globals.css";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import { ThemeProvider } from "@mui/material/styles";
 import { PleaseWait } from "@/components/PleaseWait";
