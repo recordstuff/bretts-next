@@ -26,24 +26,28 @@ const menuOptions: DrawerMenuItem[] = [
         Route: "/",
         Icon: HomeIcon,
         Role: JwtRole.Any,
+        Breadcrumb: { title: "Home", url: "/" },
     },
     {
         Text: "Grid Example",
         Route: "/gridexample",
         Icon: TableRowsIcon,
         Role: JwtRole.User,
+        Breadcrumb: { title: "Grid Example", url: "/gridexample" },
     },
     {
         Text: "Example Two",
         Route: "/exampletwo",
         Icon: TableChartIcon,
         Role: JwtRole.User,
+        Breadcrumb: { title: "Example Two", url: "/exampletwo" },
     },
     {
         Text: "Bacon Ipsum",
         Route: "/baconipsum",
         Icon: AgricultureIcon,
         Role: JwtRole.User,
+        Breadcrumb: { title: "Bacon Ipsum", url: "/baconipsum" },
     },
     divider,
     {
@@ -51,6 +55,7 @@ const menuOptions: DrawerMenuItem[] = [
         Route: "/users",
         Icon: PeopleIcon,
         Role: JwtRole.Admin,
+        Breadcrumb: { title: "Users", url: "/users" },
         ChildRoutes: ['/user']
     },
     {
@@ -58,6 +63,7 @@ const menuOptions: DrawerMenuItem[] = [
         Route: "/settings",
         Icon: SettingsIcon,
         Role: JwtRole.Admin,
+        Breadcrumb: { title: "Settings", url: "/settings" },
     },
 ]
 
@@ -67,7 +73,7 @@ interface Props {
 
 const LeftDrawer: FC<Props> = ({ children }) => {
     const pathname = usePathname()
-    const { pageTitle } = useContext(LeftDrawerContext)
+    const { firstBreadcrumb, pageTitle } = useContext(LeftDrawerContext)
     const [mobileOpen, setMobileOpen] = useState(false)
 
     const selectedMenuOption = useMemo(() => menuOptions.find(menuOption =>
@@ -83,6 +89,11 @@ const LeftDrawer: FC<Props> = ({ children }) => {
         setMobileOpen(false)
     }
 
+    const handleMenuOptionClick = (menuOption: MenuOption): void => {
+        firstBreadcrumb(menuOption.Breadcrumb)
+        handleDrawerClose()
+    }
+
     const drawerContent = (
         <List>
             {menuOptions.map((menuItem, index) => {
@@ -95,7 +106,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
                 return jwtUtil.hasRole(menuOption.Role) ? (
                     <ListItem disablePadding component={Link} href={menuOption.Route} key={menuOption.Text}>
                         <ListItemButton
-                            onClick={handleDrawerClose}
+                            onClick={() => handleMenuOptionClick(menuOption)}
                             selected={menuOption === selectedMenuOption}
                         >
                             <ListItemIcon>
@@ -136,9 +147,14 @@ const LeftDrawer: FC<Props> = ({ children }) => {
                         </Typography>
                         <Box sx={{ marginLeft: 'auto' }}>
                             {sessionStorage.getItem(JwtField.DisplayName)}
-                            <a href="/login" title='Go back to the login screen.'>
-                                <Typography sx={{ fontSize: '.9em' }}>Logout</Typography>
-                            </a>
+                            <Typography
+                                className="logout-link"
+                                component={Link}
+                                href="/login"
+                                title='Go back to the login screen.'
+                            >
+                                Logout
+                            </Typography>
                         </Box>
                     </Toolbar>
                 </AppBar>
