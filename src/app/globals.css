@@ -8,18 +8,20 @@ a {
     display: block;
     font-size: .9em;
     text-decoration: none;
+    transform-origin: left center;
     transition: color 120ms ease, font-weight 120ms ease, transform 80ms ease;
 }
 
 .logout-link:hover {
-    color: #d0d0d0;
-    font-weight: 700;
+    color: #1a1a1a;
+    font-weight: 800;
+    transform: scale(1.05);
 }
 
 .logout-link:active {
-    color: #a8a8a8;
-    font-weight: 700;
-    transform: translateY(1px);
+    color: #000;
+    font-weight: 800;
+    transform: translateY(1px) scale(.97);
 }
 
 .logout-link:focus-visible {

@@ -1,6 +1,6 @@
 import { FC, useContext, useMemo } from "react"
-import { Breadcrumbs, Typography } from "@mui/material"
-import Link from "next/link"
+import { Breadcrumbs, Link as MuiLink, Typography } from "@mui/material"
+import NextLink from "next/link"
 import { LeftDrawerContext, VisitedPage } from "./LeftDrawerProvider"
 
 export const Breadcrumbinator: FC = () => {
@@ -20,9 +20,29 @@ export const Breadcrumbinator: FC = () => {
                 }
                 else {
                     return (
-                        <Link href={page.url} key={index}>
+                        <MuiLink
+                            component={NextLink}
+                            href={page.url}
+                            key={index}
+                            underline="always"
+                            sx={{
+                                color: 'primary.main',
+                                fontWeight: 500,
+                                textDecorationThickness: '1px',
+                                textUnderlineOffset: '0.2em',
+                                transition: 'color 120ms ease, text-decoration-thickness 120ms ease',
+                                '&:hover': {
+                                    color: 'primary.light',
+                                    textDecorationThickness: '2px',
+                                },
+                                '&:active': {
+                                    color: 'primary.dark',
+                                    textDecorationThickness: '3px',
+                                },
+                            }}
+                        >
                             {page.title}
-                        </Link>
+                        </MuiLink>
                     )
                 }
             })}
