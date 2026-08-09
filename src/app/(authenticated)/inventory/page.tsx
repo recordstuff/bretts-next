@@ -14,7 +14,7 @@ import { emptyPaginationResult, PaginationResult } from '@/models/PaginationResu
 import { SortDirection } from '@/models/SortDirection'
 import { takeSuccessMessage } from '@/utils/successMessageStorage'
 import AddIcon from '@mui/icons-material/Add'
-import { Box, Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Box, Checkbox, FormControlLabel, Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import Link from 'next/link'
 import { FC, useCallback, useContext, useEffect, useState } from 'react'
 
@@ -30,6 +30,7 @@ const Inventory: FC = () => {
     const [paginationResult, setPaginationResult] = useState<PaginationResult<InventoryItemSummary>>(emptyPaginationResult())
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
+    const [topLevelOnly, setTopLevelOnly] = useState(false)
     const [sortColumn, setSortColumn] = useState(InventoryItemsSortColumn.Definition)
     const [sortDirection, setSortDirection] = useState(SortDirection.Ascending)
     const {showSnackbar} = useAppSnackbar()
@@ -42,12 +43,13 @@ const Inventory: FC = () => {
             page,
             PAGE_SIZE,
             searchText,
+            topLevelOnly,
             sortColumn,
             sortDirection
         )
         setPaginationResult(response)
         doneWaiting()
-    }, [page, searchText, sortColumn, sortDirection, pleaseWait, doneWaiting])
+    }, [page, searchText, topLevelOnly, sortColumn, sortDirection, pleaseWait, doneWaiting])
 
     const handleSort = (column: InventoryItemsSortColumn): void => {
         setPage(1)
@@ -82,9 +84,26 @@ const Inventory: FC = () => {
                 </IconButton>
             </Grid>
             <Stack spacing={3}>
-                <Box sx={{maxWidth: '40rem'}}>
-                    <TextFilter label="Search Text" searchText={searchText} setSearchText={setSearchText} />
-                </Box>
+                <Stack
+                    direction={{xs: 'column', sm: 'row'}}
+                    spacing={{xs: 1, sm: 3}}
+                    alignItems={{sm: 'center'}}
+                    sx={{maxWidth: '60rem'}}
+                >
+                    <Box sx={{flex: 1, width: '100%'}}>
+                        <TextFilter label="Search Text" searchText={searchText} setSearchText={setSearchText} />
+                    </Box>
+                    <FormControlLabel
+                        control={<Checkbox
+                            checked={topLevelOnly}
+                            onChange={event => {
+                                setPage(1)
+                                setTopLevelOnly(event.target.checked)
+                            }}
+                        />}
+                        label="Show Top-level Inventory Only"
+                    />
+                </Stack>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
