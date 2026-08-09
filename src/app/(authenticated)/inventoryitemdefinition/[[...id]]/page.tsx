@@ -32,15 +32,15 @@ const InventoryItemDefinition: FC = () => {
     const loadDefinition = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        const [options, loadedDefinition] = await Promise.all([
+        const [possibleItemDefinitionComponents, inventoryItemDefinition] = await Promise.all([
             inventoryItemDefinitionClient.getInventoryItemDefinitionOptions(),
             id === undefined
                 ? Promise.resolve(emptyInventoryItemDefinitionDetail())
                 : inventoryItemDefinitionClient.getInventoryItemDefinition(id),
         ])
 
-        setDefinitionOptions(options)
-        setDefinition(loadedDefinition)
+        setDefinitionOptions(possibleItemDefinitionComponents)
+        setDefinition(inventoryItemDefinition)
         setShowValidation(false)
         doneWaiting()
     }, [id, pleaseWait, doneWaiting])
