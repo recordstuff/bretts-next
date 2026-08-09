@@ -1,6 +1,6 @@
 import { InventoryItemComponentDetail } from '@/models/InventoryItemComponentDetail'
-import { Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
-import { FC, Fragment } from 'react'
+import { Box, Paper, Stack, TextField, Typography } from '@mui/material'
+import { FC } from 'react'
 import AttributeValueFields from './AttributeValueFields'
 
 interface InventoryItemComponentsEditorProps {
@@ -22,81 +22,67 @@ const InventoryItemComponentsEditor: FC<InventoryItemComponentsEditorProps> = ({
         : component))
 
     return (
-        <TableContainer component={Paper} sx={{overflowX: 'auto'}}>
-            <Table aria-label={level === 0 ? 'Inventory item components' : 'Nested inventory item components'} sx={{minWidth: 560}}>
-                <TableHead>
-                    <TableRow>
-                        <TableCell sx={{width: '24%'}}>Component</TableCell>
-                        <TableCell>Values</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {components.map((component, index) => {
-                        const key = component.Guid === '00000000-0000-0000-0000-000000000000'
-                            ? `${component.InventoryItemDefinitionGuid}-${index}`
-                            : component.Guid
-                        const matchingComponents = components.filter(candidate =>
-                            candidate.InventoryItemDefinitionGuid === component.InventoryItemDefinitionGuid)
-                        const componentNumber = components.slice(0, index + 1).filter(candidate =>
-                            candidate.InventoryItemDefinitionGuid === component.InventoryItemDefinitionGuid).length
-                        const componentLabel = matchingComponents.length > 1
-                            ? `${component.InventoryItemDefinitionName} ${componentNumber}`
-                            : component.InventoryItemDefinitionName
+        <Box
+            aria-label={level === 0 ? 'Inventory item components' : 'Nested inventory item components'}
+            component="section"
+            sx={{
+                display: 'grid',
+                gap: 2,
+                gridTemplateColumns: {xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))'},
+            }}
+        >
+            {components.map((component, index) => {
+                const key = component.Guid === '00000000-0000-0000-0000-000000000000'
+                    ? `${component.InventoryItemDefinitionGuid}-${index}`
+                    : component.Guid
+                const matchingComponents = components.filter(candidate =>
+                    candidate.InventoryItemDefinitionGuid === component.InventoryItemDefinitionGuid)
+                const componentNumber = components.slice(0, index + 1).filter(candidate =>
+                    candidate.InventoryItemDefinitionGuid === component.InventoryItemDefinitionGuid).length
+                const componentLabel = matchingComponents.length > 1
+                    ? `${component.InventoryItemDefinitionName} ${componentNumber}`
+                    : component.InventoryItemDefinitionName
 
-                        return (
-                            <Fragment key={key}>
-                                <TableRow>
-                                    <TableCell rowSpan={component.Attributes.length + 1} sx={{verticalAlign: 'top'}}>
-                                        <Typography fontWeight={500}>{componentLabel}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <TextField
-                                            fullWidth
-                                            label={`${component.InventoryItemDefinitionName} Serial Number`}
-                                            onChange={event => updateComponent(index, {SerialNumber: event.target.value})}
-                                            value={component.SerialNumber ?? ''}
-                                        />
-                                    </TableCell>
-                                </TableRow>
-                                {component.Attributes.map(attribute => (
-                                    <TableRow key={`${key}-${attribute.AttributeDefinitionGuid}`}>
-                                        <TableCell>
-                                            <AttributeValueFields
-                                                attributes={[attribute]}
-                                                onChange={updatedAttributes => updateComponent(index, {
-                                                    Attributes: component.Attributes.map(currentAttribute =>
-                                                        currentAttribute.AttributeDefinitionGuid === attribute.AttributeDefinitionGuid
-                                                            ? updatedAttributes[0]
-                                                            : currentAttribute),
-                                                })}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {component.Components.length > 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={2} sx={{pl: {xs: 2, md: 5}, py: 2}}>
-                                            <Stack spacing={1}>
-                                                <Typography component="h3" variant="subtitle1">
-                                                    {component.InventoryItemDefinitionName} Components
-                                                </Typography>
-                                                <InventoryItemComponentsEditor
-                                                    components={component.Components}
-                                                    level={level + 1}
-                                                    onChange={nestedComponents => updateComponent(index, {
-                                                        Components: nestedComponents,
-                                                    })}
-                                                />
-                                            </Stack>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </Fragment>
-                        )
-                    })}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                return (
+                    <Paper
+                        component="article"
+                        key={key}
+                        variant="outlined"
+                        sx={{p: {xs: 2, sm: 2.5}}}
+                    >
+                        <Stack spacing={2.5}>
+                            <Typography component="h3" variant="h6">{componentLabel}</Typography>
+                            <TextField
+                                fullWidth
+                                label="Serial Number"
+                                onChange={event => updateComponent(index, {SerialNumber: event.target.value})}
+                                value={component.SerialNumber ?? ''}
+                            />
+                            {component.Attributes.length === 0
+                                ? <Typography color="text.secondary">This component has no attributes.</Typography>
+                                : <AttributeValueFields
+                                    attributes={component.Attributes}
+                                    onChange={attributes => updateComponent(index, {Attributes: attributes})}
+                                />}
+                            {component.Components.length > 0 && (
+                                <Stack spacing={1.5}>
+                                    <Typography component="h4" variant="subtitle1">
+                                        {component.InventoryItemDefinitionName} Components
+                                    </Typography>
+                                    <InventoryItemComponentsEditor
+                                        components={component.Components}
+                                        level={level + 1}
+                                        onChange={nestedComponents => updateComponent(index, {
+                                            Components: nestedComponents,
+                                        })}
+                                    />
+                                </Stack>
+                            )}
+                        </Stack>
+                    </Paper>
+                )
+            })}
+        </Box>
     )
 }
 
