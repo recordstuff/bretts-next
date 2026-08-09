@@ -53,12 +53,12 @@ const menuOptions: DrawerMenuItem[] = [
     },
     divider,
     {
-        Text: "Users",
-        Route: "/users",
-        Icon: PeopleIcon,
+        Text: "Inventory Definitions",
+        Route: "/inventoryitemdefinitions",
+        Icon: Inventory2Icon,
         Role: JwtRole.Admin,
-        Breadcrumb: { title: "Users", url: "/users" },
-        ChildRoutes: ['/user']
+        Breadcrumb: { title: "Inventory Item Definitions", url: "/inventoryitemdefinitions" },
+        ChildRoutes: ['/inventoryitemdefinition']
     },
     {
         Text: "Attribute Definitions",
@@ -69,12 +69,12 @@ const menuOptions: DrawerMenuItem[] = [
         ChildRoutes: ['/attributedefinition']
     },
     {
-        Text: "Inventory Definitions",
-        Route: "/inventoryitemdefinitions",
-        Icon: Inventory2Icon,
+        Text: "Users",
+        Route: "/users",
+        Icon: PeopleIcon,
         Role: JwtRole.Admin,
-        Breadcrumb: { title: "Inventory Item Definitions", url: "/inventoryitemdefinitions" },
-        ChildRoutes: ['/inventoryitemdefinition']
+        Breadcrumb: { title: "Users", url: "/users" },
+        ChildRoutes: ['/user']
     },
     {
         Text: "Settings",

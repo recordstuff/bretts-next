@@ -24,6 +24,7 @@ const SORT_COLUMNS = [
     {label: 'Id', column: AttributeDefinitionsSortColumn.Id},
     {label: 'Name', column: AttributeDefinitionsSortColumn.Name},
     {label: 'Data Type', column: AttributeDefinitionsSortColumn.DataType},
+    {label: 'Inventory Definitions', column: AttributeDefinitionsSortColumn.InventoryItemDefinitionCount},
 ] as const
 
 const AttributeDefinitions: FC = () => {
@@ -100,7 +101,6 @@ const AttributeDefinitions: FC = () => {
                                     sortDirection={sortDirection}
                                     onSort={handleSort}
                                 />
-                                <TableCell>Inventory Definitions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
