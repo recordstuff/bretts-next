@@ -6,7 +6,6 @@ import { AppBar, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButto
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MenuIcon from '@mui/icons-material/Menu';
 import PeopleIcon from '@mui/icons-material/People';
-import SettingsIcon from '@mui/icons-material/Settings';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import LabelIcon from '@mui/icons-material/Label';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
@@ -69,13 +68,6 @@ const menuOptions: DrawerMenuItem[] = [
         Role: JwtRole.Admin,
         Breadcrumb: { title: "Roles", url: "/roles" },
         ChildRoutes: ['/role']
-    },
-    {
-        Text: "Settings",
-        Route: "/settings",
-        Icon: SettingsIcon,
-        Role: JwtRole.Admin,
-        Breadcrumb: { title: "Settings", url: "/settings" },
     },
 ]
 
