@@ -1,14 +1,17 @@
 'use client'
 
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import AgricultureIcon from '@mui/icons-material/Agriculture'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
+import Inventory2Icon from '@mui/icons-material/Inventory2'
+import LabelIcon from '@mui/icons-material/Label'
 import PeopleIcon from '@mui/icons-material/People'
 import SettingsIcon from '@mui/icons-material/Settings'
-import TableChartIcon from '@mui/icons-material/TableChart'
-import TableRowsIcon from '@mui/icons-material/TableRows'
+import WarehouseIcon from '@mui/icons-material/Warehouse'
 import { Card, CardActionArea, Stack, Typography } from "@mui/material"
 import Link from "next/link"
 import { FC, useContext, useEffect } from "react"
+import { jwtUtil } from '@/helpers/JwtUtil'
+import { JwtRole } from '@/models/Jwt'
 
 interface OptionCardProps {
     children: React.ReactNode
@@ -31,75 +34,57 @@ const OptionCard: FC<OptionCardProps> = ({ children, featured = false, href }) =
     </Card>
 )
 
-const Home: FC = () => {
+const Dashboard: FC = () => {
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     useEffect(() => {
-        setPageTitle('Home')
-        firstBreadcrumb({ title: 'Home', url: '/' })
+        setPageTitle('Dashboard')
+        firstBreadcrumb({ title: 'Dashboard', url: '/' })
     }, [firstBreadcrumb, setPageTitle])
 
     return (
         <Stack spacing={3}>
             <div>
-                <Typography variant="h5" gutterBottom>Project options</Typography>
+                <Typography variant="h5" gutterBottom>Dashboard</Typography>
                 <Typography>
-                    Use the menu to explore examples of common application layouts and, if you are an administrator, manage users and settings.
+                    Select an option to manage inventory or, if you are an administrator, configure the application.
                 </Typography>
             </div>
 
-            <OptionCard href="/gridexample">
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <TableRowsIcon />
-                    <Typography variant="h6">Grid Example</Typography>
-                </Stack>
-                <Typography>
-                    Contains two groups of fields: Contact and Address. They appear side by side on larger screens, then move into one column on smaller screens with Contact first and Address below it.
-                </Typography>
-            </OptionCard>
+            {jwtUtil.hasRole(JwtRole.User) && (
+                <OptionCard featured href="/inventory">
+                    <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                        <WarehouseIcon color="primary" />
+                        <Typography variant="h5">Inventory</Typography>
+                    </Stack>
+                    <Typography>Manage physical inventory items and their definition-driven attribute values.</Typography>
+                </OptionCard>
+            )}
 
-            <OptionCard href="/exampletwo">
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <TableChartIcon />
-                    <Typography variant="h6">Example Two</Typography>
-                </Stack>
-                <Typography>
-                    Shows a different responsive two-column pattern. Instead of moving whole field groups like Grid Example, its individual fields flow from two columns into a single column as the screen narrows.
-                </Typography>
-            </OptionCard>
-
-            <OptionCard href="/baconipsum">
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <AgricultureIcon />
-                    <Typography variant="h6">Bacon Ipsum</Typography>
-                </Stack>
-                <Typography>
-                    A placeholder page for now. Its sample text keeps the navigation route and application layout represented until this area is replaced with a functional feature.
-                </Typography>
-            </OptionCard>
-
-            <OptionCard featured href="/users">
-                <Typography color="primary" variant="overline">Featured working example</Typography>
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <PeopleIcon color="primary" />
-                    <Typography variant="h5">Users</Typography>
-                </Stack>
-                <Typography>
-                    The project&apos;s most complete working feature manages real user data through a full set of CRUD operations. Administrators can search and filter users, create accounts, edit user details and role assignments, and delete users.
-                </Typography>
-            </OptionCard>
-
-            <OptionCard href="/settings">
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <SettingsIcon />
-                    <Typography variant="h6">Settings</Typography>
-                </Stack>
-                <Typography>
-                    An administrator-only page for testing the global exception handler, writing a structured test log entry, and shutting down the sandbox backend for the more mischievous admins. <span aria-hidden="true">😈</span>
-                </Typography>
-            </OptionCard>
+            {jwtUtil.hasRole(JwtRole.Admin) && (<>
+                <OptionCard href="/inventoryitemdefinitions">
+                    <Stack direction="row" spacing={1} alignItems="center" mb={1}><Inventory2Icon /><Typography variant="h6">Inventory Definitions</Typography></Stack>
+                    <Typography>Define reusable inventory item types, attributes, and component relationships.</Typography>
+                </OptionCard>
+                <OptionCard href="/attributedefinitions">
+                    <Stack direction="row" spacing={1} alignItems="center" mb={1}><LabelIcon /><Typography variant="h6">Attribute Definitions</Typography></Stack>
+                    <Typography>Manage reusable typed attributes for inventory item definitions.</Typography>
+                </OptionCard>
+                <OptionCard href="/users">
+                    <Stack direction="row" spacing={1} alignItems="center" mb={1}><PeopleIcon /><Typography variant="h6">Users</Typography></Stack>
+                    <Typography>Manage user accounts and their assigned roles.</Typography>
+                </OptionCard>
+                <OptionCard href="/roles">
+                    <Stack direction="row" spacing={1} alignItems="center" mb={1}><AdminPanelSettingsIcon /><Typography variant="h6">Roles</Typography></Stack>
+                    <Typography>Manage the roles available for user assignment.</Typography>
+                </OptionCard>
+                <OptionCard href="/settings">
+                    <Stack direction="row" spacing={1} alignItems="center" mb={1}><SettingsIcon /><Typography variant="h6">Settings</Typography></Stack>
+                    <Typography>An administrator-only page for testing the global exception handler, writing a structured test log entry, and shutting down the sandbox backend for the more mischievous admins. <span aria-hidden="true">😈</span></Typography>
+                </OptionCard>
+            </>)}
         </Stack>
     )
 }
 
-export default Home
+export default Dashboard

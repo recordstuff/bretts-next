@@ -1,15 +1,15 @@
 'use client'
 
-import { inventoryItemDefinitionClient } from '@/clients/InventoryItemDefinitionClient'
+import { inventoryItemClient } from '@/clients/InventoryItemClient'
+import { useAppSnackbar } from '@/components/AppSnackbarProvider'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import Paginator from '@/components/Paginator'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
 import SortableTableHeaders from '@/components/SortableTableHeaders'
 import TextFilter from '@/components/TextFilter'
-import { useAppSnackbar } from '@/components/AppSnackbarProvider'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
-import { InventoryItemDefinitionsSortColumn } from '@/models/InventoryItemDefinitionsSortColumn'
-import { InventoryItemDefinitionSummary } from '@/models/InventoryItemDefinitionSummary'
+import { InventoryItemSummary } from '@/models/InventoryItemSummary'
+import { InventoryItemsSortColumn } from '@/models/InventoryItemsSortColumn'
 import { emptyPaginationResult, PaginationResult } from '@/models/PaginationResult'
 import { SortDirection } from '@/models/SortDirection'
 import { takeSuccessMessage } from '@/utils/successMessageStorage'
@@ -20,61 +20,55 @@ import { FC, useCallback, useContext, useEffect, useState } from 'react'
 
 const PAGE_SIZE = 5
 const SORT_COLUMNS = [
-    {label: 'Id', column: InventoryItemDefinitionsSortColumn.Id},
-    {label: 'Name', column: InventoryItemDefinitionsSortColumn.Name},
-    {label: 'Description', column: InventoryItemDefinitionsSortColumn.Description},
-    {label: 'Attributes', column: InventoryItemDefinitionsSortColumn.AttributeCount},
-    {label: 'Components', column: InventoryItemDefinitionsSortColumn.ComponentCount},
+    {label: 'Id', column: InventoryItemsSortColumn.Id},
+    {label: 'Definition', column: InventoryItemsSortColumn.Definition},
+    {label: 'Serial Number', column: InventoryItemsSortColumn.SerialNumber},
+    {label: 'Attribute Values', column: InventoryItemsSortColumn.AttributeValueCount},
 ] as const
 
-const InventoryItemDefinitions: FC = () => {
-    const [paginationResult, setPaginationResult] = useState<PaginationResult<InventoryItemDefinitionSummary>>(emptyPaginationResult())
+const Inventory: FC = () => {
+    const [paginationResult, setPaginationResult] = useState<PaginationResult<InventoryItemSummary>>(emptyPaginationResult())
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
-    const [sortColumn, setSortColumn] = useState(InventoryItemDefinitionsSortColumn.Name)
+    const [sortColumn, setSortColumn] = useState(InventoryItemsSortColumn.Definition)
     const [sortDirection, setSortDirection] = useState(SortDirection.Ascending)
     const {showSnackbar} = useAppSnackbar()
     const {actions: {pleaseWait, doneWaiting}} = useContext(PleaseWaitContext)
     const {firstBreadcrumb, setPageTitle} = useContext(LeftDrawerContext)
 
-    const getDefinitions = useCallback(async (): Promise<void> => {
+    const getInventory = useCallback(async (): Promise<void> => {
         pleaseWait()
-
-        const response = await inventoryItemDefinitionClient.getInventoryItemDefinitions(
+        const response = await inventoryItemClient.getInventoryItems(
             page,
             PAGE_SIZE,
             searchText,
             sortColumn,
             sortDirection
         )
-
         setPaginationResult(response)
         doneWaiting()
     }, [page, searchText, sortColumn, sortDirection, pleaseWait, doneWaiting])
 
-    const handleSort = (column: InventoryItemDefinitionsSortColumn): void => {
+    const handleSort = (column: InventoryItemsSortColumn): void => {
         setPage(1)
-
         if (column === sortColumn) {
             setSortDirection(sortDirection === SortDirection.Ascending
                 ? SortDirection.Descending
                 : SortDirection.Ascending)
             return
         }
-
         setSortColumn(column)
         setSortDirection(SortDirection.Ascending)
     }
 
     useEffect(() => {
-        setPageTitle('Inventory Item Definitions')
-        firstBreadcrumb({title: 'Inventory Item Definitions', url: '/inventoryitemdefinitions'})
-        getDefinitions()
-    }, [setPageTitle, firstBreadcrumb, getDefinitions])
+        setPageTitle('Inventory')
+        firstBreadcrumb({title: 'Inventory', url: '/inventory'})
+        getInventory()
+    }, [setPageTitle, firstBreadcrumb, getInventory])
 
     useEffect(() => {
         const storedSuccessMessage = takeSuccessMessage()
-
         if (storedSuccessMessage !== null) {
             showSnackbar(storedSuccessMessage, AppSnackbarSeverity.Success)
         }
@@ -83,8 +77,8 @@ const InventoryItemDefinitions: FC = () => {
     return (
         <>
             <Grid item marginBottom={2} marginLeft={-1} marginTop={1}>
-                <IconButton component={Link} href="/inventoryitemdefinition" sx={{paddingBottom: '-1'}}>
-                    <AddIcon /><Typography variant="body2">Add Inventory Definition</Typography>
+                <IconButton component={Link} href="/inventoryitem" sx={{paddingBottom: '-1'}}>
+                    <AddIcon /><Typography variant="body2">Add Inventory Item</Typography>
                 </IconButton>
             </Grid>
             <Stack spacing={3}>
@@ -105,21 +99,16 @@ const InventoryItemDefinitions: FC = () => {
                         </TableHead>
                         <TableBody>
                             {paginationResult.Items.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={5}>No inventory item definitions were found.</TableCell>
-                                </TableRow>
+                                <TableRow><TableCell colSpan={4}>No inventory items were found.</TableCell></TableRow>
                             )}
-                            {paginationResult.Items.map(definition => (
-                                <TableRow key={definition.Guid}>
+                            {paginationResult.Items.map(item => (
+                                <TableRow key={item.Guid}>
                                     <TableCell>
-                                        <Link className="entity-id-link" href={`/inventoryitemdefinition/${definition.Guid}`}>
-                                            {definition.Guid}
-                                        </Link>
+                                        <Link className="entity-id-link" href={`/inventoryitem/${item.Guid}`}>{item.Guid}</Link>
                                     </TableCell>
-                                    <TableCell>{definition.Name}</TableCell>
-                                    <TableCell>{definition.Description ?? '—'}</TableCell>
-                                    <TableCell>{definition.AttributeCount}</TableCell>
-                                    <TableCell>{definition.ComponentCount}</TableCell>
+                                    <TableCell>{item.InventoryItemDefinitionName}</TableCell>
+                                    <TableCell>{item.SerialNumber ?? '—'}</TableCell>
+                                    <TableCell>{item.AttributeValueCount}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -131,4 +120,4 @@ const InventoryItemDefinitions: FC = () => {
     )
 }
 
-export default InventoryItemDefinitions
+export default Inventory
