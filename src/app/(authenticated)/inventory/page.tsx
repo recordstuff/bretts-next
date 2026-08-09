@@ -12,6 +12,7 @@ import { InventoryItemSummary } from '@/models/InventoryItemSummary'
 import { InventoryItemsSortColumn } from '@/models/InventoryItemsSortColumn'
 import { emptyPaginationResult, PaginationResult } from '@/models/PaginationResult'
 import { SortDirection } from '@/models/SortDirection'
+import { useSessionStorageBoolean } from '@/hooks/useSessionStorageBoolean'
 import { takeSuccessMessage } from '@/utils/successMessageStorage'
 import AddIcon from '@mui/icons-material/Add'
 import { Box, Checkbox, FormControlLabel, Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
@@ -19,6 +20,7 @@ import Link from 'next/link'
 import { FC, useCallback, useContext, useEffect, useState } from 'react'
 
 const PAGE_SIZE = 5
+const TOP_LEVEL_ONLY_SESSION_KEY = 'inventoryTopLevelOnly'
 const SORT_COLUMNS = [
     {label: 'Id', column: InventoryItemsSortColumn.Id},
     {label: 'Definition', column: InventoryItemsSortColumn.Definition},
@@ -30,7 +32,11 @@ const Inventory: FC = () => {
     const [paginationResult, setPaginationResult] = useState<PaginationResult<InventoryItemSummary>>(emptyPaginationResult())
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
-    const [topLevelOnly, setTopLevelOnly] = useState(false)
+    const {
+        isLoaded: topLevelOnlyIsLoaded,
+        setValue: setTopLevelOnly,
+        value: topLevelOnly,
+    } = useSessionStorageBoolean(TOP_LEVEL_ONLY_SESSION_KEY, false)
     const [sortColumn, setSortColumn] = useState(InventoryItemsSortColumn.Definition)
     const [sortDirection, setSortDirection] = useState(SortDirection.Ascending)
     const {showSnackbar} = useAppSnackbar()
@@ -38,6 +44,8 @@ const Inventory: FC = () => {
     const {firstBreadcrumb, setPageTitle} = useContext(LeftDrawerContext)
 
     const getInventory = useCallback(async (): Promise<void> => {
+        if (!topLevelOnlyIsLoaded) return
+
         pleaseWait()
         const response = await inventoryItemClient.getInventoryItems(
             page,
@@ -49,7 +57,7 @@ const Inventory: FC = () => {
         )
         setPaginationResult(response)
         doneWaiting()
-    }, [page, searchText, topLevelOnly, sortColumn, sortDirection, pleaseWait, doneWaiting])
+    }, [page, searchText, topLevelOnly, topLevelOnlyIsLoaded, sortColumn, sortDirection, pleaseWait, doneWaiting])
 
     const handleSort = (column: InventoryItemsSortColumn): void => {
         setPage(1)
