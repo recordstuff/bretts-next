@@ -4,8 +4,7 @@ import { FC, useCallback, useContext, useEffect, useState } from "react"
 import { userClient } from "../../../clients/UserClient"
 import { PaginationResult, emptyPaginationResult } from "../../../models/PaginationResult"
 import { UserSummary } from "../../../models/UserSummary"
-import { Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from "@mui/material"
-import { alpha } from "@mui/material/styles"
+import { Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
 import { JwtRole } from "../../../models/Jwt"
 import AddIcon from '@mui/icons-material/Add';
 import Link from "next/link"
@@ -20,6 +19,7 @@ import { UsersSortColumn } from "@/models/UsersSortColumn"
 import { SortDirection } from "@/models/SortDirection"
 import { useAppSnackbar } from "@/components/AppSnackbarProvider"
 import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
+import SortableTableHeaders from "@/components/SortableTableHeaders"
 
 const PAGE_SIZE = 5
 const USER_SORT_COLUMNS = [
@@ -115,61 +115,19 @@ const Users: FC = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                {USER_SORT_COLUMNS.map(({ label, column }) => {
-                                    const active = sortColumn === column
-                                    const direction = sortDirection === SortDirection.Ascending ? 'asc' : 'desc'
-
-                                    return (
-                                        <TableCell key={column} sortDirection={active ? direction : false}>
-                                            <TableSortLabel
-                                                active={active}
-                                                direction={active ? direction : 'asc'}
-                                                onClick={() => handleSort(column)}
-                                                sx={(theme) => ({
-                                                    textDecoration: 'underline',
-                                                    textDecorationThickness: '1px',
-                                                    textUnderlineOffset: '0.2em',
-                                                    borderRadius: 1,
-                                                    px: 0.75,
-                                                    py: 0.25,
-                                                    mx: -0.75,
-                                                    my: -0.25,
-                                                    transition: theme.transitions.create([
-                                                        'background-color',
-                                                        'color',
-                                                        'text-shadow',
-                                                        'transform',
-                                                    ], {
-                                                        duration: theme.transitions.duration.shortest,
-                                                    }),
-                                                    '&:hover': {
-                                                        color: theme.palette.common.white,
-                                                        backgroundColor: alpha(theme.palette.common.white, 0.1),
-                                                        textShadow: `0 0 8px ${alpha(theme.palette.common.white, 0.4)}`,
-                                                    },
-                                                    '&:active': {
-                                                        color: theme.palette.common.white,
-                                                        backgroundColor: alpha(theme.palette.common.white, 0.18),
-                                                        transform: 'translateY(1px) scale(0.98)',
-                                                    },
-                                                    '&.Mui-focusVisible': {
-                                                        outline: `2px solid ${theme.palette.common.white}`,
-                                                        outlineOffset: 2,
-                                                    },
-                                                })}
-                                            >
-                                                {label}
-                                            </TableSortLabel>
-                                        </TableCell>
-                                    )
-                                })}
+                                <SortableTableHeaders
+                                    columns={USER_SORT_COLUMNS}
+                                    sortColumn={sortColumn}
+                                    sortDirection={sortDirection}
+                                    onSort={handleSort}
+                                />
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {paginationResult.Items.map((row, index) => (
-                                <TableRow key={index}>
+                            {paginationResult.Items.map(row => (
+                                <TableRow key={row.Guid}>
                                     <TableCell>
-                                        <Link className="user-id-link" href={`/user/${row.Guid}`}>{row.Guid}</Link>
+                                        <Link className="entity-id-link" href={`/user/${row.Guid}`}>{row.Guid}</Link>
                                     </TableCell>
                                     <TableCell>
                                         {row.DisplayName}
