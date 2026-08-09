@@ -3,6 +3,7 @@
 import { HTTP_STATUS_CODES } from '@/clients/HttpClient'
 import { inventoryItemDefinitionClient } from '@/clients/InventoryItemDefinitionClient'
 import { useAppSnackbar } from '@/components/AppSnackbarProvider'
+import InventoryItemDefinitionAttributesEditor from '@/components/InventoryItemDefinitionAttributesEditor'
 import InventoryItemDefinitionComponentsEditor from '@/components/InventoryItemDefinitionComponentsEditor'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
@@ -80,6 +81,18 @@ const InventoryItemDefinition: FC = () => {
             return
         }
 
+        const attributeNames = definition.Attributes.map(attribute => attribute.Name.trim().toLocaleLowerCase())
+
+        if (attributeNames.some(name => name.length === 0)) {
+            showSnackbar('Every attribute requires a name.', AppSnackbarSeverity.Warning)
+            return
+        }
+
+        if (new Set(attributeNames).size !== attributeNames.length) {
+            showSnackbar('Attribute names must be unique.', AppSnackbarSeverity.Warning)
+            return
+        }
+
         pleaseWait()
 
         try {
@@ -87,6 +100,7 @@ const InventoryItemDefinition: FC = () => {
                 const newDefinition: InventoryItemDefinitionNew = {
                     Name: definition.Name,
                     Description: definition.Description,
+                    Attributes: definition.Attributes,
                     Components: definition.Components,
                 }
                 const addedDefinition = await inventoryItemDefinitionClient.insertInventoryItemDefinition(newDefinition)
@@ -99,6 +113,7 @@ const InventoryItemDefinition: FC = () => {
 
             const updatedDefinition = await inventoryItemDefinitionClient.updateInventoryItemDefinition({
                 ...definition,
+                AttributeCount: definition.Attributes.length,
                 ComponentCount: definition.Components.length,
             })
 
@@ -111,7 +126,7 @@ const InventoryItemDefinition: FC = () => {
 
             if (ex instanceof AxiosError && ex.response?.status === HTTP_STATUS_CODES.BAD_REQUEST) {
                 showSnackbar(
-                    'The definition could not be saved. Check its fields and component relationships.',
+                    'The definition could not be saved. Check its fields, attributes, and component relationships.',
                     AppSnackbarSeverity.Error
                 )
                 return
@@ -177,6 +192,15 @@ const InventoryItemDefinition: FC = () => {
                 minRows={3}
                 onChange={handleChange}
                 value={definition.Description ?? ''}
+            />
+            <InventoryItemDefinitionAttributesEditor
+                attributes={definition.Attributes}
+                onChange={attributes => setDefinition(currentDefinition => ({
+                    ...currentDefinition,
+                    Attributes: attributes,
+                    AttributeCount: attributes.length,
+                }))}
+                showValidation={showValidation}
             />
             <InventoryItemDefinitionComponentsEditor
                 allDefinitions={definitionOptions}

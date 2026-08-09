@@ -99,13 +99,14 @@ const InventoryItemDefinitions: FC = () => {
                                     sortDirection={sortDirection}
                                     onSort={handleSort}
                                 />
+                                <TableCell>Attributes</TableCell>
                                 <TableCell>Components</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {paginationResult.Items.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={4}>No inventory item definitions were found.</TableCell>
+                                    <TableCell colSpan={5}>No inventory item definitions were found.</TableCell>
                                 </TableRow>
                             )}
                             {paginationResult.Items.map(definition => (
@@ -117,6 +118,7 @@ const InventoryItemDefinitions: FC = () => {
                                     </TableCell>
                                     <TableCell>{definition.Name}</TableCell>
                                     <TableCell>{definition.Description ?? '—'}</TableCell>
+                                    <TableCell>{definition.AttributeCount}</TableCell>
                                     <TableCell>{definition.ComponentCount}</TableCell>
                                 </TableRow>
                             ))}
