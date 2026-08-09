@@ -1,27 +1,26 @@
-import { ATTRIBUTE_DATA_TYPE_OPTIONS, AttributeDataType } from '@/models/AttributeDataType'
+import { ATTRIBUTE_DATA_TYPE_OPTIONS, AttributeDataType, attributeDataTypeLabel } from '@/models/AttributeDataType'
 import { AttributeDefinitionDetail } from '@/models/AttributeDefinitionDetail'
 import { AttributeDefinitionNew } from '@/models/AttributeDefinitionNew'
 import AddIcon from '@mui/icons-material/Add'
 import {
     Button,
-    Checkbox,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    FormControl,
-    FormHelperText,
-    InputLabel,
-    ListItemText,
     MenuItem,
-    OutlinedInput,
-    Select,
-    SelectChangeEvent,
+    Paper,
     Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     TextField,
     Typography,
 } from '@mui/material'
-import { FC, useState } from 'react'
+import { FC, useMemo, useState } from 'react'
 
 interface AttributeDefinitionsSelectorProps {
     allAttributes: AttributeDefinitionDetail[]
@@ -41,14 +40,23 @@ const AttributeDefinitionsSelector: FC<AttributeDefinitionsSelectorProps> = ({
     const [dataType, setDataType] = useState(AttributeDataType.String)
     const [showValidation, setShowValidation] = useState(false)
     const [adding, setAdding] = useState(false)
-    const selectedGuids = selectedAttributes.map(attribute => attribute.Guid)
+    const [selectedGuid, setSelectedGuid] = useState('')
 
-    const handleSelectionChange = (event: SelectChangeEvent<string[]>): void => {
-        const guids = typeof event.target.value === 'string'
-            ? event.target.value.split(',')
-            : event.target.value
+    const availableAttributes = useMemo(() => allAttributes.filter(attribute =>
+        !selectedAttributes.some(selectedAttribute => selectedAttribute.Guid === attribute.Guid)
+    ), [allAttributes, selectedAttributes])
 
-        onChange(allAttributes.filter(attribute => guids.includes(attribute.Guid)))
+    const addSelectedAttribute = (): void => {
+        const attribute = availableAttributes.find(option => option.Guid === selectedGuid)
+
+        if (attribute === undefined) return
+
+        onChange([...selectedAttributes, attribute])
+        setSelectedGuid('')
+    }
+
+    const removeAttribute = (guid: string): void => {
+        onChange(selectedAttributes.filter(attribute => attribute.Guid !== guid))
     }
 
     const closeDialog = (): void => {
@@ -82,29 +90,28 @@ const AttributeDefinitionsSelector: FC<AttributeDefinitionsSelectorProps> = ({
     return (
         <Stack spacing={2}>
             <Typography component="h2" variant="h6">Attributes</Typography>
-            <Stack direction={{xs: 'column', sm: 'row'}} spacing={2} alignItems={{sm: 'flex-start'}}>
-                <FormControl fullWidth>
-                    <InputLabel id="attribute-definitions-label">Attribute Definitions</InputLabel>
-                    <Select<string[]>
-                        labelId="attribute-definitions-label"
-                        multiple
-                        value={selectedGuids}
-                        onChange={handleSelectionChange}
-                        input={<OutlinedInput label="Attribute Definitions" />}
-                        renderValue={guids => guids
-                            .map(guid => allAttributes.find(attribute => attribute.Guid === guid)?.Name)
-                            .filter(name => name !== undefined)
-                            .join(', ')}
-                    >
-                        {allAttributes.map(attribute => (
-                            <MenuItem key={attribute.Guid} value={attribute.Guid}>
-                                <Checkbox checked={selectedGuids.includes(attribute.Guid)} />
-                                <ListItemText primary={attribute.Name} />
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <FormHelperText>Select the reusable attributes available to instances of this definition.</FormHelperText>
-                </FormControl>
+            <Stack direction={{xs: 'column', sm: 'row'}} spacing={2} alignItems={{sm: 'center'}}>
+                <TextField
+                    select
+                    fullWidth
+                    helperText="Select a reusable attribute available to instances of this definition."
+                    label="Attribute Definition"
+                    value={selectedGuid}
+                    onChange={event => setSelectedGuid(event.target.value)}
+                >
+                    <MenuItem value=""><em>Select an attribute</em></MenuItem>
+                    {availableAttributes.map(attribute => (
+                        <MenuItem key={attribute.Guid} value={attribute.Guid}>{attribute.Name}</MenuItem>
+                    ))}
+                </TextField>
+                <Button
+                    disabled={selectedGuid.length === 0}
+                    onClick={addSelectedAttribute}
+                    variant="contained"
+                    sx={{minWidth: {sm: '9rem'}}}
+                >
+                    Add Attribute
+                </Button>
                 <Button
                     onClick={() => setDialogOpen(true)}
                     startIcon={<AddIcon />}
@@ -114,6 +121,33 @@ const AttributeDefinitionsSelector: FC<AttributeDefinitionsSelectorProps> = ({
                     New Attribute
                 </Button>
             </Stack>
+            <TableContainer component={Paper} variant="outlined">
+                <Table aria-label="Inventory item definition attributes">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Attribute Definition</TableCell>
+                            <TableCell sx={{width: {xs: '7rem', sm: '10rem'}}}>Data Type</TableCell>
+                            <TableCell aria-label="Actions" sx={{width: {xs: '6rem', sm: '9rem'}}} />
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {selectedAttributes.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={3}>This definition does not contain any attribute definitions.</TableCell>
+                            </TableRow>
+                        )}
+                        {selectedAttributes.map(attribute => (
+                            <TableRow key={attribute.Guid}>
+                                <TableCell>{attribute.Name}</TableCell>
+                                <TableCell>{attributeDataTypeLabel(attribute.DataType)}</TableCell>
+                                <TableCell>
+                                    <Button color="error" onClick={() => removeAttribute(attribute.Guid)}>Remove</Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
             <Dialog open={dialogOpen} onClose={closeDialog} fullWidth maxWidth="sm">
                 <DialogTitle>Add Attribute Definition</DialogTitle>
                 <DialogContent>
