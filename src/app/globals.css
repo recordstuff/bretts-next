@@ -30,19 +30,19 @@ a {
     outline-offset: 2px;
 }
 
-.user-id-link,
-.user-id-link:visited {
+.entity-id-link,
+.entity-id-link:visited {
     color: #9dffb4;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
 }
 
-.user-id-link:hover {
+.entity-id-link:hover {
     text-decoration-thickness: 2px;
 }
 
-.user-id-link:focus-visible {
+.entity-id-link:focus-visible {
     border-radius: 2px;
     outline: 2px solid #9dffb4;
     outline-offset: 2px;
