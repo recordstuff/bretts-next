@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
 
-interface SessionStorageBoolean {
+interface LocalStorageBoolean {
     isLoaded: boolean
     setValue: (value: boolean) => void
     value: boolean
 }
 
-export const useSessionStorageBoolean = (key: string, defaultValue: boolean): SessionStorageBoolean => {
+export const useLocalStorageBoolean = (key: string, defaultValue: boolean): LocalStorageBoolean => {
     const [value, setValue] = useState(defaultValue)
     const [isLoaded, setIsLoaded] = useState(false)
 
     useEffect(() => {
-        const storedValue = sessionStorage.getItem(key)
+        const storedValue = localStorage.getItem(key)
         if (storedValue === null) {
-            sessionStorage.setItem(key, String(defaultValue))
+            localStorage.setItem(key, String(defaultValue))
         } else {
             setValue(storedValue === 'true')
         }
@@ -21,7 +21,7 @@ export const useSessionStorageBoolean = (key: string, defaultValue: boolean): Se
     }, [defaultValue, key])
 
     const setStoredValue = useCallback((newValue: boolean): void => {
-        sessionStorage.setItem(key, String(newValue))
+        localStorage.setItem(key, String(newValue))
         setValue(newValue)
     }, [key])
 

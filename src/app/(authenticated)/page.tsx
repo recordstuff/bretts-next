@@ -3,13 +3,13 @@
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import { inventoryItemClient } from '@/clients/InventoryItemClient'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
-import { useSessionStorageBoolean } from '@/hooks/useSessionStorageBoolean'
+import { useLocalStorageBoolean } from '@/hooks/useLocalStorageBoolean'
 import { Card, CardContent, Checkbox, FormControlLabel, Link, Stack, Typography } from "@mui/material"
 import { FC, useCallback, useContext, useEffect, useState } from "react"
 import { jwtUtil } from '@/helpers/JwtUtil'
 import { JwtRole } from '@/models/Jwt'
 
-const TOP_LEVEL_ONLY_SESSION_KEY = 'dashboardTopLevelOnly'
+const TOP_LEVEL_ONLY_STORAGE_KEY = 'dashboardTopLevelOnly'
 
 const Dashboard: FC = () => {
     const [totalInventoryItems, setTotalInventoryItems] = useState<number | null>(null)
@@ -17,7 +17,7 @@ const Dashboard: FC = () => {
         isLoaded: topLevelOnlyIsLoaded,
         setValue: setTopLevelOnly,
         value: topLevelOnly,
-    } = useSessionStorageBoolean(TOP_LEVEL_ONLY_SESSION_KEY, true)
+    } = useLocalStorageBoolean(TOP_LEVEL_ONLY_STORAGE_KEY, true)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
     const {actions: {pleaseWait, doneWaiting}} = useContext(PleaseWaitContext)
 
