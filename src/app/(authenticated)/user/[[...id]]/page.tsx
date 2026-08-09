@@ -16,6 +16,8 @@ import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import AppSnackbar from "@/components/AppSnackbar"
 import YesNoDialog from "@/components/YesNoDialog"
 import { storeSuccessMessage, takeSuccessMessage } from "@/utils/successMessageStorage"
+import { useAppSnackbar } from "@/hooks/useAppSnackbar"
+import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 
 const User: FC = () => {
 
@@ -24,7 +26,7 @@ const User: FC = () => {
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
     const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
-    const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    const {snackbar, showSnackbar, closeSnackbar} = useAppSnackbar()
     const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -75,9 +77,9 @@ const User: FC = () => {
         const storedSuccessMessage = takeSuccessMessage()
 
         if (storedSuccessMessage !== null) {
-            setSuccessMessage(storedSuccessMessage)
+            showSnackbar(storedSuccessMessage, AppSnackbarSeverity.Success)
         }
-    }, [id])
+    }, [id, showSnackbar])
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         if (event.target.name === 'Password') {
@@ -118,7 +120,7 @@ const User: FC = () => {
             newUser.Roles = selectedRoles
             
             setUser(await userClient.updateUser(newUser))
-            setSuccessMessage('This user was saved.')
+            showSnackbar('This user was saved.', AppSnackbarSeverity.Success)
         }
 
         doneWaiting()
@@ -175,9 +177,9 @@ const User: FC = () => {
                 onYes={handleDelete}
             />
             <AppSnackbar
-                message={successMessage}
-                severity="success"
-                onClose={() => setSuccessMessage(null)}
+                message={snackbar.message}
+                severity={snackbar.severity}
+                onClose={closeSnackbar}
             />
         </Stack>
     )

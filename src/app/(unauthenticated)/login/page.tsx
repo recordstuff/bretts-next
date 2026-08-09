@@ -10,12 +10,14 @@ import { userClient } from "../../../clients/UserClient"
 import { useRouter } from "next/navigation"
 import { PleaseWaitContext } from "../../../components/PleaseWaitProvider"
 import AppSnackbar from "@/components/AppSnackbar"
+import { useAppSnackbar } from "@/hooks/useAppSnackbar"
+import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 
 const Layout: FC = () => {
 
     const [userCredentials, setUserCredentials] = useState<UserCredentials>(defaultUserCredentials());
     const [useErrorCondition, setUseErrorCondition] = useState<boolean>(false)
-    const [isInvalidCredentials, setIsInvalidCredentials] = useState<boolean>(false)
+    const {snackbar, showSnackbar, closeSnackbar} = useAppSnackbar()
     const router = useRouter()
     const { actions: {pleaseWait, doneWaiting, clearAllWaits} } = useContext(PleaseWaitContext)
 
@@ -40,7 +42,7 @@ const Layout: FC = () => {
         catch (ex: unknown) {
             clearAllWaits()
             if (ex instanceof AxiosError && ex.response?.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
-                setIsInvalidCredentials(true)
+                showSnackbar('The Email or Password was incorrect.', AppSnackbarSeverity.Warning)
                 return
             }
 
@@ -49,7 +51,7 @@ const Layout: FC = () => {
     }
 
     const credentialsChanged = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-        setIsInvalidCredentials(false)
+        closeSnackbar()
         const newCreds = { ...userCredentials }
         newCreds[event.target.name as keyof UserCredentials] = event.target.value
         setUserCredentials(newCreds)
@@ -157,9 +159,9 @@ const Layout: FC = () => {
                         </Link>
                     </Grid>
                     <AppSnackbar
-                        message={isInvalidCredentials ? 'The Email or Password was incorrect.' : null}
-                        severity="warning"
-                        onClose={() => setIsInvalidCredentials(false)}
+                        message={snackbar.message}
+                        severity={snackbar.severity}
+                        onClose={closeSnackbar}
                     />
                 </Grid>
             </Paper>

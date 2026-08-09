@@ -19,6 +19,8 @@ import AppSnackbar from "@/components/AppSnackbar"
 import { takeSuccessMessage } from "@/utils/successMessageStorage"
 import { UsersSortColumn } from "@/models/UsersSortColumn"
 import { SortDirection } from "@/models/SortDirection"
+import { useAppSnackbar } from "@/hooks/useAppSnackbar"
+import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 
 const PAGE_SIZE = 5
 const USER_SORT_COLUMNS = [
@@ -34,7 +36,7 @@ const Users: FC = () => {
     const [roleFilter, setRoleFilter] = useState<JwtRole>(JwtRole.Any)
     const [sortColumn, setSortColumn] = useState<UsersSortColumn>(UsersSortColumn.DisplayName)
     const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Ascending)
-    const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    const {snackbar, showSnackbar, closeSnackbar} = useAppSnackbar()
     const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -79,9 +81,9 @@ const Users: FC = () => {
         const storedSuccessMessage = takeSuccessMessage()
 
         if (storedSuccessMessage !== null) {
-            setSuccessMessage(storedSuccessMessage)
+            showSnackbar(storedSuccessMessage, AppSnackbarSeverity.Success)
         }
-    }, [])
+    }, [showSnackbar])
 
     return (
         <>
@@ -187,9 +189,9 @@ const Users: FC = () => {
                 />
             </Stack>
             <AppSnackbar
-                message={successMessage}
-                severity="success"
-                onClose={() => setSuccessMessage(null)}
+                message={snackbar.message}
+                severity={snackbar.severity}
+                onClose={closeSnackbar}
             />
         </>
     )
