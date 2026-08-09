@@ -5,7 +5,7 @@ import { roleClient } from '@/clients/RoleClient'
 import { useAppSnackbar } from '@/components/AppSnackbarProvider'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
-import YesNoDialog from '@/components/YesNoDialog'
+import { useYesNoDialog } from '@/components/YesNoDialogProvider'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
 import { emptyRoleDetail, RoleDetail } from '@/models/RoleDetail'
 import { RoleNew } from '@/models/RoleNew'
@@ -17,9 +17,9 @@ import { FC, useCallback, useContext, useEffect, useState } from 'react'
 
 const Role: FC = () => {
     const [role, setRole] = useState<RoleDetail>(emptyRoleDetail())
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [showValidation, setShowValidation] = useState(false)
     const {showSnackbar} = useAppSnackbar()
+    const {showYesNoDialog} = useYesNoDialog()
     const {actions: {clearAllWaits, pleaseWait, doneWaiting}} = useContext(PleaseWaitContext)
     const {addBreadcrumb, setPageTitle} = useContext(LeftDrawerContext)
     const {id} = useParams<{id: string}>()
@@ -98,7 +98,6 @@ const Role: FC = () => {
 
     const handleDelete = async (): Promise<void> => {
         if (id === undefined) return
-        setDeleteDialogOpen(false)
         pleaseWait()
         try {
             await roleClient.deleteRole(id)
@@ -135,15 +134,17 @@ const Role: FC = () => {
                 <Button onClick={upsert} color="primary" variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
                 <Button color="secondary" onClick={handleReset}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
                 {id !== undefined && (
-                    <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => showYesNoDialog({
+                            question: 'Are you sure you want to delete this role?',
+                            onYes: handleDelete,
+                        })}>
+                        Delete
+                    </Button>
                 )}
             </Stack>
-            <YesNoDialog
-                open={deleteDialogOpen}
-                question="Are you sure you want to delete this role?"
-                onNo={() => setDeleteDialogOpen(false)}
-                onYes={handleDelete}
-            />
         </Stack>
     )
 }

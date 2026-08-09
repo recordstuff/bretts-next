@@ -13,7 +13,7 @@ import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import YesNoDialog from "@/components/YesNoDialog"
+import { useYesNoDialog } from "@/components/YesNoDialogProvider"
 import { storeSuccessMessage, takeSuccessMessage } from "@/utils/successMessageStorage"
 import { useAppSnackbar } from "@/components/AppSnackbarProvider"
 import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
@@ -24,8 +24,8 @@ const User: FC = () => {
     const [user, setUser] = useState<UserDetail>(emptyUserDetail())
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
     const {showSnackbar} = useAppSnackbar()
+    const {showYesNoDialog} = useYesNoDialog()
     const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -139,7 +139,6 @@ const User: FC = () => {
             return
         }
 
-        setDeleteDialogOpen(false)
         pleaseWait()
 
         await userClient.deleteUser(id)
@@ -167,14 +166,18 @@ const User: FC = () => {
             <Stack direction='row' spacing={2}>
                 <Button onClick={upsert} color='primary' variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
                 <Button color="secondary" onClick={handleCancel}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
-                {id !== undefined && <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>}
+                {id !== undefined && (
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => showYesNoDialog({
+                            question: 'Are you sure you want to delete this user?',
+                            onYes: handleDelete,
+                        })}>
+                        Delete
+                    </Button>
+                )}
             </Stack>
-            <YesNoDialog
-                open={deleteDialogOpen}
-                question="Are you sure you want to delete this user?"
-                onNo={() => setDeleteDialogOpen(false)}
-                onYes={handleDelete}
-            />
         </Stack>
     )
 }

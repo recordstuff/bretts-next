@@ -8,7 +8,7 @@ import {
     DialogTitle,
     Stack,
 } from '@mui/material'
-import { FC, useId } from 'react'
+import { FC } from 'react'
 
 interface YesNoDialogProps {
     open: boolean
@@ -17,27 +17,23 @@ interface YesNoDialogProps {
     onYes: () => void
 }
 
-const YesNoDialog: FC<YesNoDialogProps> = ({ open, question, onNo, onYes }) => {
-    const questionId = useId()
-
-    return (
-        <Dialog
-            open={open}
-            onClose={onNo}
-            aria-labelledby={questionId}
-        >
-            <DialogTitle id={questionId} sx={{ color: 'info.light' }}>
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                    <HelpOutlineIcon color="info" />
-                    <span>{question}</span>
-                </Stack>
-            </DialogTitle>
-            <DialogActions>
-                <Button color="error" onClick={onYes}>Yes</Button>
-                <Button autoFocus color="info" variant="contained" onClick={onNo}>No</Button>
-            </DialogActions>
-        </Dialog>
-    )
-}
+const YesNoDialog: FC<YesNoDialogProps> = ({ open, question, onNo, onYes }) => (
+    <Dialog
+        open={open}
+        onClose={onNo}
+        aria-labelledby="yes-no-dialog-question"
+    >
+        <DialogTitle id="yes-no-dialog-question" sx={{ color: 'info.light' }}>
+            <Stack direction="row" spacing={1.5} alignItems="center">
+                <HelpOutlineIcon color="info" />
+                <span>{question}</span>
+            </Stack>
+        </DialogTitle>
+        <DialogActions>
+            <Button color="error" onClick={onYes}>Yes</Button>
+            <Button autoFocus color="info" variant="contained" onClick={onNo}>No</Button>
+        </DialogActions>
+    </Dialog>
+)
 
 export default YesNoDialog

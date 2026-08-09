@@ -7,7 +7,7 @@ import AttributeValueFields from '@/components/AttributeValueFields'
 import InventoryItemComponentsEditor from '@/components/InventoryItemComponentsEditor'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
-import YesNoDialog from '@/components/YesNoDialog'
+import { useYesNoDialog } from '@/components/YesNoDialogProvider'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
 import { InventoryItemComponentTemplate } from '@/models/InventoryItemComponentTemplate'
 import { emptyInventoryItemDetail, InventoryItemDetail } from '@/models/InventoryItemDetail'
@@ -20,19 +20,13 @@ import { AxiosError } from 'axios'
 import { useParams, useRouter } from 'next/navigation'
 import { FC, useCallback, useContext, useEffect, useState } from 'react'
 
-interface ComponentDeleteRequest {
-    componentLabel: string
-    guid: string
-}
-
 const InventoryItem: FC = () => {
     const [item, setItem] = useState<InventoryItemDetail>(emptyInventoryItemDetail())
     const [componentTemplates, setComponentTemplates] = useState<InventoryItemComponentTemplate[]>([])
     const [definitionOptions, setDefinitionOptions] = useState<NameGuidPair[]>([])
-    const [componentDeleteRequest, setComponentDeleteRequest] = useState<ComponentDeleteRequest | null>(null)
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [showValidation, setShowValidation] = useState(false)
     const {showSnackbar} = useAppSnackbar()
+    const {showYesNoDialog} = useYesNoDialog()
     const {actions: {clearAllWaits, pleaseWait, doneWaiting}} = useContext(PleaseWaitContext)
     const {addBreadcrumb, setPageTitle} = useContext(LeftDrawerContext)
     const {id} = useParams<{id: string}>()
@@ -136,7 +130,6 @@ const InventoryItem: FC = () => {
 
     const handleDelete = async (): Promise<void> => {
         if (id === undefined) return
-        setDeleteDialogOpen(false)
         pleaseWait()
         try {
             await inventoryItemClient.deleteInventoryItem(id)
@@ -149,11 +142,7 @@ const InventoryItem: FC = () => {
         }
     }
 
-    const handleDeleteComponent = async (): Promise<void> => {
-        if (componentDeleteRequest === null) return
-
-        const {guid} = componentDeleteRequest
-        setComponentDeleteRequest(null)
+    const handleDeleteComponent = async (guid: string): Promise<void> => {
         pleaseWait()
         try {
             await inventoryItemClient.deleteInventoryItem(guid)
@@ -210,9 +199,9 @@ const InventoryItem: FC = () => {
                             componentTemplates={componentTemplates}
                             onDelete={id === undefined
                                 ? undefined
-                                : (component, componentLabel) => setComponentDeleteRequest({
-                                    componentLabel,
-                                    guid: component.Guid,
+                                : (component, componentLabel) => showYesNoDialog({
+                                    question: `Are you sure you want to delete ${componentLabel}? Any components it contains will also be deleted.`,
+                                    onYes: () => handleDeleteComponent(component.Guid),
                                 })}
                             onChange={components => setItem(currentItem => ({...currentItem, Components: components}))}
                         />}
@@ -222,23 +211,19 @@ const InventoryItem: FC = () => {
                 <Button onClick={upsert} color="primary" variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
                 <Button color="secondary" onClick={handleReset}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
                 {id !== undefined && (
-                    <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => showYesNoDialog({
+                            question: item.Components.length > 0
+                                ? 'This inventory item contains other inventory items. The contained inventory items will be deleted. Are you sure?'
+                                : 'Are you sure you want to delete this inventory item?',
+                            onYes: handleDelete,
+                        })}>
+                        Delete
+                    </Button>
                 )}
             </Stack>
-            <YesNoDialog
-                open={componentDeleteRequest !== null}
-                question={`Are you sure you want to delete ${componentDeleteRequest?.componentLabel ?? 'this component'}? Any components it contains will also be deleted.`}
-                onNo={() => setComponentDeleteRequest(null)}
-                onYes={handleDeleteComponent}
-            />
-            <YesNoDialog
-                open={deleteDialogOpen}
-                question={item.Components.length > 0
-                    ? 'This inventory item contains other inventory items. The contained inventory items will be deleted. Are you sure?'
-                    : 'Are you sure you want to delete this inventory item?'}
-                onNo={() => setDeleteDialogOpen(false)}
-                onYes={handleDelete}
-            />
         </Stack>
     )
 }

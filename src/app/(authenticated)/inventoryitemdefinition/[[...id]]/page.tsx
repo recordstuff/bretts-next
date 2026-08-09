@@ -8,7 +8,7 @@ import AttributeDefinitionsSelector from '@/components/AttributeDefinitionsSelec
 import InventoryItemDefinitionComponentsEditor from '@/components/InventoryItemDefinitionComponentsEditor'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
-import YesNoDialog from '@/components/YesNoDialog'
+import { useYesNoDialog } from '@/components/YesNoDialogProvider'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
 import { AttributeDefinitionDetail } from '@/models/AttributeDefinitionDetail'
 import { AttributeDefinitionNew } from '@/models/AttributeDefinitionNew'
@@ -25,9 +25,9 @@ const InventoryItemDefinition: FC = () => {
     const [definition, setDefinition] = useState<InventoryItemDefinitionDetail>(emptyInventoryItemDefinitionDetail())
     const [attributeOptions, setAttributeOptions] = useState<AttributeDefinitionDetail[]>([])
     const [definitionOptions, setDefinitionOptions] = useState<NameGuidPair[]>([])
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [showValidation, setShowValidation] = useState(false)
     const {showSnackbar} = useAppSnackbar()
+    const {showYesNoDialog} = useYesNoDialog()
     const {actions: {clearAllWaits, pleaseWait, doneWaiting}} = useContext(PleaseWaitContext)
     const {addBreadcrumb, setPageTitle} = useContext(LeftDrawerContext)
     const {id} = useParams<{id: string}>()
@@ -191,7 +191,6 @@ const InventoryItemDefinition: FC = () => {
     const handleDelete = async (): Promise<void> => {
         if (id === undefined) return
 
-        setDeleteDialogOpen(false)
         pleaseWait()
 
         try {
@@ -263,15 +262,17 @@ const InventoryItemDefinition: FC = () => {
                 <Button onClick={upsert} color="primary" variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
                 <Button color="secondary" onClick={handleReset}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
                 {id !== undefined && (
-                    <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => showYesNoDialog({
+                            question: 'Are you sure you want to delete this inventory item definition?',
+                            onYes: handleDelete,
+                        })}>
+                        Delete
+                    </Button>
                 )}
             </Stack>
-            <YesNoDialog
-                open={deleteDialogOpen}
-                question="Are you sure you want to delete this inventory item definition?"
-                onNo={() => setDeleteDialogOpen(false)}
-                onYes={handleDelete}
-            />
         </Stack>
     )
 }
