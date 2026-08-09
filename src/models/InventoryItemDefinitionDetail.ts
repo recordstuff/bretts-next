@@ -1,9 +1,9 @@
-import { InventoryItemAttributeDefinitionDetail } from './InventoryItemAttributeDefinitionDetail'
+import { AttributeDefinitionDetail } from './AttributeDefinitionDetail'
 import { InventoryItemDefinitionComponentDetail } from './InventoryItemDefinitionComponentDetail'
 import { InventoryItemDefinitionSummary } from './InventoryItemDefinitionSummary'
 
 export interface InventoryItemDefinitionDetail extends InventoryItemDefinitionSummary {
-    Attributes: InventoryItemAttributeDefinitionDetail[]
+    Attributes: AttributeDefinitionDetail[]
     Components: InventoryItemDefinitionComponentDetail[]
 }
 

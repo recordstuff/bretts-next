@@ -1,23 +1,23 @@
-import { InventoryItemAttributeDataType } from '@/models/InventoryItemAttributeDataType'
-import { InventoryItemAttributeDefinitionDetail } from '@/models/InventoryItemAttributeDefinitionDetail'
+import { AttributeDataType } from '@/models/AttributeDataType'
+import { AttributeDefinitionDetail } from '@/models/AttributeDefinitionDetail'
 import AddIcon from '@mui/icons-material/Add'
 import { Button, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { ChangeEvent, FC } from 'react'
 
 const EMPTY_GUID = '00000000-0000-0000-0000-000000000000'
 const DATA_TYPE_OPTIONS = [
-    {label: 'String', value: InventoryItemAttributeDataType.String},
-    {label: 'Integer', value: InventoryItemAttributeDataType.Integer},
-    {label: 'Currency', value: InventoryItemAttributeDataType.Currency},
+    {label: 'String', value: AttributeDataType.String},
+    {label: 'Integer', value: AttributeDataType.Integer},
+    {label: 'Currency', value: AttributeDataType.Currency},
 ] as const
 
-interface InventoryItemDefinitionAttributesEditorProps {
-    attributes: InventoryItemAttributeDefinitionDetail[]
-    onChange: (attributes: InventoryItemAttributeDefinitionDetail[]) => void
+interface AttributeDefinitionsEditorProps {
+    attributes: AttributeDefinitionDetail[]
+    onChange: (attributes: AttributeDefinitionDetail[]) => void
     showValidation: boolean
 }
 
-const InventoryItemDefinitionAttributesEditor: FC<InventoryItemDefinitionAttributesEditorProps> = ({
+const AttributeDefinitionsEditor: FC<AttributeDefinitionsEditorProps> = ({
     attributes,
     onChange,
     showValidation,
@@ -28,7 +28,7 @@ const InventoryItemDefinitionAttributesEditor: FC<InventoryItemDefinitionAttribu
         onChange([...attributes, {
             Guid: EMPTY_GUID,
             Name: '',
-            DataType: InventoryItemAttributeDataType.String,
+            DataType: AttributeDataType.String,
         }])
     }
 
@@ -40,7 +40,7 @@ const InventoryItemDefinitionAttributesEditor: FC<InventoryItemDefinitionAttribu
 
     const updateDataType = (index: number, event: ChangeEvent<HTMLInputElement>): void => {
         onChange(attributes.map((attribute, attributeIndex) => attributeIndex === index
-            ? {...attribute, DataType: Number(event.target.value) as InventoryItemAttributeDataType}
+            ? {...attribute, DataType: Number(event.target.value) as AttributeDataType}
             : attribute))
     }
 
@@ -129,4 +129,4 @@ const InventoryItemDefinitionAttributesEditor: FC<InventoryItemDefinitionAttribu
     )
 }
 
-export default InventoryItemDefinitionAttributesEditor
+export default AttributeDefinitionsEditor

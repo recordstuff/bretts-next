@@ -3,7 +3,7 @@
 import { HTTP_STATUS_CODES } from '@/clients/HttpClient'
 import { inventoryItemDefinitionClient } from '@/clients/InventoryItemDefinitionClient'
 import { useAppSnackbar } from '@/components/AppSnackbarProvider'
-import InventoryItemDefinitionAttributesEditor from '@/components/InventoryItemDefinitionAttributesEditor'
+import AttributeDefinitionsEditor from '@/components/AttributeDefinitionsEditor'
 import InventoryItemDefinitionComponentsEditor from '@/components/InventoryItemDefinitionComponentsEditor'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
@@ -193,7 +193,7 @@ const InventoryItemDefinition: FC = () => {
                 onChange={handleChange}
                 value={definition.Description ?? ''}
             />
-            <InventoryItemDefinitionAttributesEditor
+            <AttributeDefinitionsEditor
                 attributes={definition.Attributes}
                 onChange={attributes => setDefinition(currentDefinition => ({
                     ...currentDefinition,
