@@ -63,7 +63,7 @@ const Dashboard: FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     color="primary"
-                    sx={{alignSelf: 'flex-end'}}>
+                    sx={{alignSelf: 'flex-start'}}>
                     brettdrake.org
                 </Link>
             </Stack>
