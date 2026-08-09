@@ -3,15 +3,14 @@
 import { FC, useContext, useMemo, useState } from "react"
 import PrivateRoute from "../components/PrivateRoute"
 import { AppBar, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material"
-import AgricultureIcon from '@mui/icons-material/Agriculture';
-import HomeIcon from '@mui/icons-material/Home';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import MenuIcon from '@mui/icons-material/Menu';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
-import TableChartIcon from '@mui/icons-material/TableChart';
-import TableRowsIcon from '@mui/icons-material/TableRows';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import LabelIcon from '@mui/icons-material/Label';
+import WarehouseIcon from '@mui/icons-material/Warehouse';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { DrawerMenuItem, MenuOption, divider } from "../models/MenuOption";
 import { JwtField, JwtRole } from "../models/Jwt";
 import { jwtUtil } from "../helpers/JwtUtil"
@@ -24,32 +23,19 @@ const drawerWidth = 200
 
 const menuOptions: DrawerMenuItem[] = [
     {
-        Text: "Home",
+        Text: "Dashboard",
         Route: "/",
-        Icon: HomeIcon,
+        Icon: DashboardIcon,
         Role: JwtRole.Any,
-        Breadcrumb: { title: "Home", url: "/" },
+        Breadcrumb: { title: "Dashboard", url: "/" },
     },
     {
-        Text: "Grid Example",
-        Route: "/gridexample",
-        Icon: TableRowsIcon,
+        Text: "Inventory",
+        Route: "/inventory",
+        Icon: WarehouseIcon,
         Role: JwtRole.User,
-        Breadcrumb: { title: "Grid Example", url: "/gridexample" },
-    },
-    {
-        Text: "Example Two",
-        Route: "/exampletwo",
-        Icon: TableChartIcon,
-        Role: JwtRole.User,
-        Breadcrumb: { title: "Example Two", url: "/exampletwo" },
-    },
-    {
-        Text: "Bacon Ipsum",
-        Route: "/baconipsum",
-        Icon: AgricultureIcon,
-        Role: JwtRole.User,
-        Breadcrumb: { title: "Bacon Ipsum", url: "/baconipsum" },
+        Breadcrumb: { title: "Inventory", url: "/inventory" },
+        ChildRoutes: ['/inventoryitem']
     },
     divider,
     {
@@ -75,6 +61,14 @@ const menuOptions: DrawerMenuItem[] = [
         Role: JwtRole.Admin,
         Breadcrumb: { title: "Users", url: "/users" },
         ChildRoutes: ['/user']
+    },
+    {
+        Text: "Roles",
+        Route: "/roles",
+        Icon: AdminPanelSettingsIcon,
+        Role: JwtRole.Admin,
+        Breadcrumb: { title: "Roles", url: "/roles" },
+        ChildRoutes: ['/role']
     },
     {
         Text: "Settings",
