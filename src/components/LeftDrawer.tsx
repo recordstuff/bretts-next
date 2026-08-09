@@ -20,6 +20,9 @@ import { LeftDrawerContext } from "./LeftDrawerProvider";
 
 const drawerWidth = 200
 
+const matchesChildRoute = (pathname: string, childRoute: string): boolean =>
+    pathname === childRoute || pathname.startsWith(`${childRoute}/`)
+
 const menuOptions: DrawerMenuItem[] = [
     {
         Text: "Dashboard",
@@ -83,7 +86,8 @@ const LeftDrawer: FC<Props> = ({ children }) => {
     const selectedMenuOption = useMemo(() => menuOptions.find(menuOption =>
         menuOption !== divider
         && ((menuOption as MenuOption).Route === pathname
-            || (menuOption as MenuOption).ChildRoutes?.some(cr => pathname.startsWith(cr)))) ?? menuOptions[0], [pathname])
+            || (menuOption as MenuOption).ChildRoutes?.some(childRoute =>
+                matchesChildRoute(pathname, childRoute)))) ?? menuOptions[0], [pathname])
 
     const handleDrawerToggle = (): void => {
         setMobileOpen(isOpen => !isOpen)
