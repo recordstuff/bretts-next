@@ -11,6 +11,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
+import LabelIcon from '@mui/icons-material/Label';
 import { DrawerMenuItem, MenuOption, divider } from "../models/MenuOption";
 import { JwtField, JwtRole } from "../models/Jwt";
 import { jwtUtil } from "../helpers/JwtUtil"
@@ -58,6 +59,14 @@ const menuOptions: DrawerMenuItem[] = [
         Role: JwtRole.Admin,
         Breadcrumb: { title: "Users", url: "/users" },
         ChildRoutes: ['/user']
+    },
+    {
+        Text: "Attribute Definitions",
+        Route: "/attributedefinitions",
+        Icon: LabelIcon,
+        Role: JwtRole.Admin,
+        Breadcrumb: { title: "Attribute Definitions", url: "/attributedefinitions" },
+        ChildRoutes: ['/attributedefinition']
     },
     {
         Text: "Inventory Definitions",
