@@ -1,14 +1,17 @@
 'use client'
 
 import { HTTP_STATUS_CODES } from '@/clients/HttpClient'
+import { attributeDefinitionClient } from '@/clients/AttributeDefinitionClient'
 import { inventoryItemDefinitionClient } from '@/clients/InventoryItemDefinitionClient'
 import { useAppSnackbar } from '@/components/AppSnackbarProvider'
-import AttributeDefinitionsEditor from '@/components/AttributeDefinitionsEditor'
+import AttributeDefinitionsSelector from '@/components/AttributeDefinitionsSelector'
 import InventoryItemDefinitionComponentsEditor from '@/components/InventoryItemDefinitionComponentsEditor'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
 import YesNoDialog from '@/components/YesNoDialog'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
+import { AttributeDefinitionDetail } from '@/models/AttributeDefinitionDetail'
+import { AttributeDefinitionNew } from '@/models/AttributeDefinitionNew'
 import { emptyInventoryItemDefinitionDetail, InventoryItemDefinitionDetail } from '@/models/InventoryItemDefinitionDetail'
 import { InventoryItemDefinitionNew } from '@/models/InventoryItemDefinitionNew'
 import { NameGuidPair } from '@/models/NameGuidPair'
@@ -20,6 +23,7 @@ import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from 'r
 
 const InventoryItemDefinition: FC = () => {
     const [definition, setDefinition] = useState<InventoryItemDefinitionDetail>(emptyInventoryItemDefinitionDetail())
+    const [attributeOptions, setAttributeOptions] = useState<AttributeDefinitionDetail[]>([])
     const [definitionOptions, setDefinitionOptions] = useState<NameGuidPair[]>([])
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [showValidation, setShowValidation] = useState(false)
@@ -32,13 +36,15 @@ const InventoryItemDefinition: FC = () => {
     const loadDefinition = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        const [possibleItemDefinitionComponents, inventoryItemDefinition] = await Promise.all([
+        const [possibleAttributes, possibleItemDefinitionComponents, inventoryItemDefinition] = await Promise.all([
+            attributeDefinitionClient.getAttributeDefinitionOptions(),
             inventoryItemDefinitionClient.getInventoryItemDefinitionOptions(),
             id === undefined
                 ? Promise.resolve(emptyInventoryItemDefinitionDetail())
                 : inventoryItemDefinitionClient.getInventoryItemDefinition(id),
         ])
 
+        setAttributeOptions(possibleAttributes)
         setDefinitionOptions(possibleItemDefinitionComponents)
         setDefinition(inventoryItemDefinition)
         setShowValidation(false)
@@ -78,18 +84,6 @@ const InventoryItemDefinition: FC = () => {
 
         if (definition.Name.trim().length === 0) {
             showSnackbar('A definition name is required.', AppSnackbarSeverity.Warning)
-            return
-        }
-
-        const attributeNames = definition.Attributes.map(attribute => attribute.Name.trim().toLocaleLowerCase())
-
-        if (attributeNames.some(name => name.length === 0)) {
-            showSnackbar('Every attribute requires a name.', AppSnackbarSeverity.Warning)
-            return
-        }
-
-        if (new Set(attributeNames).size !== attributeNames.length) {
-            showSnackbar('Attribute names must be unique.', AppSnackbarSeverity.Warning)
             return
         }
 
@@ -145,6 +139,35 @@ const InventoryItemDefinition: FC = () => {
         loadDefinition()
     }
 
+    const quickAddAttribute = async (newAttribute: AttributeDefinitionNew): Promise<boolean> => {
+        pleaseWait()
+
+        try {
+            const addedAttribute = await attributeDefinitionClient.insertAttributeDefinition(newAttribute)
+
+            setAttributeOptions(currentOptions => [...currentOptions, addedAttribute]
+                .sort((left, right) => left.Name.localeCompare(right.Name)))
+            setDefinition(currentDefinition => ({
+                ...currentDefinition,
+                Attributes: [...currentDefinition.Attributes, addedAttribute],
+                AttributeCount: currentDefinition.Attributes.length + 1,
+            }))
+            doneWaiting()
+            showSnackbar('The attribute definition was created and selected.', AppSnackbarSeverity.Success)
+
+            return true
+        } catch (ex: unknown) {
+            clearAllWaits()
+
+            if (ex instanceof AxiosError && ex.response?.status === HTTP_STATUS_CODES.CONFLICT) {
+                showSnackbar('An attribute definition with this name already exists.', AppSnackbarSeverity.Error)
+                return false
+            }
+
+            throw ex
+        }
+    }
+
     const handleDelete = async (): Promise<void> => {
         if (id === undefined) return
 
@@ -193,14 +216,15 @@ const InventoryItemDefinition: FC = () => {
                 onChange={handleChange}
                 value={definition.Description ?? ''}
             />
-            <AttributeDefinitionsEditor
-                attributes={definition.Attributes}
+            <AttributeDefinitionsSelector
+                allAttributes={attributeOptions}
+                selectedAttributes={definition.Attributes}
                 onChange={attributes => setDefinition(currentDefinition => ({
                     ...currentDefinition,
                     Attributes: attributes,
                     AttributeCount: attributes.length,
                 }))}
-                showValidation={showValidation}
+                onQuickAdd={quickAddAttribute}
             />
             <InventoryItemDefinitionComponentsEditor
                 allDefinitions={definitionOptions}

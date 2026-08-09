@@ -11,6 +11,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
+import LabelIcon from '@mui/icons-material/Label';
 import { DrawerMenuItem, MenuOption, divider } from "../models/MenuOption";
 import { JwtField, JwtRole } from "../models/Jwt";
 import { jwtUtil } from "../helpers/JwtUtil"
@@ -52,20 +53,28 @@ const menuOptions: DrawerMenuItem[] = [
     },
     divider,
     {
-        Text: "Users",
-        Route: "/users",
-        Icon: PeopleIcon,
-        Role: JwtRole.Admin,
-        Breadcrumb: { title: "Users", url: "/users" },
-        ChildRoutes: ['/user']
-    },
-    {
         Text: "Inventory Definitions",
         Route: "/inventoryitemdefinitions",
         Icon: Inventory2Icon,
         Role: JwtRole.Admin,
         Breadcrumb: { title: "Inventory Item Definitions", url: "/inventoryitemdefinitions" },
         ChildRoutes: ['/inventoryitemdefinition']
+    },
+    {
+        Text: "Attribute Definitions",
+        Route: "/attributedefinitions",
+        Icon: LabelIcon,
+        Role: JwtRole.Admin,
+        Breadcrumb: { title: "Attribute Definitions", url: "/attributedefinitions" },
+        ChildRoutes: ['/attributedefinition']
+    },
+    {
+        Text: "Users",
+        Route: "/users",
+        Icon: PeopleIcon,
+        Role: JwtRole.Admin,
+        Breadcrumb: { title: "Users", url: "/users" },
+        ChildRoutes: ['/user']
     },
     {
         Text: "Settings",
