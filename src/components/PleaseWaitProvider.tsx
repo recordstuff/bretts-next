@@ -16,7 +16,7 @@ export const PleaseWaitProvider: FC<Props> = ({ children }) => {
             setWaitCount(previousWaitCount => previousWaitCount + 1)
         }, 
         doneWaiting: () => {
-            setWaitCount(previousWaitCount => Math.min(previousWaitCount - 1, 0))
+            setWaitCount(previousWaitCount => Math.max(previousWaitCount - 1, 0))
         }, 
         clearAllWaits: () => {
             setWaitCount(0)

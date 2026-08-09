@@ -66,7 +66,7 @@ const InventoryItemComponentsEditor: FC<InventoryItemComponentsEditorProps> = ({
                         >
                             <Stack alignItems="flex-start" spacing={1.5}>
                                 <Typography component="h3" variant="h6">{componentLabel}</Typography>
-                                <Typography color="text.secondary">This required component is missing.</Typography>
+                                <Typography color="text.secondary">This component is missing.</Typography>
                                 <Button startIcon={<AddIcon />} onClick={() => addComponent(template)}>
                                     Add {template.InventoryItemDefinitionName} Component
                                 </Button>
