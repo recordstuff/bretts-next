@@ -13,9 +13,10 @@ import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import AppSnackbar from "@/components/AppSnackbar"
 import YesNoDialog from "@/components/YesNoDialog"
 import { storeSuccessMessage, takeSuccessMessage } from "@/utils/successMessageStorage"
+import { useAppSnackbar } from "@/components/AppSnackbarProvider"
+import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 
 const User: FC = () => {
 
@@ -24,7 +25,7 @@ const User: FC = () => {
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
     const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
-    const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    const {showSnackbar} = useAppSnackbar()
     const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -75,9 +76,9 @@ const User: FC = () => {
         const storedSuccessMessage = takeSuccessMessage()
 
         if (storedSuccessMessage !== null) {
-            setSuccessMessage(storedSuccessMessage)
+            showSnackbar(storedSuccessMessage, AppSnackbarSeverity.Success)
         }
-    }, [id])
+    }, [id, showSnackbar])
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         if (event.target.name === 'Password') {
@@ -118,7 +119,7 @@ const User: FC = () => {
             newUser.Roles = selectedRoles
             
             setUser(await userClient.updateUser(newUser))
-            setSuccessMessage('This user was saved.')
+            showSnackbar('This user was saved.', AppSnackbarSeverity.Success)
         }
 
         doneWaiting()
@@ -173,11 +174,6 @@ const User: FC = () => {
                 question="Are you sure you want to delete this user?"
                 onNo={() => setDeleteDialogOpen(false)}
                 onYes={handleDelete}
-            />
-            <AppSnackbar
-                message={successMessage}
-                severity="success"
-                onClose={() => setSuccessMessage(null)}
             />
         </Stack>
     )

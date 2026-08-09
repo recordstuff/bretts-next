@@ -2,11 +2,11 @@
 
 import { Alert, Fade, Snackbar } from '@mui/material'
 import { FC } from 'react'
-import type { AlertColor } from '@mui/material'
+import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
 
 interface AppSnackbarProps {
     message: string | null
-    severity: AlertColor
+    severity: AppSnackbarSeverity
     onClose: () => void
 }
 

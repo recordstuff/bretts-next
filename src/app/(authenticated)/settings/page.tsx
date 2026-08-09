@@ -2,14 +2,14 @@
 
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import { testClient } from "@/clients/TestClient"
-import AppSnackbar from "@/components/AppSnackbar"
 import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
 import { alpha } from "@mui/material/styles"
-import { FC, useContext, useEffect, useState } from "react"
+import { FC, useContext, useEffect } from "react"
+import { useAppSnackbar } from "@/components/AppSnackbarProvider"
+import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 
 const Settings: FC = () => {
-    const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null)
-    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success')
+    const {showSnackbar} = useAppSnackbar()
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     useEffect(() => {
@@ -24,22 +24,18 @@ const Settings: FC = () => {
     const writeLogEntry = async (): Promise<void> => {
         try {
             await testClient.writeLogEntry()
-            setSnackbarSeverity('success')
-            setSnackbarMessage('The test log entry was written.')
+            showSnackbar('The test log entry was written.', AppSnackbarSeverity.Success)
         } catch {
-            setSnackbarSeverity('error')
-            setSnackbarMessage('The test log entry could not be written.')
+            showSnackbar('The test log entry could not be written.', AppSnackbarSeverity.Error)
         }
     }
 
     const shutdown = async (): Promise<void> => {
         try {
             await testClient.shutdown()
-            setSnackbarSeverity('success')
-            setSnackbarMessage('The backend shutdown was requested.')
+            showSnackbar('The backend shutdown was requested.', AppSnackbarSeverity.Success)
         } catch {
-            setSnackbarSeverity('error')
-            setSnackbarMessage('The backend shutdown could not be requested.')
+            showSnackbar('The backend shutdown could not be requested.', AppSnackbarSeverity.Error)
         }
     }
     
@@ -100,11 +96,6 @@ const Settings: FC = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <AppSnackbar
-                message={snackbarMessage}
-                severity={snackbarSeverity}
-                onClose={() => setSnackbarMessage(null)}
-            />
         </Stack>
     )
 }
