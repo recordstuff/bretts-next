@@ -95,7 +95,7 @@ const Layout: FC = () => {
                 }}>
                 <Grid container direction="column" spacing={2}>
                     <Grid item>
-                        This is a React sample using NextJS.  Log in with Admin and User rights to see all the options including Users CRUD operations.
+                        This is a sample Inventory app written using React NextJS.  Log in with Admin and User rights to see all the options and create Inventory Definitions, Inventory Items, Users, Roles, etc.
                     </Grid>
                     <Grid item>
                         <Box

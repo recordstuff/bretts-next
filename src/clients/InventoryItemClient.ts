@@ -17,6 +17,7 @@ class InventoryItemClient extends HttpClient {
         page: number,
         pageSize: number,
         searchText: string | null = null,
+        topLevelOnly: boolean = false,
         sortColumn: InventoryItemsSortColumn = InventoryItemsSortColumn.Definition,
         sortDirection: SortDirection = SortDirection.Ascending
     ): Promise<PaginationResult<InventoryItemSummary>> {
@@ -24,6 +25,7 @@ class InventoryItemClient extends HttpClient {
             page,
             pageSize,
             searchText,
+            topLevelOnly,
             sortColumn,
             sortDirection,
         })

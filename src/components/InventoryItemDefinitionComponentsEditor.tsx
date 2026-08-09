@@ -1,23 +1,40 @@
+import { AttributeDefinitionDetail } from '@/models/AttributeDefinitionDetail'
+import { AttributeDefinitionNew } from '@/models/AttributeDefinitionNew'
 import { InventoryItemDefinitionComponentDetail } from '@/models/InventoryItemDefinitionComponentDetail'
+import { InventoryItemDefinitionNew } from '@/models/InventoryItemDefinitionNew'
 import { NameGuidPair } from '@/models/NameGuidPair'
-import { Button, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { ChangeEvent, FC, useMemo, useState } from 'react'
+import AttributeDefinitionsSelector from './AttributeDefinitionsSelector'
 
 interface InventoryItemDefinitionComponentsEditorProps {
     allDefinitions: NameGuidPair[]
+    allAttributes: AttributeDefinitionDetail[]
     components: InventoryItemDefinitionComponentDetail[]
     currentDefinitionGuid?: string
     onChange: (components: InventoryItemDefinitionComponentDetail[]) => void
+    onQuickAdd: (definition: InventoryItemDefinitionNew) => Promise<NameGuidPair | null>
+    onQuickAddAttribute: (definition: AttributeDefinitionNew) => Promise<AttributeDefinitionDetail | null>
 }
 
 const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionComponentsEditorProps> = ({
     allDefinitions,
+    allAttributes,
     components,
     currentDefinitionGuid,
     onChange,
+    onQuickAdd,
+    onQuickAddAttribute,
 }) => {
     const [selectedGuid, setSelectedGuid] = useState('')
     const [quantity, setQuantity] = useState(1)
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [name, setName] = useState('')
+    const [description, setDescription] = useState('')
+    const [showValidation, setShowValidation] = useState(false)
+    const [adding, setAdding] = useState(false)
+    const [newDefinitionAttributes, setNewDefinitionAttributes] = useState<AttributeDefinitionDetail[]>([])
 
     const availableDefinitions = useMemo(() => allDefinitions.filter(definition =>
         definition.Guid !== currentDefinitionGuid
@@ -48,6 +65,49 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
 
     const removeComponent = (guid: string): void => {
         onChange(components.filter(component => component.Guid !== guid))
+    }
+
+    const closeDialog = (): void => {
+        if (adding) return
+
+        setDialogOpen(false)
+        setName('')
+        setDescription('')
+        setNewDefinitionAttributes([])
+        setShowValidation(false)
+    }
+
+    const addDefinition = async (): Promise<void> => {
+        setShowValidation(true)
+
+        if (name.trim().length === 0) return
+
+        setAdding(true)
+
+        try {
+            const addedDefinition = await onQuickAdd({
+                Name: name,
+                Description: description,
+                Attributes: newDefinitionAttributes,
+                Components: [],
+            })
+
+            if (addedDefinition === null) return
+
+            onChange([...components, {
+                Guid: addedDefinition.Guid,
+                Name: addedDefinition.Name,
+                Quantity: quantity,
+            }])
+            setQuantity(1)
+            setDialogOpen(false)
+            setName('')
+            setDescription('')
+            setNewDefinitionAttributes([])
+            setShowValidation(false)
+        } finally {
+            setAdding(false)
+        }
     }
 
     return (
@@ -81,6 +141,14 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
                     sx={{minWidth: {sm: '9rem'}}}
                 >
                     Add Component
+                </Button>
+                <Button
+                    onClick={() => setDialogOpen(true)}
+                    startIcon={<AddIcon />}
+                    variant="outlined"
+                    sx={{minWidth: {sm: '15rem'}}}
+                >
+                    New Inventory Definition
                 </Button>
             </Stack>
             <TableContainer component={Paper} variant="outlined">
@@ -119,6 +187,39 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Dialog open={dialogOpen} onClose={closeDialog} fullWidth maxWidth="md">
+                <DialogTitle>Add Inventory Item Definition</DialogTitle>
+                <DialogContent>
+                    <Stack spacing={3} paddingTop={1}>
+                        <TextField
+                            autoFocus
+                            required
+                            error={showValidation && name.trim().length === 0}
+                            helperText={showValidation && name.trim().length === 0 ? 'Name is required.' : undefined}
+                            label="Name"
+                            value={name}
+                            onChange={event => setName(event.target.value)}
+                        />
+                        <TextField
+                            label="Description"
+                            multiline
+                            minRows={3}
+                            value={description}
+                            onChange={event => setDescription(event.target.value)}
+                        />
+                        <AttributeDefinitionsSelector
+                            allAttributes={allAttributes}
+                            selectedAttributes={newDefinitionAttributes}
+                            onChange={setNewDefinitionAttributes}
+                            onQuickAdd={onQuickAddAttribute}
+                        />
+                    </Stack>
+                </DialogContent>
+                <DialogActions>
+                    <Button color="secondary" disabled={adding} onClick={closeDialog}>Cancel</Button>
+                    <Button disabled={adding} onClick={addDefinition} variant="contained">Add</Button>
+                </DialogActions>
+            </Dialog>
         </Stack>
     )
 }

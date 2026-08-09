@@ -1,10 +1,8 @@
 import { InventoryItemNew } from './InventoryItemNew'
-import { InventoryItemSummary } from './InventoryItemSummary'
 
 export interface InventoryItemDetail extends InventoryItemNew {
     Guid: string
     InventoryItemDefinitionName: string
-    Components: InventoryItemSummary[]
 }
 
 export const emptyInventoryItemDetail = (): InventoryItemDetail => ({

@@ -3,27 +3,37 @@
 import { HTTP_STATUS_CODES } from '@/clients/HttpClient'
 import { inventoryItemClient } from '@/clients/InventoryItemClient'
 import { useAppSnackbar } from '@/components/AppSnackbarProvider'
+import AttributeValueFields from '@/components/AttributeValueFields'
+import InventoryItemComponentsEditor from '@/components/InventoryItemComponentsEditor'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
 import YesNoDialog from '@/components/YesNoDialog'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
-import { AttributeDataType } from '@/models/AttributeDataType'
-import { AttributeValueDetail } from '@/models/AttributeValueDetail'
+import { InventoryItemComponentDetail } from '@/models/InventoryItemComponentDetail'
 import { InventoryItemComponentTemplate } from '@/models/InventoryItemComponentTemplate'
 import { emptyInventoryItemDetail, InventoryItemDetail } from '@/models/InventoryItemDetail'
 import { InventoryItemNew } from '@/models/InventoryItemNew'
 import { NameGuidPair } from '@/models/NameGuidPair'
 import { storeSuccessMessage, takeSuccessMessage } from '@/utils/successMessageStorage'
-import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from '@mui/material'
 import { AxiosError } from 'axios'
 import { useParams, useRouter } from 'next/navigation'
-import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from 'react'
-import Link from 'next/link'
+import { FC, useCallback, useContext, useEffect, useState } from 'react'
+
+const emptyGuid = '00000000-0000-0000-0000-000000000000'
+
+const toComponentDetail = (template: InventoryItemComponentTemplate): InventoryItemComponentDetail => ({
+    Guid: emptyGuid,
+    InventoryItemDefinitionGuid: template.InventoryItemDefinitionGuid,
+    InventoryItemDefinitionName: template.InventoryItemDefinitionName,
+    SerialNumber: '',
+    Attributes: template.Attributes,
+    Components: template.Components.map(toComponentDetail),
+})
 
 const InventoryItem: FC = () => {
     const [item, setItem] = useState<InventoryItemDetail>(emptyInventoryItemDetail())
     const [definitionOptions, setDefinitionOptions] = useState<NameGuidPair[]>([])
-    const [componentTemplates, setComponentTemplates] = useState<InventoryItemComponentTemplate[]>([])
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [showValidation, setShowValidation] = useState(false)
     const {showSnackbar} = useAppSnackbar()
@@ -42,7 +52,6 @@ const InventoryItem: FC = () => {
         ])
         setDefinitionOptions(options)
         setItem(loadedItem)
-        setComponentTemplates([])
         setShowValidation(false)
         doneWaiting()
     }, [id, pleaseWait, doneWaiting])
@@ -72,35 +81,9 @@ const InventoryItem: FC = () => {
             InventoryItemDefinitionGuid: inventoryItemDefinitionGuid,
             InventoryItemDefinitionName: template.InventoryItemDefinitionName,
             Attributes: template.Attributes,
+            Components: template.Components.map(toComponentDetail),
         }))
-        setComponentTemplates(template.Components)
         doneWaiting()
-    }
-
-    const updateAttribute = (
-        attributeGuid: string,
-        updates: Partial<AttributeValueDetail>
-    ): void => {
-        setItem(currentItem => ({
-            ...currentItem,
-            Attributes: currentItem.Attributes.map(attribute => attribute.AttributeDefinitionGuid === attributeGuid
-                ? {...attribute, ...updates}
-                : attribute),
-        }))
-    }
-
-    const handleNumberChange = (
-        attribute: AttributeValueDetail,
-        event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ): void => {
-        const value = event.target.value === '' ? null : Number(event.target.value)
-        if (attribute.DataType === AttributeDataType.Integer) {
-            updateAttribute(attribute.AttributeDefinitionGuid, {IntegerValue: value})
-        } else if (attribute.DataType === AttributeDataType.Currency) {
-            updateAttribute(attribute.AttributeDefinitionGuid, {CurrencyValue: value})
-        } else {
-            updateAttribute(attribute.AttributeDefinitionGuid, {DecimalValue: value})
-        }
     }
 
     const upsert = async (): Promise<void> => {
@@ -117,6 +100,7 @@ const InventoryItem: FC = () => {
                     InventoryItemDefinitionGuid: item.InventoryItemDefinitionGuid,
                     SerialNumber: item.SerialNumber,
                     Attributes: item.Attributes,
+                    Components: item.Components,
                 }
                 const addedItem = await inventoryItemClient.insertInventoryItem(newItem)
                 doneWaiting()
@@ -160,64 +144,8 @@ const InventoryItem: FC = () => {
             router.push('/inventory')
         } catch (ex: unknown) {
             clearAllWaits()
-            if (ex instanceof AxiosError && ex.response?.status === HTTP_STATUS_CODES.CONFLICT) {
-                showSnackbar('This inventory item contains other items and cannot be deleted.', AppSnackbarSeverity.Error)
-                return
-            }
             throw ex
         }
-    }
-
-    const attributeField = (attribute: AttributeValueDetail) => {
-        if (attribute.DataType === AttributeDataType.Checkbox) {
-            return (
-                <FormControlLabel
-                    key={attribute.AttributeDefinitionGuid}
-                    control={<Checkbox
-                        checked={attribute.CheckboxValue}
-                        onChange={event => updateAttribute(attribute.AttributeDefinitionGuid, {
-                            CheckboxValue: event.target.checked,
-                        })}
-                    />}
-                    label={attribute.Name}
-                />
-            )
-        }
-
-        if (attribute.DataType === AttributeDataType.String) {
-            return (
-                <TextField
-                    fullWidth
-                    key={attribute.AttributeDefinitionGuid}
-                    label={attribute.Name}
-                    onChange={event => updateAttribute(attribute.AttributeDefinitionGuid, {
-                        StringValue: event.target.value.length === 0 ? null : event.target.value,
-                    })}
-                    value={attribute.StringValue ?? ''}
-                />
-            )
-        }
-
-        const value = attribute.DataType === AttributeDataType.Integer
-            ? attribute.IntegerValue
-            : attribute.DataType === AttributeDataType.Currency
-                ? attribute.CurrencyValue
-                : attribute.DecimalValue
-        const step = attribute.DataType === AttributeDataType.Integer
-            ? 1
-            : attribute.DataType === AttributeDataType.Currency ? 0.01 : 'any'
-
-        return (
-            <TextField
-                fullWidth
-                key={attribute.AttributeDefinitionGuid}
-                inputProps={{step}}
-                label={attribute.Name}
-                onChange={event => handleNumberChange(attribute, event)}
-                type="number"
-                value={value ?? ''}
-            />
-        )
     }
 
     return (
@@ -248,48 +176,21 @@ const InventoryItem: FC = () => {
                     <Typography variant="h6">Attributes</Typography>
                     {item.Attributes.length === 0
                         ? <Typography color="text.secondary">This definition has no attributes.</Typography>
-                        : item.Attributes.map(attributeField)}
+                        : <AttributeValueFields
+                            attributes={item.Attributes}
+                            onChange={attributes => setItem(currentItem => ({...currentItem, Attributes: attributes}))}
+                        />}
                 </Stack>
             )}
             {item.InventoryItemDefinitionGuid.length > 0 && (
                 <Stack spacing={2}>
                     <Typography variant="h6">Components</Typography>
-                    {(id === undefined ? componentTemplates.length : item.Components.length) === 0
+                    {item.Components.length === 0
                         ? <Typography color="text.secondary">This inventory item has no components.</Typography>
-                        : (
-                            <TableContainer component={Paper}>
-                                <Table aria-label="Inventory item components">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Id</TableCell>
-                                            <TableCell>Definition</TableCell>
-                                            <TableCell>Serial Number</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {id === undefined
-                                            ? componentTemplates.map((component, index) => (
-                                                <TableRow key={`${component.InventoryItemDefinitionGuid}-${index}`}>
-                                                    <TableCell>—</TableCell>
-                                                    <TableCell>{component.InventoryItemDefinitionName}</TableCell>
-                                                    <TableCell>—</TableCell>
-                                                </TableRow>
-                                            ))
-                                            : item.Components.map(component => (
-                                                <TableRow key={component.Guid}>
-                                                    <TableCell>
-                                                        <Link className="entity-id-link" href={`/inventoryitem/${component.Guid}`}>
-                                                            {component.Guid}
-                                                        </Link>
-                                                    </TableCell>
-                                                    <TableCell>{component.InventoryItemDefinitionName}</TableCell>
-                                                    <TableCell>{component.SerialNumber ?? '—'}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        )}
+                        : <InventoryItemComponentsEditor
+                            components={item.Components}
+                            onChange={components => setItem(currentItem => ({...currentItem, Components: components}))}
+                        />}
                 </Stack>
             )}
             <Stack direction={{xs: 'column', sm: 'row'}} spacing={2}>
@@ -301,7 +202,9 @@ const InventoryItem: FC = () => {
             </Stack>
             <YesNoDialog
                 open={deleteDialogOpen}
-                question="Are you sure you want to delete this inventory item?"
+                question={item.Components.length > 0
+                    ? 'This inventory item contains other inventory items. The contained inventory items will be deleted. Are you sure?'
+                    : 'Are you sure you want to delete this inventory item?'}
                 onNo={() => setDeleteDialogOpen(false)}
                 onYes={handleDelete}
             />
