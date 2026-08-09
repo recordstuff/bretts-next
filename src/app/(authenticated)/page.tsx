@@ -39,7 +39,9 @@ const Dashboard: FC = () => {
     return (
         jwtUtil.hasRole(JwtRole.User) && (
             <Stack spacing={2} sx={{width: '100%'}}>
-                <Card variant="outlined" sx={{maxWidth: '24rem', width: '100%'}}>
+                <Card
+                    variant="outlined"
+                    sx={{borderColor: 'primary.main', maxWidth: '24rem', width: '100%'}}>
                     <CardContent>
                         <Stack spacing={1.5}>
                             <Typography color="text.secondary" variant="h6">Total Inventory Items</Typography>
