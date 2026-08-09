@@ -1,7 +1,7 @@
-import { InventoryItemAttributeValueDetail } from './InventoryItemAttributeValueDetail'
+import { AttributeValueDetail } from './AttributeValueDetail'
 
 export interface InventoryItemNew {
     InventoryItemDefinitionGuid: string
     SerialNumber: string | null
-    Attributes: InventoryItemAttributeValueDetail[]
+    Attributes: AttributeValueDetail[]
 }

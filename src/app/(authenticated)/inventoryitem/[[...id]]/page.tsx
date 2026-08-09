@@ -8,19 +8,22 @@ import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
 import YesNoDialog from '@/components/YesNoDialog'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
 import { AttributeDataType } from '@/models/AttributeDataType'
-import { InventoryItemAttributeValueDetail } from '@/models/InventoryItemAttributeValueDetail'
+import { AttributeValueDetail } from '@/models/AttributeValueDetail'
+import { InventoryItemComponentTemplate } from '@/models/InventoryItemComponentTemplate'
 import { emptyInventoryItemDetail, InventoryItemDetail } from '@/models/InventoryItemDetail'
 import { InventoryItemNew } from '@/models/InventoryItemNew'
 import { NameGuidPair } from '@/models/NameGuidPair'
 import { storeSuccessMessage, takeSuccessMessage } from '@/utils/successMessageStorage'
-import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from '@mui/material'
+import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { AxiosError } from 'axios'
 import { useParams, useRouter } from 'next/navigation'
 import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from 'react'
+import Link from 'next/link'
 
 const InventoryItem: FC = () => {
     const [item, setItem] = useState<InventoryItemDetail>(emptyInventoryItemDetail())
     const [definitionOptions, setDefinitionOptions] = useState<NameGuidPair[]>([])
+    const [componentTemplates, setComponentTemplates] = useState<InventoryItemComponentTemplate[]>([])
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [showValidation, setShowValidation] = useState(false)
     const {showSnackbar} = useAppSnackbar()
@@ -39,6 +42,7 @@ const InventoryItem: FC = () => {
         ])
         setDefinitionOptions(options)
         setItem(loadedItem)
+        setComponentTemplates([])
         setShowValidation(false)
         doneWaiting()
     }, [id, pleaseWait, doneWaiting])
@@ -62,20 +66,20 @@ const InventoryItem: FC = () => {
     const handleDefinitionChange = async (event: SelectChangeEvent<string>): Promise<void> => {
         const inventoryItemDefinitionGuid = event.target.value
         pleaseWait()
-        const attributes = await inventoryItemClient.getAttributes(inventoryItemDefinitionGuid)
-        const selectedDefinition = definitionOptions.find(option => option.Guid === inventoryItemDefinitionGuid)
+        const template = await inventoryItemClient.getInventoryItemTemplate(inventoryItemDefinitionGuid)
         setItem(currentItem => ({
             ...currentItem,
             InventoryItemDefinitionGuid: inventoryItemDefinitionGuid,
-            InventoryItemDefinitionName: selectedDefinition?.Name ?? '',
-            Attributes: attributes,
+            InventoryItemDefinitionName: template.InventoryItemDefinitionName,
+            Attributes: template.Attributes,
         }))
+        setComponentTemplates(template.Components)
         doneWaiting()
     }
 
     const updateAttribute = (
         attributeGuid: string,
-        updates: Partial<InventoryItemAttributeValueDetail>
+        updates: Partial<AttributeValueDetail>
     ): void => {
         setItem(currentItem => ({
             ...currentItem,
@@ -86,7 +90,7 @@ const InventoryItem: FC = () => {
     }
 
     const handleNumberChange = (
-        attribute: InventoryItemAttributeValueDetail,
+        attribute: AttributeValueDetail,
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ): void => {
         const value = event.target.value === '' ? null : Number(event.target.value)
@@ -164,7 +168,7 @@ const InventoryItem: FC = () => {
         }
     }
 
-    const attributeField = (attribute: InventoryItemAttributeValueDetail) => {
+    const attributeField = (attribute: AttributeValueDetail) => {
         if (attribute.DataType === AttributeDataType.Checkbox) {
             return (
                 <FormControlLabel
@@ -224,6 +228,7 @@ const InventoryItem: FC = () => {
                 <Select
                     labelId="inventory-definition-label"
                     label="Inventory Definition"
+                    disabled={id !== undefined}
                     onChange={handleDefinitionChange}
                     value={item.InventoryItemDefinitionGuid}
                 >
@@ -244,6 +249,47 @@ const InventoryItem: FC = () => {
                     {item.Attributes.length === 0
                         ? <Typography color="text.secondary">This definition has no attributes.</Typography>
                         : item.Attributes.map(attributeField)}
+                </Stack>
+            )}
+            {item.InventoryItemDefinitionGuid.length > 0 && (
+                <Stack spacing={2}>
+                    <Typography variant="h6">Components</Typography>
+                    {(id === undefined ? componentTemplates.length : item.Components.length) === 0
+                        ? <Typography color="text.secondary">This inventory item has no components.</Typography>
+                        : (
+                            <TableContainer component={Paper}>
+                                <Table aria-label="Inventory item components">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Id</TableCell>
+                                            <TableCell>Definition</TableCell>
+                                            <TableCell>Serial Number</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {id === undefined
+                                            ? componentTemplates.map((component, index) => (
+                                                <TableRow key={`${component.InventoryItemDefinitionGuid}-${index}`}>
+                                                    <TableCell>—</TableCell>
+                                                    <TableCell>{component.InventoryItemDefinitionName}</TableCell>
+                                                    <TableCell>—</TableCell>
+                                                </TableRow>
+                                            ))
+                                            : item.Components.map(component => (
+                                                <TableRow key={component.Guid}>
+                                                    <TableCell>
+                                                        <Link className="entity-id-link" href={`/inventoryitem/${component.Guid}`}>
+                                                            {component.Guid}
+                                                        </Link>
+                                                    </TableCell>
+                                                    <TableCell>{component.InventoryItemDefinitionName}</TableCell>
+                                                    <TableCell>{component.SerialNumber ?? '—'}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        )}
                 </Stack>
             )}
             <Stack direction={{xs: 'column', sm: 'row'}} spacing={2}>

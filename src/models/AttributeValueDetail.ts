@@ -1,6 +1,6 @@
 import { AttributeDataType } from './AttributeDataType'
 
-export interface InventoryItemAttributeValueDetail {
+export interface AttributeValueDetail {
     AttributeDefinitionGuid: string
     Name: string
     DataType: AttributeDataType
