@@ -144,10 +144,6 @@ const InventoryItem: FC = () => {
             router.push('/inventory')
         } catch (ex: unknown) {
             clearAllWaits()
-            if (ex instanceof AxiosError && ex.response?.status === HTTP_STATUS_CODES.CONFLICT) {
-                showSnackbar('This inventory item contains other items and cannot be deleted.', AppSnackbarSeverity.Error)
-                return
-            }
             throw ex
         }
     }
@@ -206,7 +202,9 @@ const InventoryItem: FC = () => {
             </Stack>
             <YesNoDialog
                 open={deleteDialogOpen}
-                question="Are you sure you want to delete this inventory item?"
+                question={item.Components.length > 0
+                    ? 'This inventory item contains other inventory items. The contained inventory items will be deleted. Are you sure?'
+                    : 'Are you sure you want to delete this inventory item?'}
                 onNo={() => setDeleteDialogOpen(false)}
                 onYes={handleDelete}
             />
