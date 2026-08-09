@@ -9,30 +9,20 @@ import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
 import YesNoDialog from '@/components/YesNoDialog'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
-import { InventoryItemComponentDetail } from '@/models/InventoryItemComponentDetail'
 import { InventoryItemComponentTemplate } from '@/models/InventoryItemComponentTemplate'
 import { emptyInventoryItemDetail, InventoryItemDetail } from '@/models/InventoryItemDetail'
 import { InventoryItemNew } from '@/models/InventoryItemNew'
 import { NameGuidPair } from '@/models/NameGuidPair'
 import { storeSuccessMessage, takeSuccessMessage } from '@/utils/successMessageStorage'
+import { toInventoryItemComponentDetail } from '@/utils/inventoryItemComponent'
 import { Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from '@mui/material'
 import { AxiosError } from 'axios'
 import { useParams, useRouter } from 'next/navigation'
 import { FC, useCallback, useContext, useEffect, useState } from 'react'
 
-const emptyGuid = '00000000-0000-0000-0000-000000000000'
-
-const toComponentDetail = (template: InventoryItemComponentTemplate): InventoryItemComponentDetail => ({
-    Guid: emptyGuid,
-    InventoryItemDefinitionGuid: template.InventoryItemDefinitionGuid,
-    InventoryItemDefinitionName: template.InventoryItemDefinitionName,
-    SerialNumber: '',
-    Attributes: template.Attributes,
-    Components: template.Components.map(toComponentDetail),
-})
-
 const InventoryItem: FC = () => {
     const [item, setItem] = useState<InventoryItemDetail>(emptyInventoryItemDetail())
+    const [componentTemplates, setComponentTemplates] = useState<InventoryItemComponentTemplate[]>([])
     const [definitionOptions, setDefinitionOptions] = useState<NameGuidPair[]>([])
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [showValidation, setShowValidation] = useState(false)
@@ -50,8 +40,12 @@ const InventoryItem: FC = () => {
                 ? Promise.resolve(emptyInventoryItemDetail())
                 : inventoryItemClient.getInventoryItem(id),
         ])
+        const template = loadedItem.InventoryItemDefinitionGuid.length === 0
+            ? null
+            : await inventoryItemClient.getInventoryItemTemplate(loadedItem.InventoryItemDefinitionGuid)
         setDefinitionOptions(options)
         setItem(loadedItem)
+        setComponentTemplates(template?.Components ?? [])
         setShowValidation(false)
         doneWaiting()
     }, [id, pleaseWait, doneWaiting])
@@ -81,8 +75,9 @@ const InventoryItem: FC = () => {
             InventoryItemDefinitionGuid: inventoryItemDefinitionGuid,
             InventoryItemDefinitionName: template.InventoryItemDefinitionName,
             Attributes: template.Attributes,
-            Components: template.Components.map(toComponentDetail),
+            Components: template.Components.map(toInventoryItemComponentDetail),
         }))
+        setComponentTemplates(template.Components)
         doneWaiting()
     }
 
@@ -185,10 +180,11 @@ const InventoryItem: FC = () => {
             {item.InventoryItemDefinitionGuid.length > 0 && (
                 <Stack spacing={2}>
                     <Typography variant="h6">Components</Typography>
-                    {item.Components.length === 0
+                    {componentTemplates.length === 0
                         ? <Typography color="text.secondary">This inventory item has no components.</Typography>
                         : <InventoryItemComponentsEditor
                             components={item.Components}
+                            componentTemplates={componentTemplates}
                             onChange={components => setItem(currentItem => ({...currentItem, Components: components}))}
                         />}
                 </Stack>
