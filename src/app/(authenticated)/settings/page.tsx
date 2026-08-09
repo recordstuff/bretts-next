@@ -2,11 +2,14 @@
 
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import { testClient } from "@/clients/TestClient"
+import AppSnackbar from "@/components/AppSnackbar"
 import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
 import { alpha } from "@mui/material/styles"
-import { FC, useContext, useEffect } from "react"
+import { FC, useContext, useEffect, useState } from "react"
 
 const Settings: FC = () => {
+    const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null)
+    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success')
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     useEffect(() => {
@@ -19,11 +22,25 @@ const Settings: FC = () => {
     }
 
     const writeLogEntry = async (): Promise<void> => {
-        await testClient.writeLogEntry()
+        try {
+            await testClient.writeLogEntry()
+            setSnackbarSeverity('success')
+            setSnackbarMessage('The test log entry was written.')
+        } catch {
+            setSnackbarSeverity('error')
+            setSnackbarMessage('The test log entry could not be written.')
+        }
     }
 
     const shutdown = async (): Promise<void> => {
-        await testClient.shutdown()
+        try {
+            await testClient.shutdown()
+            setSnackbarSeverity('success')
+            setSnackbarMessage('The backend shutdown was requested.')
+        } catch {
+            setSnackbarSeverity('error')
+            setSnackbarMessage('The backend shutdown could not be requested.')
+        }
     }
     
     return (
@@ -83,6 +100,11 @@ const Settings: FC = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <AppSnackbar
+                message={snackbarMessage}
+                severity={snackbarSeverity}
+                onClose={() => setSnackbarMessage(null)}
+            />
         </Stack>
     )
 }
