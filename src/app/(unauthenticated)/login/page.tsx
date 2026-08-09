@@ -9,15 +9,14 @@ import { AxiosError } from "axios"
 import { userClient } from "../../../clients/UserClient"
 import { useRouter } from "next/navigation"
 import { PleaseWaitContext } from "../../../components/PleaseWaitProvider"
-import AppSnackbar from "@/components/AppSnackbar"
-import { useAppSnackbar } from "@/hooks/useAppSnackbar"
+import { useAppSnackbar } from "@/components/AppSnackbarProvider"
 import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 
 const Layout: FC = () => {
 
     const [userCredentials, setUserCredentials] = useState<UserCredentials>(defaultUserCredentials());
     const [useErrorCondition, setUseErrorCondition] = useState<boolean>(false)
-    const {snackbar, showSnackbar, closeSnackbar} = useAppSnackbar()
+    const {showSnackbar, closeSnackbar} = useAppSnackbar()
     const router = useRouter()
     const { actions: {pleaseWait, doneWaiting, clearAllWaits} } = useContext(PleaseWaitContext)
 
@@ -158,11 +157,6 @@ const Layout: FC = () => {
                             brettdrake.org
                         </Link>
                     </Grid>
-                    <AppSnackbar
-                        message={snackbar.message}
-                        severity={snackbar.severity}
-                        onClose={closeSnackbar}
-                    />
                 </Grid>
             </Paper>
         </Box>

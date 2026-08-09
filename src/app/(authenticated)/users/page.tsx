@@ -15,11 +15,10 @@ import OptionFilter from "@/components/OptionFilter"
 import Paginator from "@/components/Paginator"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import AppSnackbar from "@/components/AppSnackbar"
 import { takeSuccessMessage } from "@/utils/successMessageStorage"
 import { UsersSortColumn } from "@/models/UsersSortColumn"
 import { SortDirection } from "@/models/SortDirection"
-import { useAppSnackbar } from "@/hooks/useAppSnackbar"
+import { useAppSnackbar } from "@/components/AppSnackbarProvider"
 import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 
 const PAGE_SIZE = 5
@@ -36,7 +35,7 @@ const Users: FC = () => {
     const [roleFilter, setRoleFilter] = useState<JwtRole>(JwtRole.Any)
     const [sortColumn, setSortColumn] = useState<UsersSortColumn>(UsersSortColumn.DisplayName)
     const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Ascending)
-    const {snackbar, showSnackbar, closeSnackbar} = useAppSnackbar()
+    const {showSnackbar} = useAppSnackbar()
     const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -188,11 +187,6 @@ const Users: FC = () => {
                     setPage={setPage}
                 />
             </Stack>
-            <AppSnackbar
-                message={snackbar.message}
-                severity={snackbar.severity}
-                onClose={closeSnackbar}
-            />
         </>
     )
 }

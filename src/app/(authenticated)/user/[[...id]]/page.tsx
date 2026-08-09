@@ -13,10 +13,9 @@ import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import AppSnackbar from "@/components/AppSnackbar"
 import YesNoDialog from "@/components/YesNoDialog"
 import { storeSuccessMessage, takeSuccessMessage } from "@/utils/successMessageStorage"
-import { useAppSnackbar } from "@/hooks/useAppSnackbar"
+import { useAppSnackbar } from "@/components/AppSnackbarProvider"
 import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 
 const User: FC = () => {
@@ -26,7 +25,7 @@ const User: FC = () => {
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
     const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
-    const {snackbar, showSnackbar, closeSnackbar} = useAppSnackbar()
+    const {showSnackbar} = useAppSnackbar()
     const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -175,11 +174,6 @@ const User: FC = () => {
                 question="Are you sure you want to delete this user?"
                 onNo={() => setDeleteDialogOpen(false)}
                 onYes={handleDelete}
-            />
-            <AppSnackbar
-                message={snackbar.message}
-                severity={snackbar.severity}
-                onClose={closeSnackbar}
             />
         </Stack>
     )

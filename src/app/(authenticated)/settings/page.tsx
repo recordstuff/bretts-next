@@ -2,15 +2,14 @@
 
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import { testClient } from "@/clients/TestClient"
-import AppSnackbar from "@/components/AppSnackbar"
 import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
 import { alpha } from "@mui/material/styles"
 import { FC, useContext, useEffect } from "react"
-import { useAppSnackbar } from "@/hooks/useAppSnackbar"
+import { useAppSnackbar } from "@/components/AppSnackbarProvider"
 import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 
 const Settings: FC = () => {
-    const {snackbar, showSnackbar, closeSnackbar} = useAppSnackbar()
+    const {showSnackbar} = useAppSnackbar()
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     useEffect(() => {
@@ -97,11 +96,6 @@ const Settings: FC = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <AppSnackbar
-                message={snackbar.message}
-                severity={snackbar.severity}
-                onClose={closeSnackbar}
-            />
         </Stack>
     )
 }
