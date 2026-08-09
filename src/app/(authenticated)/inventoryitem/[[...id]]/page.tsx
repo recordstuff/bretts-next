@@ -20,10 +20,16 @@ import { AxiosError } from 'axios'
 import { useParams, useRouter } from 'next/navigation'
 import { FC, useCallback, useContext, useEffect, useState } from 'react'
 
+interface ComponentDeleteRequest {
+    componentLabel: string
+    guid: string
+}
+
 const InventoryItem: FC = () => {
     const [item, setItem] = useState<InventoryItemDetail>(emptyInventoryItemDetail())
     const [componentTemplates, setComponentTemplates] = useState<InventoryItemComponentTemplate[]>([])
     const [definitionOptions, setDefinitionOptions] = useState<NameGuidPair[]>([])
+    const [componentDeleteRequest, setComponentDeleteRequest] = useState<ComponentDeleteRequest | null>(null)
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [showValidation, setShowValidation] = useState(false)
     const {showSnackbar} = useAppSnackbar()
@@ -143,6 +149,23 @@ const InventoryItem: FC = () => {
         }
     }
 
+    const handleDeleteComponent = async (): Promise<void> => {
+        if (componentDeleteRequest === null) return
+
+        const {guid} = componentDeleteRequest
+        setComponentDeleteRequest(null)
+        pleaseWait()
+        try {
+            await inventoryItemClient.deleteInventoryItem(guid)
+            await loadItem()
+            doneWaiting()
+            showSnackbar('This component was deleted.', AppSnackbarSeverity.Success)
+        } catch (ex: unknown) {
+            clearAllWaits()
+            throw ex
+        }
+    }
+
     return (
         <Stack margin={2} spacing={4}>
             {id !== undefined && <TextField fullWidth label="Id" value={item.Guid} disabled />}
@@ -185,6 +208,12 @@ const InventoryItem: FC = () => {
                         : <InventoryItemComponentsEditor
                             components={item.Components}
                             componentTemplates={componentTemplates}
+                            onDelete={id === undefined
+                                ? undefined
+                                : (component, componentLabel) => setComponentDeleteRequest({
+                                    componentLabel,
+                                    guid: component.Guid,
+                                })}
                             onChange={components => setItem(currentItem => ({...currentItem, Components: components}))}
                         />}
                 </Stack>
@@ -196,6 +225,12 @@ const InventoryItem: FC = () => {
                     <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>
                 )}
             </Stack>
+            <YesNoDialog
+                open={componentDeleteRequest !== null}
+                question={`Are you sure you want to delete ${componentDeleteRequest?.componentLabel ?? 'this component'}? Any components it contains will also be deleted.`}
+                onNo={() => setComponentDeleteRequest(null)}
+                onYes={handleDeleteComponent}
+            />
             <YesNoDialog
                 open={deleteDialogOpen}
                 question={item.Components.length > 0

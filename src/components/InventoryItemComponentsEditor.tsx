@@ -2,13 +2,15 @@ import { InventoryItemComponentDetail } from '@/models/InventoryItemComponentDet
 import { InventoryItemComponentTemplate } from '@/models/InventoryItemComponentTemplate'
 import { toInventoryItemComponentDetail } from '@/utils/inventoryItemComponent'
 import AddIcon from '@mui/icons-material/Add'
-import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import { Box, Button, IconButton, Paper, Stack, TextField, Typography } from '@mui/material'
 import { FC } from 'react'
 import AttributeValueFields from './AttributeValueFields'
 
 interface InventoryItemComponentsEditorProps {
     components: InventoryItemComponentDetail[]
     componentTemplates: InventoryItemComponentTemplate[]
+    onDelete?: (component: InventoryItemComponentDetail, componentLabel: string) => void
     onChange: (components: InventoryItemComponentDetail[]) => void
     level?: number
 }
@@ -16,6 +18,7 @@ interface InventoryItemComponentsEditorProps {
 const InventoryItemComponentsEditor: FC<InventoryItemComponentsEditorProps> = ({
     components,
     componentTemplates,
+    onDelete,
     onChange,
     level = 0,
 }) => {
@@ -88,7 +91,21 @@ const InventoryItemComponentsEditor: FC<InventoryItemComponentsEditorProps> = ({
                         sx={{p: {xs: 2, sm: 2.5}}}
                     >
                         <Stack spacing={2.5}>
-                            <Typography component="h3" variant="h6">{componentLabel}</Typography>
+                            <Stack alignItems="center" direction="row" justifyContent="space-between">
+                                <Typography component="h3" variant="h6">{componentLabel}</Typography>
+                                {onDelete !== undefined
+                                 && component.Guid !== '00000000-0000-0000-0000-000000000000' && (
+                                    <IconButton
+                                        aria-label={`Delete ${componentLabel}`}
+                                        color="error"
+                                        onClick={() => onDelete(component, componentLabel)}
+                                        size="small"
+                                        sx={{m: -1}}
+                                    >
+                                        <CloseIcon />
+                                    </IconButton>
+                                )}
+                            </Stack>
                             <TextField
                                 fullWidth
                                 label="Serial Number"
@@ -110,6 +127,7 @@ const InventoryItemComponentsEditor: FC<InventoryItemComponentsEditorProps> = ({
                                         components={component.Components}
                                         componentTemplates={template.Components}
                                         level={level + 1}
+                                        onDelete={onDelete}
                                         onChange={nestedComponents => updateComponent(index, {
                                             Components: nestedComponents,
                                         })}
