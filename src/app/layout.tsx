@@ -6,6 +6,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { CssBaseline } from "@mui/material";
 import { PleaseWaitProvider } from "@/components/PleaseWaitProvider";
 import { AppSnackbarProvider } from "@/components/AppSnackbarProvider";
+import { YesNoDialogProvider } from "@/components/YesNoDialogProvider";
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
@@ -21,8 +22,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                             <ErrorBoundary>
                                 <PleaseWaitProvider>
                                     <AppSnackbarProvider>
-                                        <PleaseWait />
-                                        {children}
+                                        <YesNoDialogProvider>
+                                            <PleaseWait />
+                                            {children}
+                                        </YesNoDialogProvider>
                                     </AppSnackbarProvider>
                                 </PleaseWaitProvider>
                             </ErrorBoundary>

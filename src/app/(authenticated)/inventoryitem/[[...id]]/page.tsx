@@ -7,36 +7,26 @@ import AttributeValueFields from '@/components/AttributeValueFields'
 import InventoryItemComponentsEditor from '@/components/InventoryItemComponentsEditor'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
-import YesNoDialog from '@/components/YesNoDialog'
+import { useYesNoDialog } from '@/components/YesNoDialogProvider'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
-import { InventoryItemComponentDetail } from '@/models/InventoryItemComponentDetail'
 import { InventoryItemComponentTemplate } from '@/models/InventoryItemComponentTemplate'
 import { emptyInventoryItemDetail, InventoryItemDetail } from '@/models/InventoryItemDetail'
 import { InventoryItemNew } from '@/models/InventoryItemNew'
 import { NameGuidPair } from '@/models/NameGuidPair'
 import { storeSuccessMessage, takeSuccessMessage } from '@/utils/successMessageStorage'
+import { toInventoryItemComponentDetail } from '@/utils/inventoryItemComponent'
 import { Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from '@mui/material'
 import { AxiosError } from 'axios'
 import { useParams, useRouter } from 'next/navigation'
 import { FC, useCallback, useContext, useEffect, useState } from 'react'
 
-const emptyGuid = '00000000-0000-0000-0000-000000000000'
-
-const toComponentDetail = (template: InventoryItemComponentTemplate): InventoryItemComponentDetail => ({
-    Guid: emptyGuid,
-    InventoryItemDefinitionGuid: template.InventoryItemDefinitionGuid,
-    InventoryItemDefinitionName: template.InventoryItemDefinitionName,
-    SerialNumber: '',
-    Attributes: template.Attributes,
-    Components: template.Components.map(toComponentDetail),
-})
-
 const InventoryItem: FC = () => {
     const [item, setItem] = useState<InventoryItemDetail>(emptyInventoryItemDetail())
+    const [componentTemplates, setComponentTemplates] = useState<InventoryItemComponentTemplate[]>([])
     const [definitionOptions, setDefinitionOptions] = useState<NameGuidPair[]>([])
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [showValidation, setShowValidation] = useState(false)
     const {showSnackbar} = useAppSnackbar()
+    const {showYesNoDialog} = useYesNoDialog()
     const {actions: {clearAllWaits, pleaseWait, doneWaiting}} = useContext(PleaseWaitContext)
     const {addBreadcrumb, setPageTitle} = useContext(LeftDrawerContext)
     const {id} = useParams<{id: string}>()
@@ -50,8 +40,12 @@ const InventoryItem: FC = () => {
                 ? Promise.resolve(emptyInventoryItemDetail())
                 : inventoryItemClient.getInventoryItem(id),
         ])
+        const template = loadedItem.InventoryItemDefinitionGuid.length === 0
+            ? null
+            : await inventoryItemClient.getInventoryItemTemplate(loadedItem.InventoryItemDefinitionGuid)
         setDefinitionOptions(options)
         setItem(loadedItem)
+        setComponentTemplates(template?.Components ?? [])
         setShowValidation(false)
         doneWaiting()
     }, [id, pleaseWait, doneWaiting])
@@ -81,8 +75,9 @@ const InventoryItem: FC = () => {
             InventoryItemDefinitionGuid: inventoryItemDefinitionGuid,
             InventoryItemDefinitionName: template.InventoryItemDefinitionName,
             Attributes: template.Attributes,
-            Components: template.Components.map(toComponentDetail),
+            Components: template.Components.map(toInventoryItemComponentDetail),
         }))
+        setComponentTemplates(template.Components)
         doneWaiting()
     }
 
@@ -135,13 +130,25 @@ const InventoryItem: FC = () => {
 
     const handleDelete = async (): Promise<void> => {
         if (id === undefined) return
-        setDeleteDialogOpen(false)
         pleaseWait()
         try {
             await inventoryItemClient.deleteInventoryItem(id)
             doneWaiting()
             storeSuccessMessage('This inventory item was deleted.')
             router.push('/inventory')
+        } catch (ex: unknown) {
+            clearAllWaits()
+            throw ex
+        }
+    }
+
+    const handleDeleteComponent = async (guid: string): Promise<void> => {
+        pleaseWait()
+        try {
+            await inventoryItemClient.deleteInventoryItem(guid)
+            await loadItem()
+            doneWaiting()
+            showSnackbar('This component was deleted.', AppSnackbarSeverity.Success)
         } catch (ex: unknown) {
             clearAllWaits()
             throw ex
@@ -185,10 +192,17 @@ const InventoryItem: FC = () => {
             {item.InventoryItemDefinitionGuid.length > 0 && (
                 <Stack spacing={2}>
                     <Typography variant="h6">Components</Typography>
-                    {item.Components.length === 0
+                    {componentTemplates.length === 0
                         ? <Typography color="text.secondary">This inventory item has no components.</Typography>
                         : <InventoryItemComponentsEditor
                             components={item.Components}
+                            componentTemplates={componentTemplates}
+                            onDelete={id === undefined
+                                ? undefined
+                                : (component, componentLabel) => showYesNoDialog({
+                                    question: `Are you sure you want to delete ${componentLabel}? Any components it contains will also be deleted.`,
+                                    onYes: () => handleDeleteComponent(component.Guid),
+                                })}
                             onChange={components => setItem(currentItem => ({...currentItem, Components: components}))}
                         />}
                 </Stack>
@@ -197,17 +211,19 @@ const InventoryItem: FC = () => {
                 <Button onClick={upsert} color="primary" variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
                 <Button color="secondary" onClick={handleReset}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
                 {id !== undefined && (
-                    <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => showYesNoDialog({
+                            question: item.Components.length > 0
+                                ? 'This inventory item contains other inventory items. The contained inventory items will be deleted. Are you sure?'
+                                : 'Are you sure you want to delete this inventory item?',
+                            onYes: handleDelete,
+                        })}>
+                        Delete
+                    </Button>
                 )}
             </Stack>
-            <YesNoDialog
-                open={deleteDialogOpen}
-                question={item.Components.length > 0
-                    ? 'This inventory item contains other inventory items. The contained inventory items will be deleted. Are you sure?'
-                    : 'Are you sure you want to delete this inventory item?'}
-                onNo={() => setDeleteDialogOpen(false)}
-                onYes={handleDelete}
-            />
         </Stack>
     )
 }
