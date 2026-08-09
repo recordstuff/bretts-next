@@ -1,5 +1,4 @@
 import { HttpClient } from './HttpClient'
-import { InventoryItemAttributeValueDetail } from '@/models/InventoryItemAttributeValueDetail'
 import { InventoryItemDetail } from '@/models/InventoryItemDetail'
 import { InventoryItemNew } from '@/models/InventoryItemNew'
 import { InventoryItemSummary } from '@/models/InventoryItemSummary'
@@ -7,6 +6,7 @@ import { InventoryItemsSortColumn } from '@/models/InventoryItemsSortColumn'
 import { NameGuidPair } from '@/models/NameGuidPair'
 import { PaginationResult } from '@/models/PaginationResult'
 import { SortDirection } from '@/models/SortDirection'
+import { InventoryItemTemplate } from '@/models/InventoryItemTemplate'
 
 class InventoryItemClient extends HttpClient {
     constructor() {
@@ -33,8 +33,8 @@ class InventoryItemClient extends HttpClient {
         return this.get<NameGuidPair[]>('definitionoptions')
     }
 
-    public getAttributes(inventoryItemDefinitionGuid: string): Promise<InventoryItemAttributeValueDetail[]> {
-        return this.get<InventoryItemAttributeValueDetail[]>(`attributes/${inventoryItemDefinitionGuid}`)
+    public getInventoryItemTemplate(inventoryItemDefinitionGuid: string): Promise<InventoryItemTemplate> {
+        return this.get<InventoryItemTemplate>(`template/${inventoryItemDefinitionGuid}`)
     }
 
     public getInventoryItem(id: string): Promise<InventoryItemDetail> {
