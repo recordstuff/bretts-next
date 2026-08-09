@@ -26,7 +26,7 @@ interface AttributeDefinitionsSelectorProps {
     allAttributes: AttributeDefinitionDetail[]
     selectedAttributes: AttributeDefinitionDetail[]
     onChange: (attributes: AttributeDefinitionDetail[]) => void
-    onQuickAdd: (definition: AttributeDefinitionNew) => Promise<boolean>
+    onQuickAdd: (definition: AttributeDefinitionNew) => Promise<AttributeDefinitionDetail | null>
 }
 
 const AttributeDefinitionsSelector: FC<AttributeDefinitionsSelectorProps> = ({
@@ -76,7 +76,10 @@ const AttributeDefinitionsSelector: FC<AttributeDefinitionsSelectorProps> = ({
         setAdding(true)
 
         try {
-            if (await onQuickAdd({Name: name, DataType: dataType})) {
+            const addedAttribute = await onQuickAdd({Name: name, DataType: dataType})
+
+            if (addedAttribute !== null) {
+                onChange([...selectedAttributes, addedAttribute])
                 setDialogOpen(false)
                 setName('')
                 setDataType(AttributeDataType.String)

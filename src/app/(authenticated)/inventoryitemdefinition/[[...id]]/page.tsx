@@ -139,7 +139,7 @@ const InventoryItemDefinition: FC = () => {
         loadDefinition()
     }
 
-    const quickAddAttribute = async (newAttribute: AttributeDefinitionNew): Promise<boolean> => {
+    const quickAddAttribute = async (newAttribute: AttributeDefinitionNew): Promise<AttributeDefinitionDetail | null> => {
         pleaseWait()
 
         try {
@@ -147,21 +147,41 @@ const InventoryItemDefinition: FC = () => {
 
             setAttributeOptions(currentOptions => [...currentOptions, addedAttribute]
                 .sort((left, right) => left.Name.localeCompare(right.Name)))
-            setDefinition(currentDefinition => ({
-                ...currentDefinition,
-                Attributes: [...currentDefinition.Attributes, addedAttribute],
-                AttributeCount: currentDefinition.Attributes.length + 1,
-            }))
             doneWaiting()
             showSnackbar('The attribute definition was created and selected.', AppSnackbarSeverity.Success)
 
-            return true
+            return addedAttribute
         } catch (ex: unknown) {
             clearAllWaits()
 
             if (ex instanceof AxiosError && ex.response?.status === HTTP_STATUS_CODES.CONFLICT) {
                 showSnackbar('An attribute definition with this name already exists.', AppSnackbarSeverity.Error)
-                return false
+                return null
+            }
+
+            throw ex
+        }
+    }
+
+    const quickAddDefinition = async (newDefinition: InventoryItemDefinitionNew): Promise<NameGuidPair | null> => {
+        pleaseWait()
+
+        try {
+            const addedDefinition = await inventoryItemDefinitionClient.insertInventoryItemDefinition(newDefinition)
+            const newOption = {Guid: addedDefinition.Guid, Name: addedDefinition.Name}
+
+            setDefinitionOptions(currentOptions => [...currentOptions, newOption]
+                .sort((left, right) => left.Name.localeCompare(right.Name)))
+            doneWaiting()
+            showSnackbar('The inventory item definition was created and selected.', AppSnackbarSeverity.Success)
+
+            return newOption
+        } catch (ex: unknown) {
+            clearAllWaits()
+
+            if (ex instanceof AxiosError && ex.response?.status === HTTP_STATUS_CODES.BAD_REQUEST) {
+                showSnackbar('An inventory item definition with this name already exists.', AppSnackbarSeverity.Error)
+                return null
             }
 
             throw ex
@@ -228,6 +248,7 @@ const InventoryItemDefinition: FC = () => {
             />
             <InventoryItemDefinitionComponentsEditor
                 allDefinitions={definitionOptions}
+                allAttributes={attributeOptions}
                 components={definition.Components}
                 currentDefinitionGuid={id}
                 onChange={components => setDefinition(currentDefinition => ({
@@ -235,6 +256,8 @@ const InventoryItemDefinition: FC = () => {
                     Components: components,
                     ComponentCount: components.length,
                 }))}
+                onQuickAdd={quickAddDefinition}
+                onQuickAddAttribute={quickAddAttribute}
             />
             <Stack direction={{xs: 'column', sm: 'row'}} spacing={2}>
                 <Button onClick={upsert} color="primary" variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
