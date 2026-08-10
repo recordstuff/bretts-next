@@ -3,13 +3,13 @@
 import { FC, useContext, useMemo, useState } from "react"
 import PrivateRoute from "../components/PrivateRoute"
 import { AppBar, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material"
-import DashboardIcon from '@mui/icons-material/Dashboard';
+import AgricultureIcon from '@mui/icons-material/Agriculture';
+import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
 import PeopleIcon from '@mui/icons-material/People';
-import Inventory2Icon from '@mui/icons-material/Inventory2';
-import LabelIcon from '@mui/icons-material/Label';
-import WarehouseIcon from '@mui/icons-material/Warehouse';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import SettingsIcon from '@mui/icons-material/Settings';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import TableRowsIcon from '@mui/icons-material/TableRows';
 import { DrawerMenuItem, MenuOption, divider } from "../models/MenuOption";
 import { JwtField, JwtRole } from "../models/Jwt";
 import { jwtUtil } from "../helpers/JwtUtil"
@@ -20,42 +20,36 @@ import { LeftDrawerContext } from "./LeftDrawerProvider";
 
 const drawerWidth = 200
 
-const matchesChildRoute = (pathname: string, childRoute: string): boolean =>
-    pathname === childRoute || pathname.startsWith(`${childRoute}/`)
-
 const menuOptions: DrawerMenuItem[] = [
     {
-        Text: "Dashboard",
+        Text: "Home",
         Route: "/",
-        Icon: DashboardIcon,
+        Icon: HomeIcon,
         Role: JwtRole.Any,
-        Breadcrumb: { title: "Dashboard", url: "/" },
+        Breadcrumb: { title: "Home", url: "/" },
     },
     {
-        Text: "Inventory",
-        Route: "/inventory",
-        Icon: WarehouseIcon,
+        Text: "Grid Example",
+        Route: "/gridexample",
+        Icon: TableRowsIcon,
         Role: JwtRole.User,
-        Breadcrumb: { title: "Inventory", url: "/inventory" },
-        ChildRoutes: ['/inventoryitem']
+        Breadcrumb: { title: "Grid Example", url: "/gridexample" },
+    },
+    {
+        Text: "Example Two",
+        Route: "/exampletwo",
+        Icon: TableChartIcon,
+        Role: JwtRole.User,
+        Breadcrumb: { title: "Example Two", url: "/exampletwo" },
+    },
+    {
+        Text: "Bacon Ipsum",
+        Route: "/baconipsum",
+        Icon: AgricultureIcon,
+        Role: JwtRole.User,
+        Breadcrumb: { title: "Bacon Ipsum", url: "/baconipsum" },
     },
     divider,
-    {
-        Text: "Inventory Definitions",
-        Route: "/inventoryitemdefinitions",
-        Icon: Inventory2Icon,
-        Role: JwtRole.Admin,
-        Breadcrumb: { title: "Inventory Item Definitions", url: "/inventoryitemdefinitions" },
-        ChildRoutes: ['/inventoryitemdefinition']
-    },
-    {
-        Text: "Attribute Definitions",
-        Route: "/attributedefinitions",
-        Icon: LabelIcon,
-        Role: JwtRole.Admin,
-        Breadcrumb: { title: "Attribute Definitions", url: "/attributedefinitions" },
-        ChildRoutes: ['/attributedefinition']
-    },
     {
         Text: "Users",
         Route: "/users",
@@ -65,12 +59,11 @@ const menuOptions: DrawerMenuItem[] = [
         ChildRoutes: ['/user']
     },
     {
-        Text: "Roles",
-        Route: "/roles",
-        Icon: AdminPanelSettingsIcon,
+        Text: "Settings",
+        Route: "/settings",
+        Icon: SettingsIcon,
         Role: JwtRole.Admin,
-        Breadcrumb: { title: "Roles", url: "/roles" },
-        ChildRoutes: ['/role']
+        Breadcrumb: { title: "Settings", url: "/settings" },
     },
 ]
 
@@ -86,8 +79,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
     const selectedMenuOption = useMemo(() => menuOptions.find(menuOption =>
         menuOption !== divider
         && ((menuOption as MenuOption).Route === pathname
-            || (menuOption as MenuOption).ChildRoutes?.some(childRoute =>
-                matchesChildRoute(pathname, childRoute)))) ?? menuOptions[0], [pathname])
+            || (menuOption as MenuOption).ChildRoutes?.some(cr => pathname.startsWith(cr)))) ?? menuOptions[0], [pathname])
 
     const handleDrawerToggle = (): void => {
         setMobileOpen(isOpen => !isOpen)

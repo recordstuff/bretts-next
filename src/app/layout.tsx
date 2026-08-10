@@ -6,14 +6,13 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { CssBaseline } from "@mui/material";
 import { PleaseWaitProvider } from "@/components/PleaseWaitProvider";
 import { AppSnackbarProvider } from "@/components/AppSnackbarProvider";
-import { YesNoDialogProvider } from "@/components/YesNoDialogProvider";
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="en">
             <head>
                 {/* process.env.NODE_ENV === 'development' && <script src="http://localhost:8097"></script> */}
-                <title>Brett&apos;s Inventory App</title>
+                <title>Brett&apos;s NextJS React App</title>
             </head>
             <body>
                 <AppRouterCacheProvider>
@@ -22,10 +21,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                             <ErrorBoundary>
                                 <PleaseWaitProvider>
                                     <AppSnackbarProvider>
-                                        <YesNoDialogProvider>
-                                            <PleaseWait />
-                                            {children}
-                                        </YesNoDialogProvider>
+                                        <PleaseWait />
+                                        {children}
                                     </AppSnackbarProvider>
                                 </PleaseWaitProvider>
                             </ErrorBoundary>
