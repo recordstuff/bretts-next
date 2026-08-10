@@ -2,8 +2,9 @@
 
 import { FC, useContext, useMemo, useState } from "react"
 import PrivateRoute from "../components/PrivateRoute"
-import { AppBar, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material"
+import { AppBar, Box, Divider, Drawer, IconButton, Link as MuiLink, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material"
 import AgricultureIcon from '@mui/icons-material/Agriculture';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
 import PeopleIcon from '@mui/icons-material/People';
@@ -95,37 +96,60 @@ const LeftDrawer: FC<Props> = ({ children }) => {
     }
 
     const drawerContent = (
-        <List
-            disablePadding
-            sx={{
-                '& .MuiListItemButton-root': {
-                    paddingBottom: 'calc(.9em + 1px)',
-                    paddingTop: 'calc(.9em + 1px)',
-                },
-            }}
-        >
-            {menuOptions.map((menuItem, index) => {
-                if (menuItem === divider && jwtUtil.hasMultipleRoles()) {
-                    return <Divider key={`divider ${index}`} sx={{ borderColor: 'primary.main' }} />
-                }
+        <>
+            <List
+                disablePadding
+                sx={{
+                    '& .MuiListItemButton-root': {
+                        paddingBottom: 'calc(.9em + 1px)',
+                        paddingTop: 'calc(.9em + 1px)',
+                    },
+                }}
+            >
+                {menuOptions.map((menuItem, index) => {
+                    if (menuItem === divider && jwtUtil.hasMultipleRoles()) {
+                        return <Divider key={`divider ${index}`} sx={{ borderColor: 'primary.main' }} />
+                    }
 
-                const menuOption = menuItem as MenuOption
+                    const menuOption = menuItem as MenuOption
 
-                return jwtUtil.hasRole(menuOption.Role) ? (
-                    <ListItem disablePadding component={Link} href={menuOption.Route} key={menuOption.Text}>
-                        <ListItemButton
-                            onClick={() => handleMenuOptionClick(menuOption)}
-                            selected={menuOption === selectedMenuOption}
-                        >
-                            <ListItemIcon>
-                                <menuOption.Icon />
-                            </ListItemIcon>
-                            <ListItemText primary={menuOption.Text} />
-                        </ListItemButton>
-                    </ListItem>
-                ) : null
-            })}
-        </List>
+                    return jwtUtil.hasRole(menuOption.Role) ? (
+                        <ListItem disablePadding component={Link} href={menuOption.Route} key={menuOption.Text}>
+                            <ListItemButton
+                                onClick={() => handleMenuOptionClick(menuOption)}
+                                selected={menuOption === selectedMenuOption}
+                            >
+                                <ListItemIcon>
+                                    <menuOption.Icon />
+                                </ListItemIcon>
+                                <ListItemText primary={menuOption.Text} />
+                            </ListItemButton>
+                        </ListItem>
+                    ) : null
+                })}
+            </List>
+            <Stack component="footer" spacing={1} sx={{ px: 2, py: 2 }}>
+                <MuiLink
+                    href="https://github.com/recordstuff/bretts-next"
+                    onClick={handleDrawerClose}
+                    rel="noopener noreferrer"
+                    sx={{ alignItems: 'center', display: 'flex', gap: 1, width: 'fit-content' }}
+                    target="_blank"
+                >
+                    <GitHubIcon aria-hidden="true" fontSize="small" />
+                    GitHub Repo
+                </MuiLink>
+                <MuiLink
+                    href="https://brettdrake.org/"
+                    onClick={handleDrawerClose}
+                    rel="noopener noreferrer"
+                    sx={{ width: 'fit-content' }}
+                    target="_blank"
+                >
+                    brettdrake.org
+                </MuiLink>
+            </Stack>
+        </>
     )
 
     return (
