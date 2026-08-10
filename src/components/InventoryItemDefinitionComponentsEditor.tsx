@@ -31,6 +31,7 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
     const [quantity, setQuantity] = useState(1)
     const [dialogOpen, setDialogOpen] = useState(false)
     const [name, setName] = useState('')
+    const [sku, setSku] = useState('')
     const [description, setDescription] = useState('')
     const [showValidation, setShowValidation] = useState(false)
     const [adding, setAdding] = useState(false)
@@ -72,6 +73,7 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
 
         setDialogOpen(false)
         setName('')
+        setSku('')
         setDescription('')
         setNewDefinitionAttributes([])
         setShowValidation(false)
@@ -87,6 +89,7 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
         try {
             const addedDefinition = await onQuickAdd({
                 Name: name,
+                Sku: sku,
                 Description: description,
                 Attributes: newDefinitionAttributes,
                 Components: [],
@@ -102,6 +105,7 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
             setQuantity(1)
             setDialogOpen(false)
             setName('')
+            setSku('')
             setDescription('')
             setNewDefinitionAttributes([])
             setShowValidation(false)
@@ -199,6 +203,11 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
                             label="Name"
                             value={name}
                             onChange={event => setName(event.target.value)}
+                        />
+                        <TextField
+                            label="SKU"
+                            value={sku}
+                            onChange={event => setSku(event.target.value)}
                         />
                         <TextField
                             label="Description"

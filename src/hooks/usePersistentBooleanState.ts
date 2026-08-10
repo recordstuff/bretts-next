@@ -12,13 +12,11 @@ export const usePersistentBooleanState = (key: string, defaultValue: boolean): P
 
     useEffect(() => {
         const storedValue = localStorage.getItem(key)
-        if (storedValue === null) {
-            localStorage.setItem(key, String(defaultValue))
-        } else {
+        if (storedValue !== null) {
             setValue(storedValue === 'true')
         }
         setIsLoaded(true)
-    }, [defaultValue, key])
+    }, [key])
 
     const setStoredValue = useCallback((newValue: boolean): void => {
         localStorage.setItem(key, String(newValue))

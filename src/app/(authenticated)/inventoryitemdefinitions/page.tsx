@@ -22,6 +22,7 @@ const PAGE_SIZE = 5
 const SORT_COLUMNS = [
     {label: 'Id', column: InventoryItemDefinitionsSortColumn.Id},
     {label: 'Name', column: InventoryItemDefinitionsSortColumn.Name},
+    {label: 'SKU', column: InventoryItemDefinitionsSortColumn.Sku},
     {label: 'Description', column: InventoryItemDefinitionsSortColumn.Description},
     {label: 'Attributes', column: InventoryItemDefinitionsSortColumn.AttributeCount},
     {label: 'Components', column: InventoryItemDefinitionsSortColumn.ComponentCount},
@@ -106,7 +107,7 @@ const InventoryItemDefinitions: FC = () => {
                         <TableBody>
                             {paginationResult.Items.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={5}>No inventory item definitions were found.</TableCell>
+                                    <TableCell colSpan={6}>No inventory item definitions were found.</TableCell>
                                 </TableRow>
                             )}
                             {paginationResult.Items.map(definition => (
@@ -117,6 +118,7 @@ const InventoryItemDefinitions: FC = () => {
                                         </Link>
                                     </TableCell>
                                     <TableCell>{definition.Name}</TableCell>
+                                    <TableCell>{definition.Sku ?? '—'}</TableCell>
                                     <TableCell>{definition.Description ?? '—'}</TableCell>
                                     <TableCell>{definition.AttributeCount}</TableCell>
                                     <TableCell>{definition.ComponentCount}</TableCell>

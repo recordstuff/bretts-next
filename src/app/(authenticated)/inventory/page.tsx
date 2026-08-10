@@ -24,6 +24,7 @@ const TOP_LEVEL_ONLY_STORAGE_KEY = 'inventoryTopLevelOnly'
 const SORT_COLUMNS = [
     {label: 'Id', column: InventoryItemsSortColumn.Id},
     {label: 'Definition', column: InventoryItemsSortColumn.Definition},
+    {label: 'SKU', column: InventoryItemsSortColumn.Sku},
     {label: 'Serial Number', column: InventoryItemsSortColumn.SerialNumber},
     {label: 'Attribute Values', column: InventoryItemsSortColumn.AttributeValueCount},
 ] as const
@@ -126,7 +127,7 @@ const Inventory: FC = () => {
                         </TableHead>
                         <TableBody>
                             {paginationResult.Items.length === 0 && (
-                                <TableRow><TableCell colSpan={4}>No inventory items were found.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={5}>No inventory items were found.</TableCell></TableRow>
                             )}
                             {paginationResult.Items.map(item => (
                                 <TableRow key={item.Guid}>
@@ -134,6 +135,7 @@ const Inventory: FC = () => {
                                         <Link className="entity-id-link" href={`/inventoryitem/${item.Guid}`}>{item.Guid}</Link>
                                     </TableCell>
                                     <TableCell>{item.InventoryItemDefinitionName}</TableCell>
+                                    <TableCell>{item.InventoryItemDefinitionSku ?? '—'}</TableCell>
                                     <TableCell>{item.SerialNumber ?? '—'}</TableCell>
                                     <TableCell>{item.AttributeValueCount}</TableCell>
                                 </TableRow>

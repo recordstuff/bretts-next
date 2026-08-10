@@ -10,6 +10,7 @@ export interface InventoryItemDefinitionDetail extends InventoryItemDefinitionSu
 export const emptyInventoryItemDefinitionDetail = (): InventoryItemDefinitionDetail => ({
     Guid: '00000000-0000-0000-0000-000000000000',
     Name: '',
+    Sku: '',
     Description: '',
     AttributeCount: 0,
     ComponentCount: 0,

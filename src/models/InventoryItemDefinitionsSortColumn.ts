@@ -4,4 +4,5 @@ export enum InventoryItemDefinitionsSortColumn {
     Description = 2,
     AttributeCount = 3,
     ComponentCount = 4,
+    Sku = 5,
 }
