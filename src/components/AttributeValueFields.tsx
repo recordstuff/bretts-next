@@ -2,6 +2,7 @@ import { AttributeDataType } from '@/models/AttributeDataType'
 import { AttributeValueDetail } from '@/models/AttributeValueDetail'
 import { Checkbox, FormControlLabel, Stack, TextField } from '@mui/material'
 import { FC } from 'react'
+import NumberTextField from './NumberTextField'
 
 interface AttributeValueFieldsProps {
     attributes: AttributeValueDetail[]
@@ -58,21 +59,16 @@ const AttributeValueFields: FC<AttributeValueFieldsProps> = ({attributes, onChan
                     : attribute.DataType === AttributeDataType.Currency
                         ? 'CurrencyValue'
                         : 'DecimalValue'
-                const step = attribute.DataType === AttributeDataType.Integer
-                    ? 1
-                    : attribute.DataType === AttributeDataType.Currency ? 0.01 : 'any'
-
                 return (
-                    <TextField
+                    <NumberTextField
+                        allowDecimal={attribute.DataType !== AttributeDataType.Integer}
                         fullWidth
                         key={attribute.AttributeDefinitionGuid}
-                        inputProps={{step}}
                         label={attribute.Name}
-                        onChange={event => updateAttribute(attribute.AttributeDefinitionGuid, {
-                            [valueProperty]: event.target.value === '' ? null : Number(event.target.value),
+                        onValueChange={newValue => updateAttribute(attribute.AttributeDefinitionGuid, {
+                            [valueProperty]: newValue,
                         })}
-                        type="number"
-                        value={value ?? ''}
+                        value={value}
                     />
                 )
             })}

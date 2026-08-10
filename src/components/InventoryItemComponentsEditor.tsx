@@ -112,12 +112,12 @@ const InventoryItemComponentsEditor: FC<InventoryItemComponentsEditorProps> = ({
                                 onChange={event => updateComponent(index, {SerialNumber: event.target.value})}
                                 value={component.SerialNumber ?? ''}
                             />
-                            {component.Attributes.length === 0
-                                ? <Typography color="text.secondary">This component has no attributes.</Typography>
-                                : <AttributeValueFields
+                            {component.Attributes.length > 0 && (
+                                <AttributeValueFields
                                     attributes={component.Attributes}
                                     onChange={attributes => updateComponent(index, {Attributes: attributes})}
-                                />}
+                                />
+                            )}
                             {template.Components.length > 0 && (
                                 <Stack spacing={1.5}>
                                     <Typography component="h4" variant="subtitle1">
