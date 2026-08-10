@@ -9,11 +9,12 @@ const roboto = Roboto({
 })
 
 const bluePalette = {
-    darkest: '#011f4b',
-    dark: '#03396c',
-    main: '#005b96',
-    muted: '#6497b1',
-    light: '#b3cde0',
+    lightest: '#f0f3fa',
+    light: '#d5deef',
+    stripe: '#b1c9ef',
+    muted: '#8aaee0',
+    accent: '#628ecb',
+    dark: '#395886',
 }
 
 const theme = createTheme({
@@ -25,6 +26,72 @@ const theme = createTheme({
                 root: {
                     paddingTop: '.9em',
                     paddingBottom: '.9em',
+                    transition: 'background-color 120ms ease, color 120ms ease, transform 80ms ease',
+                    '&:hover': {
+                        backgroundColor: bluePalette.stripe,
+                        color: bluePalette.dark,
+                    },
+                    '&.Mui-selected': {
+                        backgroundColor: bluePalette.accent,
+                        color: '#ffffff',
+                    },
+                    '&.Mui-selected:hover': {
+                        backgroundColor: bluePalette.dark,
+                        color: '#ffffff',
+                    },
+                    '&:active': {
+                        backgroundColor: bluePalette.dark,
+                        color: '#ffffff',
+                        transform: 'translateY(1px) scale(0.98)',
+                    },
+                },
+            },
+        },
+        MuiListItemIcon: {
+            styleOverrides: {
+                root: {
+                    color: 'inherit',
+                },
+            },
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    transition: 'background-color 120ms ease, border-color 120ms ease, color 120ms ease, transform 80ms ease',
+                    '&:not(.Mui-disabled):hover': {
+                        transform: 'translateY(-1px)',
+                    },
+                    '&:not(.Mui-disabled):active': {
+                        transform: 'translateY(1px) scale(0.98)',
+                    },
+                },
+            },
+        },
+        MuiIconButton: {
+            styleOverrides: {
+                root: {
+                    transition: 'background-color 120ms ease, color 120ms ease, transform 80ms ease',
+                    '&:not(.Mui-disabled):hover': {
+                        transform: 'translateY(-1px)',
+                    },
+                    '&:not(.Mui-disabled):active': {
+                        transform: 'translateY(1px) scale(0.94)',
+                    },
+                },
+            },
+        },
+        MuiCardActionArea: {
+            styleOverrides: {
+                root: {
+                    transition: 'background-color 120ms ease, color 120ms ease, transform 80ms ease',
+                    '&:hover': {
+                        backgroundColor: bluePalette.stripe,
+                        color: bluePalette.dark,
+                    },
+                    '&:active': {
+                        backgroundColor: bluePalette.muted,
+                        transform: 'translateY(1px) scale(0.99)',
+                    },
                 },
             },
         },
@@ -32,10 +99,10 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
                     '&:nth-of-type(odd)': {
-                        backgroundColor: bluePalette.light,
+                        backgroundColor: bluePalette.stripe,
                     },
                     '&.MuiTableRow-head': {
-                        backgroundColor: bluePalette.darkest,
+                        backgroundColor: bluePalette.dark,
                     },
                 },
             },
@@ -48,41 +115,82 @@ const theme = createTheme({
                 },
             },
         },
+        MuiTableSortLabel: {
+            styleOverrides: {
+                root: {
+                    transition: 'background-color 120ms ease, color 120ms ease, transform 80ms ease',
+                    '&:hover': {
+                        transform: 'translateY(-1px)',
+                    },
+                    '&:active': {
+                        transform: 'translateY(1px) scale(0.98)',
+                    },
+                    '&.Mui-active': {
+                        color: '#ffffff',
+                    },
+                    '&.Mui-active .MuiTableSortLabel-icon': {
+                        color: '#ffffff',
+                    },
+                },
+            },
+        },
+        MuiAppBar: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: bluePalette.dark,
+                    color: '#ffffff',
+                },
+            },
+        },
+        MuiLink: {
+            styleOverrides: {
+                root: {
+                    transition: 'color 120ms ease, text-decoration-thickness 120ms ease, transform 80ms ease',
+                    '&:hover': {
+                        color: bluePalette.accent,
+                        textDecorationThickness: '2px',
+                    },
+                    '&:active': {
+                        color: '#2d466b',
+                    },
+                },
+            },
+        },
     },
     palette: {
         mode: 'light',
         contrastThreshold: 4.5,
         primary: {
-            dark: bluePalette.darkest,
-            main: bluePalette.main,
-            light: bluePalette.muted,
+            dark: '#2d466b',
+            main: bluePalette.dark,
+            light: bluePalette.accent,
             contrastText: '#ffffff',
         },
         secondary: {
-            dark: bluePalette.dark,
+            dark: bluePalette.accent,
             main: bluePalette.muted,
-            light: bluePalette.light,
-            contrastText: bluePalette.darkest,
+            light: bluePalette.stripe,
+            contrastText: '#263b59',
         },
         info: {
-            dark: bluePalette.darkest,
-            main: bluePalette.main,
-            light: bluePalette.muted,
+            dark: '#2d466b',
+            main: bluePalette.dark,
+            light: bluePalette.accent,
             contrastText: '#ffffff',
         },
         background: {
             default: bluePalette.light,
-            paper: '#f7fbfe',
+            paper: bluePalette.lightest,
         },
         text: {
-            primary: bluePalette.darkest,
-            secondary: bluePalette.dark,
+            primary: bluePalette.dark,
+            secondary: '#4d6385',
         },
         action: {
             active: bluePalette.dark,
-            hover: 'rgba(0, 91, 150, 0.12)',
-            selected: 'rgba(0, 91, 150, 0.2)',
-            focus: 'rgba(0, 91, 150, 0.22)',
+            hover: bluePalette.stripe,
+            selected: bluePalette.muted,
+            focus: bluePalette.accent,
         },
     },
 })

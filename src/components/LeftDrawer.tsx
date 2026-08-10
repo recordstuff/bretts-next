@@ -98,7 +98,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
         <List>
             {menuOptions.map((menuItem, index) => {
                 if (menuItem === divider && jwtUtil.hasMultipleRoles()) {
-                    return <Divider key={`divider ${index}`} />
+                    return <Divider key={`divider ${index}`} sx={{ borderColor: 'primary.main' }} />
                 }
 
                 const menuOption = menuItem as MenuOption
