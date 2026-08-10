@@ -96,7 +96,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
     }
 
     const drawerContent = (
-        <>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
             <List
                 disablePadding
                 sx={{
@@ -128,7 +128,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
                     ) : null
                 })}
             </List>
-            <Stack component="footer" sx={{ px: 2, py: 2 }}>
+            <Stack component="footer" sx={{ mt: 'auto', px: 2, py: 2 }}>
                 <MuiLink
                     href="https://github.com/recordstuff/bretts-next"
                     onClick={handleDrawerClose}
@@ -149,7 +149,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
                     brettdrake.org
                 </MuiLink>
             </Stack>
-        </>
+        </Box>
     )
 
     return (
