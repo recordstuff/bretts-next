@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 
-interface LocalStorageBoolean {
+interface PersistentBooleanState {
     isLoaded: boolean
     setValue: (value: boolean) => void
     value: boolean
 }
 
-export const useLocalStorageBoolean = (key: string, defaultValue: boolean): LocalStorageBoolean => {
+export const usePersistentBooleanState = (key: string, defaultValue: boolean): PersistentBooleanState => {
     const [value, setValue] = useState(defaultValue)
     const [isLoaded, setIsLoaded] = useState(false)
 

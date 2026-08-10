@@ -12,7 +12,7 @@ import { InventoryItemSummary } from '@/models/InventoryItemSummary'
 import { InventoryItemsSortColumn } from '@/models/InventoryItemsSortColumn'
 import { emptyPaginationResult, PaginationResult } from '@/models/PaginationResult'
 import { SortDirection } from '@/models/SortDirection'
-import { useLocalStorageBoolean } from '@/hooks/useLocalStorageBoolean'
+import { usePersistentBooleanState } from '@/hooks/usePersistentBooleanState'
 import { takeSuccessMessage } from '@/utils/successMessageStorage'
 import AddIcon from '@mui/icons-material/Add'
 import { Box, Checkbox, FormControlLabel, Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
@@ -36,7 +36,7 @@ const Inventory: FC = () => {
         isLoaded: topLevelOnlyIsLoaded,
         setValue: setTopLevelOnly,
         value: topLevelOnly,
-    } = useLocalStorageBoolean(TOP_LEVEL_ONLY_STORAGE_KEY, false)
+    } = usePersistentBooleanState(TOP_LEVEL_ONLY_STORAGE_KEY, true)
     const [sortColumn, setSortColumn] = useState(InventoryItemsSortColumn.Definition)
     const [sortDirection, setSortDirection] = useState(SortDirection.Ascending)
     const {showSnackbar} = useAppSnackbar()
