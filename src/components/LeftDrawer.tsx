@@ -95,7 +95,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
     }
 
     const drawerContent = (
-        <List>
+        <List disablePadding>
             {menuOptions.map((menuItem, index) => {
                 if (menuItem === divider && jwtUtil.hasMultipleRoles()) {
                     return <Divider key={`divider ${index}`} sx={{ borderColor: 'primary.main' }} />
