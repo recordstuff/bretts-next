@@ -5,8 +5,9 @@ import { InventoryItemDefinitionNew } from '@/models/InventoryItemDefinitionNew'
 import { NameGuidPair } from '@/models/NameGuidPair'
 import AddIcon from '@mui/icons-material/Add'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
-import { ChangeEvent, FC, useMemo, useState } from 'react'
+import { FC, useMemo, useState } from 'react'
 import AttributeDefinitionsSelector from './AttributeDefinitionsSelector'
+import NumberTextField from './NumberTextField'
 
 interface InventoryItemDefinitionComponentsEditorProps {
     allDefinitions: NameGuidPair[]
@@ -56,8 +57,8 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
         setQuantity(1)
     }
 
-    const updateQuantity = (guid: string, event: ChangeEvent<HTMLInputElement>): void => {
-        const updatedQuantity = Math.max(1, Number.parseInt(event.target.value, 10) || 1)
+    const updateQuantity = (guid: string, value: number | null): void => {
+        const updatedQuantity = Math.max(1, value ?? 1)
 
         onChange(components.map(component => component.Guid === guid
             ? {...component, Quantity: updatedQuantity}
@@ -130,12 +131,10 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
                         <MenuItem key={definition.Guid} value={definition.Guid}>{definition.Name}</MenuItem>
                     ))}
                 </TextField>
-                <TextField
+                <NumberTextField
                     label="Quantity"
-                    type="number"
                     value={quantity}
-                    onChange={event => setQuantity(Math.max(1, Number.parseInt(event.target.value, 10) || 1))}
-                    inputProps={{min: 1}}
+                    onValueChange={value => setQuantity(Math.max(1, value ?? 1))}
                     sx={{width: {sm: '10rem'}}}
                 />
                 <Button
@@ -174,12 +173,10 @@ const InventoryItemDefinitionComponentsEditor: FC<InventoryItemDefinitionCompone
                             <TableRow key={component.Guid}>
                                 <TableCell>{component.Name}</TableCell>
                                 <TableCell>
-                                    <TextField
+                                    <NumberTextField
                                         aria-label={`Quantity of ${component.Name}`}
-                                        type="number"
                                         value={component.Quantity}
-                                        onChange={(event: ChangeEvent<HTMLInputElement>) => updateQuantity(component.Guid, event)}
-                                        inputProps={{min: 1}}
+                                        onValueChange={value => updateQuantity(component.Guid, value)}
                                         size="small"
                                     />
                                 </TableCell>
