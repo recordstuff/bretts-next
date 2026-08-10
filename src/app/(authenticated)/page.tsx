@@ -1,78 +1,105 @@
 'use client'
 
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import { inventoryItemClient } from '@/clients/InventoryItemClient'
-import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
-import { usePersistentBooleanState } from '@/hooks/usePersistentBooleanState'
-import { Card, CardContent, Checkbox, FormControlLabel, Link, Stack, Typography } from "@mui/material"
-import { FC, useCallback, useContext, useEffect, useState } from "react"
-import { jwtUtil } from '@/helpers/JwtUtil'
-import { JwtRole } from '@/models/Jwt'
+import AgricultureIcon from '@mui/icons-material/Agriculture'
+import PeopleIcon from '@mui/icons-material/People'
+import SettingsIcon from '@mui/icons-material/Settings'
+import TableChartIcon from '@mui/icons-material/TableChart'
+import TableRowsIcon from '@mui/icons-material/TableRows'
+import { Card, CardActionArea, Stack, Typography } from "@mui/material"
+import Link from "next/link"
+import { FC, useContext, useEffect } from "react"
 
-const TOP_LEVEL_ONLY_STORAGE_KEY = 'dashboardTopLevelOnly'
+interface OptionCardProps {
+    children: React.ReactNode
+    featured?: boolean
+    href: string
+}
 
-const Dashboard: FC = () => {
-    const [totalInventoryItems, setTotalInventoryItems] = useState<number | null>(null)
-    const {
-        isLoaded: topLevelOnlyIsLoaded,
-        setValue: setTopLevelOnly,
-        value: topLevelOnly,
-    } = usePersistentBooleanState(TOP_LEVEL_ONLY_STORAGE_KEY, true)
+const OptionCard: FC<OptionCardProps> = ({ children, featured = false, href }) => (
+    <Card
+        variant="outlined"
+        sx={featured ? { borderColor: 'primary.main', borderWidth: 2 } : undefined}
+    >
+        <CardActionArea
+            component={Link}
+            href={href}
+            sx={{ p: featured ? 3 : 2 }}
+        >
+            {children}
+        </CardActionArea>
+    </Card>
+)
+
+const Home: FC = () => {
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
-    const {actions: {pleaseWait, doneWaiting}} = useContext(PleaseWaitContext)
-
-    const loadTotalInventoryItems = useCallback(async (): Promise<void> => {
-        if (!jwtUtil.hasRole(JwtRole.User) || !topLevelOnlyIsLoaded) return
-
-        pleaseWait()
-        const inventory = await inventoryItemClient.getInventoryItems(1, 1, null, topLevelOnly)
-        setTotalInventoryItems(inventory.ItemCount)
-        doneWaiting()
-    }, [topLevelOnly, topLevelOnlyIsLoaded, pleaseWait, doneWaiting])
 
     useEffect(() => {
-        setPageTitle('Inventory Dashboard')
-        firstBreadcrumb({ title: 'Dashboard', url: '/' })
-        loadTotalInventoryItems()
-    }, [firstBreadcrumb, setPageTitle, loadTotalInventoryItems])
+        setPageTitle('Home')
+        firstBreadcrumb({ title: 'Home', url: '/' })
+    }, [firstBreadcrumb, setPageTitle])
 
     return (
-        jwtUtil.hasRole(JwtRole.User) && (
-            <Stack spacing={2} sx={{width: '100%'}}>
-                <Card
-                    variant="outlined"
-                    sx={{borderColor: 'primary.main', maxWidth: '24rem', width: '100%'}}>
-                    <CardContent>
-                        <Stack spacing={1.5}>
-                            <Typography color="text.secondary" variant="h6">Total Inventory Items</Typography>
-                            <Typography aria-live="polite" color="primary" variant="h3">
-                                {totalInventoryItems ?? '—'}
-                            </Typography>
-                            <FormControlLabel
-                                control={<Checkbox
-                                    checked={topLevelOnly}
-                                    onChange={event => setTopLevelOnly(event.target.checked)}
-                                />}
-                                label="Show Top-level Inventory Only"
-                            />
-                        </Stack>
-                    </CardContent>
-                </Card>
-                <Typography component="p" sx={{maxWidth: '48rem'}}>
-                    In a real app, the items would be scanned in and out and maybe imported via spreadsheet.
-                    {' '}But you can create item definitions and add and edit items.
+        <Stack spacing={3}>
+            <div>
+                <Typography variant="h5" gutterBottom>Project options</Typography>
+                <Typography>
+                    Use the menu to explore examples of common application layouts and, if you are an administrator, manage users and settings.
                 </Typography>
-                <Link
-                    href="https://brettdrake.org/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    color="primary"
-                    sx={{alignSelf: 'flex-start'}}>
-                    brettdrake.org
-                </Link>
-            </Stack>
-        )
+            </div>
+
+            <OptionCard href="/gridexample">
+                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                    <TableRowsIcon />
+                    <Typography variant="h6">Grid Example</Typography>
+                </Stack>
+                <Typography>
+                    Contains two groups of fields: Contact and Address. They appear side by side on larger screens, then move into one column on smaller screens with Contact first and Address below it.
+                </Typography>
+            </OptionCard>
+
+            <OptionCard href="/exampletwo">
+                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                    <TableChartIcon />
+                    <Typography variant="h6">Example Two</Typography>
+                </Stack>
+                <Typography>
+                    Shows a different responsive two-column pattern. Instead of moving whole field groups like Grid Example, its individual fields flow from two columns into a single column as the screen narrows.
+                </Typography>
+            </OptionCard>
+
+            <OptionCard href="/baconipsum">
+                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                    <AgricultureIcon />
+                    <Typography variant="h6">Bacon Ipsum</Typography>
+                </Stack>
+                <Typography>
+                    A placeholder page for now. Its sample text keeps the navigation route and application layout represented until this area is replaced with a functional feature.
+                </Typography>
+            </OptionCard>
+
+            <OptionCard featured href="/users">
+                <Typography color="primary" variant="overline">Featured working example</Typography>
+                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                    <PeopleIcon color="primary" />
+                    <Typography variant="h5">Users</Typography>
+                </Stack>
+                <Typography>
+                    The project&apos;s most complete working feature manages real user data through a full set of CRUD operations. Administrators can search and filter users, create accounts, edit user details and role assignments, and delete users.
+                </Typography>
+            </OptionCard>
+
+            <OptionCard href="/settings">
+                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                    <SettingsIcon />
+                    <Typography variant="h6">Settings</Typography>
+                </Stack>
+                <Typography>
+                    An administrator-only page for testing the global exception handler, writing a structured test log entry, and shutting down the sandbox backend for the more mischievous admins. <span aria-hidden="true">😈</span>
+                </Typography>
+            </OptionCard>
+        </Stack>
     )
 }
 
-export default Dashboard
+export default Home
