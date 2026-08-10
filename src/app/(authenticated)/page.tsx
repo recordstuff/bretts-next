@@ -60,8 +60,7 @@ const Dashboard: FC = () => {
                 </Card>
                 <Typography component="p" sx={{maxWidth: '48rem'}}>
                     In a real app, the items would be scanned in and out and maybe imported via spreadsheet.
-                    {' '}This is really more of an experiment to see how far I can get with Codex at coming
-                    up with UI features. But you can create item definitions and add and edit items.
+                    {' '}But you can create item definitions and add and edit items.
                 </Typography>
                 <Link
                     href="https://brettdrake.org/"
