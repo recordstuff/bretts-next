@@ -128,12 +128,12 @@ const LeftDrawer: FC<Props> = ({ children }) => {
                     ) : null
                 })}
             </List>
-            <Stack component="footer" spacing={1} sx={{ px: 2, py: 2 }}>
+            <Stack component="footer" sx={{ px: 2, py: 2 }}>
                 <MuiLink
                     href="https://github.com/recordstuff/bretts-next"
                     onClick={handleDrawerClose}
                     rel="noopener noreferrer"
-                    sx={{ alignItems: 'center', display: 'flex', gap: 1, width: 'fit-content' }}
+                    sx={{ alignItems: 'center', display: 'flex', gap: 1, py: 1, width: 'fit-content' }}
                     target="_blank"
                 >
                     <GitHubIcon aria-hidden="true" fontSize="small" />
@@ -143,7 +143,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
                     href="https://brettdrake.org/"
                     onClick={handleDrawerClose}
                     rel="noopener noreferrer"
-                    sx={{ width: 'fit-content' }}
+                    sx={{ alignSelf: 'center', py: 1, width: 'fit-content' }}
                     target="_blank"
                 >
                     brettdrake.org
