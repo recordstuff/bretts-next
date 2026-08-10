@@ -71,7 +71,7 @@ const InventoryItemDefinition: FC = () => {
     }, [id, showSnackbar])
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-        const field = event.target.name as 'Name' | 'Description'
+        const field = event.target.name as 'Name' | 'Sku' | 'Description'
 
         setDefinition(currentDefinition => ({
             ...currentDefinition,
@@ -93,6 +93,7 @@ const InventoryItemDefinition: FC = () => {
             if (id === undefined) {
                 const newDefinition: InventoryItemDefinitionNew = {
                     Name: definition.Name,
+                    Sku: definition.Sku,
                     Description: definition.Description,
                     Attributes: definition.Attributes,
                     Components: definition.Components,
@@ -225,6 +226,13 @@ const InventoryItemDefinition: FC = () => {
                 name="Name"
                 onChange={handleChange}
                 value={definition.Name}
+            />
+            <TextField
+                fullWidth
+                label="SKU"
+                name="Sku"
+                onChange={handleChange}
+                value={definition.Sku ?? ''}
             />
             <TextField
                 fullWidth
