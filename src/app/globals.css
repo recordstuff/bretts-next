@@ -13,13 +13,13 @@ a {
 }
 
 .logout-link:hover {
-    color: #ce93d8;
+    color: #b3cde0;
     font-weight: 800;
     transform: scale(1.05);
 }
 
 .logout-link:active {
-    color: #ab47bc;
+    color: #6497b1;
     font-weight: 800;
     transform: translateY(1px) scale(.97);
 }
@@ -32,18 +32,23 @@ a {
 
 .user-id-link,
 .user-id-link:visited {
-    color: #9dffb4;
+    color: #005b96;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
 }
 
 .user-id-link:hover {
+    color: #03396c;
     text-decoration-thickness: 2px;
+}
+
+.user-id-link:active {
+    color: #011f4b;
 }
 
 .user-id-link:focus-visible {
     border-radius: 2px;
-    outline: 2px solid #9dffb4;
+    outline: 2px solid #005b96;
     outline-offset: 2px;
 }
