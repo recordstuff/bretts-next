@@ -133,7 +133,7 @@ const LeftDrawer: FC<Props> = ({ children }) => {
                     href="https://github.com/recordstuff/bretts-next"
                     onClick={handleDrawerClose}
                     rel="noopener noreferrer"
-                    sx={{ alignItems: 'center', alignSelf: 'center', display: 'flex', gap: 1, pb: 1, pt: 0.5, width: 'fit-content' }}
+                    sx={{ alignItems: 'center', alignSelf: 'center', display: 'flex', gap: 0.5, pb: 1, pt: 0.5, width: 'fit-content' }}
                     target="_blank"
                 >
                     <GitHubIcon aria-hidden="true" fontSize="small" />
