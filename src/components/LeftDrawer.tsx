@@ -95,10 +95,18 @@ const LeftDrawer: FC<Props> = ({ children }) => {
     }
 
     const drawerContent = (
-        <List>
+        <List
+            disablePadding
+            sx={{
+                '& .MuiListItemButton-root': {
+                    paddingBottom: 'calc(.9em + 1px)',
+                    paddingTop: 'calc(.9em + 1px)',
+                },
+            }}
+        >
             {menuOptions.map((menuItem, index) => {
                 if (menuItem === divider && jwtUtil.hasMultipleRoles()) {
-                    return <Divider key={`divider ${index}`} />
+                    return <Divider key={`divider ${index}`} sx={{ borderColor: 'primary.main' }} />
                 }
 
                 const menuOption = menuItem as MenuOption
