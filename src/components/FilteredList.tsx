@@ -17,11 +17,10 @@ const FilteredList: FC<Props> = ({ label, items, handleClick }) => {
     return (
         <Box
             sx={{
-                border: '1px solid',
-                borderColor: 'secondary.main',
-                borderRadius: 1,
                 minHeight: '9rem',
-                overflow: 'hidden',
+                '& .MuiInputLabel-root': {
+                    fontWeight: 400,
+                },
             }}
         >
             <TextFilter
