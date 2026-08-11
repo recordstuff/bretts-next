@@ -4,7 +4,7 @@ import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from "r
 import { roleClient } from "../../../../clients/RoleClient"
 import { userClient } from "../../../../clients/UserClient"
 import { UserDetail, emptyUserDetail } from "../../../../models/UserDetail"
-import { Button, Stack, TextField } from "@mui/material"
+import { Button, Stack, SxProps, TextField, Theme } from "@mui/material"
 import { NameGuidPair } from "../../../../models/NameGuidPair"
 import { UserNew } from "../../../../models/UserNew"
 import { AxiosError } from "axios"
@@ -17,6 +17,36 @@ import YesNoDialog from "@/components/YesNoDialog"
 import { storeSuccessMessage, takeSuccessMessage } from "@/utils/successMessageStorage"
 import { useAppSnackbar } from "@/components/AppSnackbarProvider"
 import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
+
+const userFormStyles: SxProps<Theme> = {
+    maxWidth: '75rem',
+    '& .MuiInputLabel-root': {
+        color: 'text.primary',
+        fontWeight: 500,
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'primary.light',
+    },
+    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'primary.main',
+    },
+    '& .MuiInputBase-input.Mui-disabled': {
+        WebkitTextFillColor: 'text.secondary',
+        opacity: 1,
+    },
+}
+
+const resetButtonStyles: SxProps<Theme> = {
+    color: 'primary.main',
+    '&:hover': {
+        backgroundColor: 'secondary.light',
+        color: 'primary.dark',
+    },
+    '&:active': {
+        backgroundColor: 'secondary.main',
+        color: 'primary.dark',
+    },
+}
 
 const User: FC = () => {
 
@@ -151,7 +181,7 @@ const User: FC = () => {
     }
 
     return (
-        <Stack margin={2} spacing={4}>
+        <Stack margin={2} spacing={4} sx={userFormStyles}>
             {id !== undefined && <TextField fullWidth label="Id" value={user.Guid} disabled />}
             <TextField fullWidth label="Display Name" name='DisplayName' onChange={handleChange} value={user.DisplayName} />
             <TextField fullWidth label="Email" name='Email' onChange={handleChange} value={user.Email} />
@@ -166,7 +196,7 @@ const User: FC = () => {
             />
             <Stack direction='row' spacing={2}>
                 <Button onClick={upsert} color='primary' variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
-                <Button color="secondary" onClick={handleCancel}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
+                <Button onClick={handleCancel} sx={resetButtonStyles}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
                 {id !== undefined && <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>}
             </Stack>
             <YesNoDialog
