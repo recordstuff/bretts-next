@@ -3,7 +3,7 @@ import { NameGuidPair } from "../models/NameGuidPair";
 
 class RoleClient extends HttpClient {
     constructor() {
-        super('roles')
+        super('role')
     }
 
     public getAllRoles(): Promise<NameGuidPair[]> {
