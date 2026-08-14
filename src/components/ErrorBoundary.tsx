@@ -1,8 +1,7 @@
 'use client'
 
 import React, { ErrorInfo } from "react";
-import { AxiosError } from "axios";
-import { HTTP_STATUS_CODES } from "../clients/HttpClient";
+import { HTTP_STATUS_CODES, isHttpStatusError } from "../clients/HttpClient";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 
 interface Props {
@@ -48,8 +47,7 @@ class ErrorBoundary extends React.PureComponent<Props, State> {
     }
 
     private readonly handleUnhandledRejection = (event: PromiseRejectionEvent): void => {
-        const suppressMessage = event.reason instanceof AxiosError
-            && event.reason.response?.status === HTTP_STATUS_CODES.FORBIDDEN
+        const suppressMessage = isHttpStatusError(event.reason, HTTP_STATUS_CODES.FORBIDDEN)
         const reason = event.reason instanceof Error ? event.reason : null
 
         this.setState({

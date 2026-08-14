@@ -2,10 +2,9 @@
 
 import { Box, Button, Grid, Link, Paper, TextField } from "@mui/material"
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react"
-import { HTTP_STATUS_CODES } from "../../../clients/HttpClient"
+import { HTTP_STATUS_CODES, isHttpStatusError } from "../../../clients/HttpClient"
 import { jwtUtil } from "../../../helpers/JwtUtil"
 import { defaultUserCredentials, UserCredentials } from "../../../models/UserCredentials"
-import { AxiosError } from "axios"
 import { userClient } from "../../../clients/UserClient"
 import { useRouter } from "next/navigation"
 import { PleaseWaitContext } from "../../../components/PleaseWaitProvider"
@@ -40,7 +39,7 @@ const Layout: FC = () => {
         }
         catch (ex: unknown) {
             clearAllWaits()
-            if (ex instanceof AxiosError && ex.response?.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
+            if (isHttpStatusError(ex, HTTP_STATUS_CODES.UNAUTHORIZED)) {
                 showSnackbar('The Email or Password was incorrect.', AppSnackbarSeverity.Warning)
                 return
             }

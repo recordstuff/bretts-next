@@ -4,49 +4,19 @@ import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from "r
 import { roleClient } from "../../../../clients/RoleClient"
 import { userClient } from "../../../../clients/UserClient"
 import { UserDetail, emptyUserDetail } from "../../../../models/UserDetail"
-import { Button, Stack, SxProps, TextField, Theme } from "@mui/material"
+import { TextField } from "@mui/material"
 import { NameGuidPair } from "../../../../models/NameGuidPair"
 import { UserNew } from "../../../../models/UserNew"
-import { AxiosError } from "axios"
-import { HTTP_STATUS_CODES } from "../../../../clients/HttpClient"
+import { HTTP_STATUS_CODES, isHttpStatusError } from "../../../../clients/HttpClient"
 import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import YesNoDialog from "@/components/YesNoDialog"
-import { storeSuccessMessage, takeSuccessMessage } from "@/utils/successMessageStorage"
+import { storeSuccessMessage } from "@/utils/successMessageStorage"
 import { useAppSnackbar } from "@/components/AppSnackbarProvider"
 import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
-
-const userFormStyles: SxProps<Theme> = {
-    maxWidth: '75rem',
-    '& .MuiInputLabel-root': {
-        color: 'text.primary',
-        fontWeight: 500,
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'primary.light',
-    },
-    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'primary.main',
-    },
-    '& .MuiInputBase-input.Mui-disabled': {
-        WebkitTextFillColor: 'text.secondary',
-        opacity: 1,
-    },
-}
-
-const resetButtonStyles: SxProps<Theme> = {
-    color: 'primary.main',
-    '&:hover': {
-        backgroundColor: 'secondary.light',
-        color: 'primary.dark',
-    },
-    '&:active': {
-        backgroundColor: 'secondary.main',
-        color: 'primary.dark',
-    },
-}
+import EntityForm from "@/components/EntityForm"
+import { useStoredSuccessMessage } from "@/hooks/useStoredSuccessMessage"
 
 const User: FC = () => {
 
@@ -54,13 +24,15 @@ const User: FC = () => {
     const [user, setUser] = useState<UserDetail>(emptyUserDetail())
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
     const {showSnackbar} = useAppSnackbar()
     const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     const { id } = useParams<{id: string}>()
     const router = useRouter()
+    const isEdit = id !== undefined
+
+    useStoredSuccessMessage(isEdit)
 
     const getAllRoles = useCallback(async (): Promise<void> => {
         pleaseWait()
@@ -98,18 +70,6 @@ const User: FC = () => {
         getUser()
     }, [id, setPageTitle, addBreadcrumb, getAllRoles, getUser])
 
-    useEffect(() => {
-        if (id === undefined) {
-            return
-        }
-
-        const storedSuccessMessage = takeSuccessMessage()
-
-        if (storedSuccessMessage !== null) {
-            showSnackbar(storedSuccessMessage, AppSnackbarSeverity.Success)
-        }
-    }, [id, showSnackbar])
-
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         if (event.target.name === 'Password') {
             setPassword(event.target.value)
@@ -125,7 +85,7 @@ const User: FC = () => {
         pleaseWait()
 
         try {
-            if (id === undefined) {
+            if (!isEdit) {
                 const newUser: UserNew = { ...user, Password: password }
                 newUser.Roles = selectedRoles
 
@@ -146,8 +106,7 @@ const User: FC = () => {
         catch (ex: unknown) {
             clearAllWaits()
 
-            if (ex instanceof AxiosError
-             && ex.response?.status === HTTP_STATUS_CODES.CONFLICT) {
+            if (isHttpStatusError(ex, HTTP_STATUS_CODES.CONFLICT)) {
                 showSnackbar('A user with this email already exists.', AppSnackbarSeverity.Warning)
                 return
             }
@@ -157,12 +116,12 @@ const User: FC = () => {
     }
 
     const handleCancel = (): void => {
-        if (id === undefined) {
+        if (!isEdit) {
             router.back()
+            return
         }
-        else {
-            getUser()
-        }
+
+        getUser()
     }
 
     const handleDelete = async (): Promise<void> => {
@@ -170,7 +129,6 @@ const User: FC = () => {
             return
         }
 
-        setDeleteDialogOpen(false)
         pleaseWait()
 
         await userClient.deleteUser(id)
@@ -182,12 +140,18 @@ const User: FC = () => {
     }
 
     return (
-        <Stack margin={2} spacing={4} sx={userFormStyles}>
-            {id !== undefined && <TextField fullWidth label="Id" value={user.Guid} disabled />}
+        <EntityForm
+            entityName="user"
+            isEdit={isEdit}
+            onCancel={handleCancel}
+            onDelete={handleDelete}
+            onSave={upsert}
+        >
+            {isEdit && <TextField fullWidth label="Id" value={user.Guid} disabled />}
             <TextField fullWidth label="Display Name" name='DisplayName' onChange={handleChange} value={user.DisplayName} />
             <TextField fullWidth label="Email" name='Email' onChange={handleChange} value={user.Email} />
             <TextField fullWidth label="Phone" name='Phone' onChange={handleChange} value={user.Phone} />
-            {id === undefined && <TextField fullWidth label="Password" name='Password' onChange={handleChange} value={password} />}
+            {!isEdit && <TextField fullWidth label="Password" name='Password' onChange={handleChange} value={password} />}
             <ItemsSelector
                 label="Roles"
                 allItems={roles}
@@ -195,18 +159,7 @@ const User: FC = () => {
                 selected={selectedRoles}
                 setSelected={setSelectedRoles}
             />
-            <Stack direction='row' spacing={2}>
-                <Button onClick={upsert} color='primary' variant="contained">{id === undefined ? 'Add' : 'Save'}</Button>
-                <Button onClick={handleCancel} sx={resetButtonStyles}>{id === undefined ? 'Cancel' : 'Reset Form'}</Button>
-                {id !== undefined && <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>}
-            </Stack>
-            <YesNoDialog
-                open={deleteDialogOpen}
-                question="Are you sure you want to delete this user?"
-                onNo={() => setDeleteDialogOpen(false)}
-                onYes={handleDelete}
-            />
-        </Stack>
+        </EntityForm>
     )
 }
 

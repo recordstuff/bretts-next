@@ -30,24 +30,24 @@ a {
     outline-offset: 2px;
 }
 
-.user-id-link,
-.user-id-link:visited {
+.entity-id-link,
+.entity-id-link:visited {
     color: #395886;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
 }
 
-.user-id-link:hover {
+.entity-id-link:hover {
     color: #628ecb;
     text-decoration-thickness: 2px;
 }
 
-.user-id-link:active {
+.entity-id-link:active {
     color: #2d466b;
 }
 
-.user-id-link:focus-visible {
+.entity-id-link:focus-visible {
     border-radius: 2px;
     outline: 2px solid #395886;
     outline-offset: 2px;

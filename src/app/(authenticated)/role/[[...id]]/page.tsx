@@ -1,61 +1,32 @@
 'use client'
 
-import { AxiosError } from 'axios'
-import { Button, Stack, SxProps, TextField, Theme } from '@mui/material'
+import { TextField } from '@mui/material'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
-import { HTTP_STATUS_CODES } from '@/clients/HttpClient'
+import { HTTP_STATUS_CODES, isHttpStatusError } from '@/clients/HttpClient'
+import EntityForm from '@/components/EntityForm'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { NameGuidPair } from '@/models/NameGuidPair'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
 import { RoleNew } from '@/models/RoleNew'
-import YesNoDialog from '@/components/YesNoDialog'
 import { roleClient } from '@/clients/RoleClient'
-import { storeSuccessMessage, takeSuccessMessage } from '@/utils/successMessageStorage'
+import { storeSuccessMessage } from '@/utils/successMessageStorage'
 import { useAppSnackbar } from '@/components/AppSnackbarProvider'
+import { useStoredSuccessMessage } from '@/hooks/useStoredSuccessMessage'
 import { useParams, useRouter } from 'next/navigation'
 import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from 'react'
-
-const roleFormStyles: SxProps<Theme> = {
-    maxWidth: '75rem',
-    '& .MuiInputLabel-root': {
-        color: 'text.primary',
-        fontWeight: 500,
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'primary.light',
-    },
-    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'primary.main',
-    },
-    '& .MuiInputBase-input.Mui-disabled': {
-        WebkitTextFillColor: 'text.secondary',
-        opacity: 1,
-    },
-}
-
-const resetButtonStyles: SxProps<Theme> = {
-    color: 'primary.main',
-    '&:hover': {
-        backgroundColor: 'secondary.light',
-        color: 'primary.dark',
-    },
-    '&:active': {
-        backgroundColor: 'secondary.main',
-        color: 'primary.dark',
-    },
-}
 
 const emptyRole = (): NameGuidPair => ({ Guid: '', Name: '' })
 
 const Role: FC = () => {
     const [role, setRole] = useState<NameGuidPair>(emptyRole())
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const { showSnackbar } = useAppSnackbar()
     const { actions: { clearAllWaits, pleaseWait, doneWaiting } } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
     const { id } = useParams<{ id: string }>()
     const router = useRouter()
     const isEdit = id !== undefined
+
+    useStoredSuccessMessage(isEdit)
 
     const getRole = useCallback(async (): Promise<void> => {
         if (id === undefined) {
@@ -80,18 +51,6 @@ const Role: FC = () => {
         addBreadcrumb({ title: pageTitle, url })
         getRole()
     }, [id, isEdit, setPageTitle, addBreadcrumb, getRole])
-
-    useEffect(() => {
-        if (!isEdit) {
-            return
-        }
-
-        const storedSuccessMessage = takeSuccessMessage()
-
-        if (storedSuccessMessage !== null) {
-            showSnackbar(storedSuccessMessage, AppSnackbarSeverity.Success)
-        }
-    }, [isEdit, showSnackbar])
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
         setRole({ ...role, Name: event.target.value })
@@ -127,8 +86,7 @@ const Role: FC = () => {
         catch (exception: unknown) {
             clearAllWaits()
 
-            if (exception instanceof AxiosError
-             && exception.response?.status === HTTP_STATUS_CODES.CONFLICT) {
+            if (isHttpStatusError(exception, HTTP_STATUS_CODES.CONFLICT)) {
                 showSnackbar('A role with this name already exists.', AppSnackbarSeverity.Warning)
                 return
             }
@@ -151,7 +109,6 @@ const Role: FC = () => {
             return
         }
 
-        setDeleteDialogOpen(false)
         pleaseWait()
 
         try {
@@ -163,8 +120,7 @@ const Role: FC = () => {
         catch (exception: unknown) {
             clearAllWaits()
 
-            if (exception instanceof AxiosError
-             && exception.response?.status === HTTP_STATUS_CODES.CONFLICT) {
+            if (isHttpStatusError(exception, HTTP_STATUS_CODES.CONFLICT)) {
                 showSnackbar('This role is assigned to one or more users and cannot be deleted.', AppSnackbarSeverity.Warning)
                 return
             }
@@ -173,30 +129,17 @@ const Role: FC = () => {
         }
     }
 
-    let saveButtonText = 'Add'
-    let cancelButtonText = 'Cancel'
-
-    if (isEdit) {
-        saveButtonText = 'Save'
-        cancelButtonText = 'Reset Form'
-    }
-
     return (
-        <Stack margin={2} spacing={4} sx={roleFormStyles}>
+        <EntityForm
+            entityName="role"
+            isEdit={isEdit}
+            onCancel={handleCancel}
+            onDelete={handleDelete}
+            onSave={upsert}
+        >
             {isEdit && <TextField fullWidth label="Id" value={role.Guid} disabled />}
             <TextField fullWidth label="Name" name="Name" onChange={handleChange} value={role.Name} />
-            <Stack direction="row" spacing={2}>
-                <Button onClick={upsert} color="primary" variant="contained">{saveButtonText}</Button>
-                <Button onClick={handleCancel} sx={resetButtonStyles}>{cancelButtonText}</Button>
-                {isEdit && <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>}
-            </Stack>
-            <YesNoDialog
-                open={deleteDialogOpen}
-                question="Are you sure you want to delete this role?"
-                onNo={() => setDeleteDialogOpen(false)}
-                onYes={handleDelete}
-            />
-        </Stack>
+        </EntityForm>
     )
 }
 
