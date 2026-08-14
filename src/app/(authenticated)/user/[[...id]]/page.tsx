@@ -65,7 +65,7 @@ const User: FC = () => {
     const getRoles = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        setRoles(await roleClient.getRoles())
+        setRoles(await roleClient.getAllRoles())
 
         doneWaiting()
     }, [pleaseWait, doneWaiting])

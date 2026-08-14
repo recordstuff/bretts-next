@@ -6,8 +6,8 @@ class RoleClient extends HttpClient {
         super('role')
     }
 
-    public getRoles(): Promise<NameGuidPair[]> {
-        return this.get<NameGuidPair[]>('roles')
+    public getAllRoles(): Promise<NameGuidPair[]> {
+        return this.get<NameGuidPair[]>('allroles')
     }
 }
 
