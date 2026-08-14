@@ -7,6 +7,10 @@ export enum HTTP_STATUS_CODES {
     UNAUTHORIZED = 401
 }
 
+export const isHttpStatusError = (exception: unknown, statusCode: HTTP_STATUS_CODES): boolean => {
+    return exception instanceof AxiosError && exception.response?.status === statusCode
+}
+
 const headers: Readonly<Record<string, string | boolean>> = {
     "Accept": "application/json",
     "Content-Type": "application/json; charset=utf-8",
@@ -45,7 +49,7 @@ abstract class HttpBase {
     }
 
     private onResponseError = (error: AxiosError): Promise<AxiosError> => {
-        if (error.response?.status === HTTP_STATUS_CODES.FORBIDDEN) {
+        if (isHttpStatusError(error, HTTP_STATUS_CODES.FORBIDDEN)) {
             window.location.href = '/login'
         }
         

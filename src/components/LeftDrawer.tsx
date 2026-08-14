@@ -4,6 +4,7 @@ import { FC, useContext, useMemo, useState } from "react"
 import PrivateRoute from "../components/PrivateRoute"
 import { AppBar, Box, Divider, Drawer, IconButton, Link as MuiLink, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material"
 import AgricultureIcon from '@mui/icons-material/Agriculture';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -58,6 +59,14 @@ const menuOptions: DrawerMenuItem[] = [
         Role: JwtRole.Admin,
         Breadcrumb: { title: "Users", url: "/users" },
         ChildRoutes: ['/user']
+    },
+    {
+        Text: "Roles",
+        Route: "/roles",
+        Icon: AdminPanelSettingsIcon,
+        Role: JwtRole.Admin,
+        Breadcrumb: { title: "Roles", url: "/roles" },
+        ChildRoutes: ['/role']
     },
     {
         Text: "Settings",
