@@ -15,7 +15,6 @@ import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import { UsersSortColumn } from "@/models/UsersSortColumn"
 import PaginatedEntityList from "@/components/PaginatedEntityList"
 import SortableTableHead from "@/components/SortableTableHead"
-import { useStoredSuccessMessage } from "@/hooks/useStoredSuccessMessage"
 import { useTableSort } from "@/hooks/useTableSort"
 import { DEFAULT_PAGE_SIZE } from "@/constants/pagination"
 
@@ -33,8 +32,6 @@ const Users: FC = () => {
     const { handleSort, sortColumn, sortDirection } = useTableSort(UsersSortColumn.DisplayName, setPage)
     const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
-
-    useStoredSuccessMessage()
 
     const getUsers = useCallback(async (): Promise<void> => {
         pleaseWait()

@@ -9,9 +9,7 @@ import { NameGuidPair } from '@/models/NameGuidPair'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
 import { RoleNew } from '@/models/RoleNew'
 import { roleClient } from '@/clients/RoleClient'
-import { storeSuccessMessage } from '@/utils/successMessageStorage'
 import { useAppSnackbar } from '@/components/AppSnackbarProvider'
-import { useStoredSuccessMessage } from '@/hooks/useStoredSuccessMessage'
 import { useParams, useRouter } from 'next/navigation'
 import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from 'react'
 
@@ -25,8 +23,6 @@ const Role: FC = () => {
     const { id } = useParams<{ id: string }>()
     const router = useRouter()
     const isEdit = id !== undefined
-
-    useStoredSuccessMessage(isEdit)
 
     const getRole = useCallback(async (): Promise<void> => {
         if (id === undefined) {
@@ -71,7 +67,7 @@ const Role: FC = () => {
                 const newRole: RoleNew = { Name: roleName }
                 const roleDetail = await roleClient.insertRole(newRole)
 
-                storeSuccessMessage('This role was created.')
+                showSnackbar('This role was created.', AppSnackbarSeverity.Success)
                 router.push(`/role/${roleDetail.Guid}`)
             }
             else {
@@ -114,7 +110,7 @@ const Role: FC = () => {
         try {
             await roleClient.deleteRole(id)
             doneWaiting()
-            storeSuccessMessage('This role was deleted.')
+            showSnackbar('This role was deleted.', AppSnackbarSeverity.Success)
             router.push('/roles')
         }
         catch (exception: unknown) {

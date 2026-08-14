@@ -10,7 +10,6 @@ import { NameGuidPair } from '@/models/NameGuidPair'
 import { emptyPaginationResult, PaginationResult } from '@/models/PaginationResult'
 import { RolesSortColumn } from '@/models/RolesSortColumn'
 import SortableTableHead from '@/components/SortableTableHead'
-import { useStoredSuccessMessage } from '@/hooks/useStoredSuccessMessage'
 import { useTableSort } from '@/hooks/useTableSort'
 import { DEFAULT_PAGE_SIZE } from '@/constants/pagination'
 import Link from 'next/link'
@@ -28,8 +27,6 @@ const Roles: FC = () => {
     const { handleSort, sortColumn, sortDirection } = useTableSort(RolesSortColumn.Name, setPage)
     const { actions: { pleaseWait, doneWaiting } } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
-
-    useStoredSuccessMessage()
 
     const getRoles = useCallback(async (): Promise<void> => {
         pleaseWait()

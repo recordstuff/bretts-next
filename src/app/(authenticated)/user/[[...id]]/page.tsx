@@ -12,11 +12,9 @@ import { useParams, useRouter } from "next/navigation"
 import ItemsSelector from "@/components/ItemsSelector"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import { storeSuccessMessage } from "@/utils/successMessageStorage"
 import { useAppSnackbar } from "@/components/AppSnackbarProvider"
 import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
 import EntityForm from "@/components/EntityForm"
-import { useStoredSuccessMessage } from "@/hooks/useStoredSuccessMessage"
 
 const User: FC = () => {
 
@@ -31,8 +29,6 @@ const User: FC = () => {
     const { id } = useParams<{id: string}>()
     const router = useRouter()
     const isEdit = id !== undefined
-
-    useStoredSuccessMessage(isEdit)
 
     const getAllRoles = useCallback(async (): Promise<void> => {
         pleaseWait()
@@ -90,7 +86,7 @@ const User: FC = () => {
                 newUser.Roles = selectedRoles
 
                 const userDetail = await userClient.insertUser(newUser)
-                storeSuccessMessage('This user was created.')
+                showSnackbar('This user was created.', AppSnackbarSeverity.Success)
                 router.push(`/user/${userDetail.Guid}`)
             }
             else {
@@ -135,7 +131,7 @@ const User: FC = () => {
 
         doneWaiting()
 
-        storeSuccessMessage('This user was deleted.')
+        showSnackbar('This user was deleted.', AppSnackbarSeverity.Success)
         router.push('/users')
     }
 
