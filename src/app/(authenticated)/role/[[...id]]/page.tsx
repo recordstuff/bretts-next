@@ -91,13 +91,13 @@ const Role: FC = () => {
         }
     }
 
-    const handleCancel = (): void => {
+    const handleCancel = async (): Promise<void> => {
         if (!isEdit) {
             router.back()
             return
         }
 
-        getRole()
+        await getRole()
     }
 
     const handleDelete = async (): Promise<void> => {

@@ -1,8 +1,10 @@
 'use client'
 
 import { Box, Button, SxProps, Theme } from '@mui/material'
+import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
 import { FC, ReactNode, useState } from 'react'
 import YesNoDialog from '@/components/YesNoDialog'
+import { useAppSnackbar } from '@/components/AppSnackbarProvider'
 import styles from './EntityForm.module.css'
 
 const formControlStyles: SxProps<Theme> = {
@@ -38,7 +40,7 @@ interface EntityFormProps {
     children: ReactNode
     entityName: string
     isEdit: boolean
-    onCancel: () => void
+    onCancel: () => void | Promise<void>
     onDelete: () => void | Promise<void>
     onSave: () => void | Promise<void>
 }
@@ -52,6 +54,7 @@ const EntityForm: FC<EntityFormProps> = ({
     onSave,
 }) => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const { showSnackbar } = useAppSnackbar()
     let saveButtonText = 'Add'
     let cancelButtonText = 'Cancel'
 
@@ -65,12 +68,20 @@ const EntityForm: FC<EntityFormProps> = ({
         await onDelete()
     }
 
+    const handleCancel = async (): Promise<void> => {
+        await onCancel()
+
+        if (isEdit) {
+            showSnackbar('The form was reset.', AppSnackbarSeverity.Info)
+        }
+    }
+
     return (
         <Box className={styles.form} sx={formControlStyles}>
             {children}
             <div className={styles.actions}>
                 <Button onClick={onSave} color="primary" variant="contained">{saveButtonText}</Button>
-                <Button onClick={onCancel} sx={resetButtonStyles}>{cancelButtonText}</Button>
+                <Button onClick={handleCancel} sx={resetButtonStyles}>{cancelButtonText}</Button>
                 {isEdit && (
                     <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>Delete</Button>
                 )}
