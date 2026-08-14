@@ -124,35 +124,36 @@ const User: FC = () => {
     const upsert = async (): Promise<void> => {
         pleaseWait()
 
-        if (id === undefined) {
-            const newUser: UserNew = { ...user, Password: password }
-            newUser.Roles = selectedRoles
+        try {
+            if (id === undefined) {
+                const newUser: UserNew = { ...user, Password: password }
+                newUser.Roles = selectedRoles
 
-            try {
                 const userDetail = await userClient.insertUser(newUser)
                 storeSuccessMessage('This user was created.')
                 router.push(`/user/${userDetail.Guid}`)
             }
-            catch (ex: unknown) {
-                clearAllWaits()
-                if (ex instanceof AxiosError 
-                 && ex.response?.status === HTTP_STATUS_CODES.CONFLICT) {
-                    // email already exists
-                    return
-                }
+            else {
+                const updatedUser = { ...user }
+                updatedUser.Roles = selectedRoles
 
-                throw ex                
+                setUser(await userClient.updateUser(updatedUser))
+                showSnackbar('This user was saved.', AppSnackbarSeverity.Success)
             }
-        }
-        else {
-            const newUser = { ...user }
-            newUser.Roles = selectedRoles
-            
-            setUser(await userClient.updateUser(newUser))
-            showSnackbar('This user was saved.', AppSnackbarSeverity.Success)
-        }
 
-        doneWaiting()
+            doneWaiting()
+        }
+        catch (ex: unknown) {
+            clearAllWaits()
+
+            if (ex instanceof AxiosError
+             && ex.response?.status === HTTP_STATUS_CODES.CONFLICT) {
+                showSnackbar('A user with this email already exists.', AppSnackbarSeverity.Warning)
+                return
+            }
+
+            throw ex
+        }
     }
 
     const handleCancel = (): void => {
