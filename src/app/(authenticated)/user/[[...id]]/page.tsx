@@ -62,10 +62,10 @@ const User: FC = () => {
     const { id } = useParams<{id: string}>()
     const router = useRouter()
 
-    const getRoles = useCallback(async (): Promise<void> => {
+    const getAllRoles = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        setRoles(await roleClient.getRoles())
+        setRoles(await roleClient.getAllRoles())
 
         doneWaiting()
     }, [pleaseWait, doneWaiting])
@@ -94,9 +94,9 @@ const User: FC = () => {
 
         setPageTitle(pageTitle)
         addBreadcrumb({ title: pageTitle, url })
-        getRoles()
+        getAllRoles()
         getUser()
-    }, [id, setPageTitle, addBreadcrumb, getRoles, getUser])
+    }, [id, setPageTitle, addBreadcrumb, getAllRoles, getUser])
 
     useEffect(() => {
         if (id === undefined) {
