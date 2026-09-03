@@ -29,13 +29,31 @@ const Paginator: FC<Props> = ({ leftElement, rightElement }) => {
 
     return (
         <Grid container>
-            <Grid item xs={12} md={6} xl={5} paddingRight={paddingHorizontal}>
+            <Grid
+                sx={{
+                    paddingRight: paddingHorizontal
+                }}
+                size={{
+                    xs: 12,
+                    md: 6,
+                    xl: 5
+                }}>
                 {leftElement}
             </Grid>
-            <Grid item xs={12} md={6} xl={5} paddingLeft={paddingHorizontal} paddingTop={paddingVertical}>
+            <Grid
+                sx={{
+                    paddingLeft: paddingHorizontal,
+                    paddingTop: paddingVertical
+                }}
+                size={{
+                    xs: 12,
+                    md: 6,
+                    xl: 5
+                }}>
                 {rightElement}
             </Grid>
-        </Grid>)
+        </Grid>
+    );
 }
 
 export default Paginator

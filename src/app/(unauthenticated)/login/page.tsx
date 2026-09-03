@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, Grid, Link, Paper, TextField } from "@mui/material"
+import { Box, Button, Grid, Link, Paper, Stack, TextField } from "@mui/material"
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react"
 import { HTTP_STATUS_CODES, isHttpStatusError } from "../../../clients/HttpClient"
 import { jwtUtil } from "../../../helpers/JwtUtil"
@@ -92,11 +92,11 @@ const Layout: FC = () => {
                     borderColor: 'primary.main',
                     transform: { xl: 'translateY(-4rem)' },
                 }}>
-                <Grid container direction="column" spacing={2}>
-                    <Grid item>
+                <Stack>
+                    <Grid>
                         This is a React sample using NextJS.  Log in with Admin and User rights to see all the options including Users CRUD operations.
                     </Grid>
-                    <Grid item>
+                    <Grid>
                         <Box
                             role="group"
                             aria-label="Populate with Credentials"
@@ -109,7 +109,7 @@ const Layout: FC = () => {
                             <Button onClick={populateWithUserCreds}>User rights only</Button>
                         </Box>
                     </Grid>
-                    <Grid item>
+                    <Grid>
                         <TextField
                             fullWidth
                             name="Email"
@@ -120,10 +120,12 @@ const Layout: FC = () => {
                             required
                             error={useErrorCondition && userCredentials.Email.length === 0}
                             helperText={useErrorCondition && userCredentials.Email.length === 0 && "Email cannot be blank."}
-                            InputLabelProps={{shrink: true}} /* "fix" issue with chrome autofill */
+                            slotProps={{
+                                inputLabel: {shrink: true}
+                            }}
                         />
                     </Grid>
-                    <Grid item>
+                    <Grid>
                         <TextField
                             fullWidth
                             name="Password"
@@ -134,10 +136,12 @@ const Layout: FC = () => {
                             required
                             error={useErrorCondition && userCredentials.Password.length === 0}
                             helperText={useErrorCondition && userCredentials.Password.length === 0 && "Password cannot be blank."}
-                            InputLabelProps={{shrink: true}} /* "fix" issue with chrome autofill */
+                            slotProps={{
+                                inputLabel: {shrink: true}
+                            }}
                         />
                     </Grid>
-                    <Grid item>
+                    <Grid>
                         <Button
                             fullWidth
                             variant="outlined"
@@ -147,7 +151,7 @@ const Layout: FC = () => {
                             Login
                         </Button>
                     </Grid>
-                    <Grid item sx={{textAlign: 'right'}}>
+                    <Grid sx={{textAlign: 'right'}}>
                         <Link
                             href="https://brettdrake.org/"
                             target="_blank"
@@ -156,10 +160,10 @@ const Layout: FC = () => {
                             brettdrake.org
                         </Link>
                     </Grid>
-                </Grid>
+                </Stack>
             </Paper>
         </Box>
-    )
+    );
 }
 
 export default Layout

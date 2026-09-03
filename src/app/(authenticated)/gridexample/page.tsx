@@ -1,7 +1,7 @@
 'use client'
 
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import { Grid, TextField, Typography } from "@mui/material"
+import { Grid, Stack, TextField, Typography } from "@mui/material"
 import { FC, useContext, useEffect } from "react"
 
 const GridExample: FC = () => {
@@ -13,40 +13,42 @@ const GridExample: FC = () => {
     }, [setPageTitle, firstBreadcrumb])
 
     return (
-            <Grid container>
-                <Grid item sm={12} lg={6} xl={5} container direction='column' padding={2} spacing={2}>
-                    <Grid item>
-                        <Typography variant="h6">Contact</Typography>
-                    </Grid>
-                    <Grid item>
-                        <TextField fullWidth label="Name" />
-                    </Grid>
-                    <Grid item>
-                        <TextField fullWidth label="Email" />
-                    </Grid>
-                    <Grid item>
-                        <TextField fullWidth label="Phone" />
-                    </Grid>
-                </Grid>
-                <Grid item sm={12} lg={6} xl={5} container direction='column' padding={2} spacing={2}>
-                    <Grid item>
-                        <Typography variant="h6">Address</Typography>
-                    </Grid>
-                    <Grid item>
-                        <TextField fullWidth label="Street" />
-                    </Grid>
-                    <Grid item>
-                        <TextField fullWidth label="City" />
-                    </Grid>
-                    <Grid item>
-                        <TextField fullWidth label="State" />
-                    </Grid>
-                    <Grid item>
-                        <TextField fullWidth label="Zip Code" />
-                    </Grid>
-                </Grid>
+        <Grid container>
+            <Grid
+                sx={{
+                    padding: 2
+                }}
+                size={{
+                    xs: 12,
+                    lg: 6,
+                    xl: 5
+                }}>
+                <Stack spacing={2}>
+                    <Typography variant="h6">Contact</Typography>
+                    <TextField fullWidth label="Name" />
+                    <TextField fullWidth label="Email" />
+                    <TextField fullWidth label="Phone" />
+                </Stack>
             </Grid>
-    )
+            <Grid
+                sx={{
+                    padding: 2
+                }}
+                size={{
+                    xs: 12,
+                    lg: 6,
+                    xl: 5
+                }}>
+                <Stack spacing={2}>
+                    <Typography variant="h6">Address</Typography>
+                    <TextField fullWidth label="Street" />
+                    <TextField fullWidth label="City" />
+                    <TextField fullWidth label="State" />
+                    <TextField fullWidth label="Zip Code" />
+                </Stack>
+            </Grid>
+        </Grid>
+    );
 }
 
 export default GridExample
