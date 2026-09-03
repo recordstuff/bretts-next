@@ -1,10 +1,10 @@
 # React NextJS Demo
 
 Currently:
-## React:      19.2.8
-## React DOM:  19.2.8
-## Next.js:    16.3.4
-## MUI:        9.4.0
+* React:      19.2.8
+* React DOM:  19.2.8
+* Next.js:    16.3.4
+* MUI:        9.4.0
 
 This project was originally based on this [Deprecated Create-React-App](https://github.com/recordstuff/bretts-app).
 
