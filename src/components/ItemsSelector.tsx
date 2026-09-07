@@ -63,22 +63,42 @@ const ItemsSelector: FC<Props> = ({ allItems, initiallySelectedItems, label, sel
                 padding: 2,
             }}
         >
-            <Typography component='legend' color='text.primary' fontWeight={500} paddingX={.75}>{label}</Typography>
+            <Typography
+                component='legend'
+                sx={{
+                    color: 'text.primary',
+                    fontWeight: 500,
+                    paddingX: .75
+                }}>{label}</Typography>
             <Grid container direction='row'>
-                <Grid item sm={12} md={5}>
+                <Grid
+                    size={{
+                        sm: 12,
+                        md: 5
+                    }}>
                     <FilteredList
                         label='Selected'
                         items={selected}
                         handleClick={handleClickDeselect}
                     />
                 </Grid>
-                <Grid item sm={12} md={2}>
-                    <Stack spacing={2} padding={2}>
+                <Grid
+                    size={{
+                        sm: 12,
+                        md: 2
+                    }}>
+                    <Stack spacing={2} sx={{
+                        padding: 2
+                    }}>
                         <Button onClick={handleClickSelectAll} variant='outlined'>{'<<'}</Button>
                         <Button onClick={handleClickDeselectAll} variant='outlined'>{'>>'}</Button>
                     </Stack>
                 </Grid>
-                <Grid item sm={12} md={5}>
+                <Grid
+                    size={{
+                        sm: 12,
+                        md: 5
+                    }}>
                     <FilteredList
                         label='Available'
                         items={available}
@@ -87,7 +107,7 @@ const ItemsSelector: FC<Props> = ({ allItems, initiallySelectedItems, label, sel
                 </Grid>
             </Grid>
         </Box>
-    )
+    );
 }
 
 export default ItemsSelector

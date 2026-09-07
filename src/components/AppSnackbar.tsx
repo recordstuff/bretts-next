@@ -14,9 +14,11 @@ const AppSnackbar: FC<AppSnackbarProps> = ({ message, severity, onClose }) => (
     <Snackbar
         open={message !== null}
         autoHideDuration={4000}
-        TransitionComponent={Fade}
         onClose={onClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        slots={{
+            transition: Fade
+        }}
     >
         <Alert
             severity={severity}

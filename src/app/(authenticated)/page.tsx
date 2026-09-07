@@ -2,6 +2,7 @@
 
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
 import AgricultureIcon from '@mui/icons-material/Agriculture'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import PeopleIcon from '@mui/icons-material/People'
 import SettingsIcon from '@mui/icons-material/Settings'
 import TableChartIcon from '@mui/icons-material/TableChart'
@@ -44,12 +45,18 @@ const Home: FC = () => {
             <div>
                 <Typography variant="h5" gutterBottom>Project options</Typography>
                 <Typography>
-                    Use the menu to explore examples of common application layouts and, if you are an administrator, manage users and settings.
+                    Use the menu to explore examples of common application layouts and, if you are an administrator, manage users, roles, and settings.
                 </Typography>
             </div>
 
             <OptionCard href="/gridexample">
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                        alignItems: "center",
+                        mb: 1
+                    }}>
                     <TableRowsIcon />
                     <Typography variant="h6">Grid Example</Typography>
                 </Stack>
@@ -59,7 +66,13 @@ const Home: FC = () => {
             </OptionCard>
 
             <OptionCard href="/exampletwo">
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                        alignItems: "center",
+                        mb: 1
+                    }}>
                     <TableChartIcon />
                     <Typography variant="h6">Example Two</Typography>
                 </Stack>
@@ -69,7 +82,13 @@ const Home: FC = () => {
             </OptionCard>
 
             <OptionCard href="/baconipsum">
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                        alignItems: "center",
+                        mb: 1
+                    }}>
                     <AgricultureIcon />
                     <Typography variant="h6">Bacon Ipsum</Typography>
                 </Stack>
@@ -80,7 +99,13 @@ const Home: FC = () => {
 
             <OptionCard featured href="/users">
                 <Typography color="primary" variant="overline">Featured working example</Typography>
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                        alignItems: "center",
+                        mb: 1
+                    }}>
                     <PeopleIcon color="primary" />
                     <Typography variant="h5">Users</Typography>
                 </Stack>
@@ -89,8 +114,30 @@ const Home: FC = () => {
                 </Typography>
             </OptionCard>
 
+            <OptionCard href="/roles">
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                        alignItems: "center",
+                        mb: 1
+                    }}>
+                    <AdminPanelSettingsIcon />
+                    <Typography variant="h6">Roles</Typography>
+                </Stack>
+                <Typography>
+                    Administrators can search and sort roles, create new roles, rename existing roles, and delete roles that are not assigned to users. Duplicate role names are prevented.
+                </Typography>
+            </OptionCard>
+
             <OptionCard href="/settings">
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                        alignItems: "center",
+                        mb: 1
+                    }}>
                     <SettingsIcon />
                     <Typography variant="h6">Settings</Typography>
                 </Stack>
@@ -99,7 +146,7 @@ const Home: FC = () => {
                 </Typography>
             </OptionCard>
         </Stack>
-    )
+    );
 }
 
 export default Home

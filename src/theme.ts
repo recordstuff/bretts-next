@@ -1,6 +1,6 @@
 'use client';
 import { Roboto } from 'next/font/google';
-import { createTheme } from '@mui/material/styles';
+import { alpha, createTheme } from '@mui/material/styles';
 
 const roboto = Roboto({
     weight: ['300', '400', '500', '700'],
@@ -118,12 +118,27 @@ const theme = createTheme({
         MuiTableSortLabel: {
             styleOverrides: {
                 root: {
+                    borderRadius: 1,
+                    margin: '-2px -6px',
+                    padding: '2px 6px',
+                    textDecoration: 'underline',
+                    textDecorationThickness: '1px',
+                    textUnderlineOffset: '0.2em',
                     transition: 'background-color 120ms ease, color 120ms ease, transform 80ms ease',
                     '&:hover': {
+                        backgroundColor: alpha('#ffffff', 0.1),
+                        color: '#ffffff',
+                        textShadow: `0 0 8px ${alpha('#ffffff', 0.4)}`,
                         transform: 'translateY(-1px)',
                     },
                     '&:active': {
+                        backgroundColor: alpha('#ffffff', 0.18),
+                        color: '#ffffff',
                         transform: 'translateY(1px) scale(0.98)',
+                    },
+                    '&.Mui-focusVisible': {
+                        outline: '2px solid #ffffff',
+                        outlineOffset: 2,
                     },
                     '&.Mui-active': {
                         color: '#ffffff',

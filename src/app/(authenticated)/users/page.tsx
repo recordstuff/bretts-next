@@ -4,24 +4,20 @@ import { FC, useCallback, useContext, useEffect, useState } from "react"
 import { userClient } from "../../../clients/UserClient"
 import { PaginationResult, emptyPaginationResult } from "../../../models/PaginationResult"
 import { UserSummary } from "../../../models/UserSummary"
-import { Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from "@mui/material"
-import { alpha } from "@mui/material/styles"
+import { TableBody, TableCell, TableRow } from "@mui/material"
 import { JwtRole } from "../../../models/Jwt"
-import AddIcon from '@mui/icons-material/Add';
 import Link from "next/link"
 import TwoElementGuide from "@/components/TwoElementGuide"
 import TextFilter from "@/components/TextFilter"
 import OptionFilter from "@/components/OptionFilter"
-import Paginator from "@/components/Paginator"
 import { PleaseWaitContext } from "@/components/PleaseWaitProvider"
 import { LeftDrawerContext } from "@/components/LeftDrawerProvider"
-import { takeSuccessMessage } from "@/utils/successMessageStorage"
 import { UsersSortColumn } from "@/models/UsersSortColumn"
-import { SortDirection } from "@/models/SortDirection"
-import { useAppSnackbar } from "@/components/AppSnackbarProvider"
-import { AppSnackbarSeverity } from "@/models/AppSnackbarState"
+import PaginatedEntityList from "@/components/PaginatedEntityList"
+import SortableTableHead from "@/components/SortableTableHead"
+import { useTableSort } from "@/hooks/useTableSort"
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination"
 
-const PAGE_SIZE = 5
 const USER_SORT_COLUMNS = [
     { label: 'Id', column: UsersSortColumn.Id },
     { label: 'Display Name', column: UsersSortColumn.DisplayName },
@@ -33,9 +29,7 @@ const Users: FC = () => {
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
     const [roleFilter, setRoleFilter] = useState<JwtRole>(JwtRole.Any)
-    const [sortColumn, setSortColumn] = useState<UsersSortColumn>(UsersSortColumn.DisplayName)
-    const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Ascending)
-    const {showSnackbar} = useAppSnackbar()
+    const { handleSort, sortColumn, sortDirection } = useTableSort(UsersSortColumn.DisplayName, setPage)
     const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
@@ -44,7 +38,7 @@ const Users: FC = () => {
 
         const response = await userClient.getUsers(
             page,
-            PAGE_SIZE,
+            DEFAULT_PAGE_SIZE,
             searchText,
             roleFilter,
             sortColumn,
@@ -56,42 +50,17 @@ const Users: FC = () => {
         doneWaiting()
     }, [page, searchText, roleFilter, sortColumn, sortDirection, pleaseWait, doneWaiting])
 
-    const handleSort = (column: UsersSortColumn): void => {
-        setPage(1)
-
-        if (column === sortColumn) {
-            setSortDirection(sortDirection === SortDirection.Ascending
-                ? SortDirection.Descending
-                : SortDirection.Ascending)
-            return
-        }
-
-        setSortColumn(column)
-        setSortDirection(SortDirection.Ascending)
-    }
-
     useEffect(() => {
         setPageTitle('Users')
         firstBreadcrumb({ title: 'Users', url: '/users' })
         getUsers()
     }, [setPageTitle, firstBreadcrumb, getUsers])
 
-    useEffect(() => {
-        const storedSuccessMessage = takeSuccessMessage()
-
-        if (storedSuccessMessage !== null) {
-            showSnackbar(storedSuccessMessage, AppSnackbarSeverity.Success)
-        }
-    }, [showSnackbar])
-
     return (
-        <>
-            <Grid item marginBottom={2} marginLeft={-1} marginTop={1}>
-                <IconButton component={Link} href='/user' sx={{ paddingBottom: '-1' }}>
-                    <AddIcon /><Typography variant='body2'>Add User</Typography>
-                </IconButton>
-            </Grid>
-            <Stack spacing={3}>
+        <PaginatedEntityList
+            addHref="/user"
+            addLabel="Add User"
+            filters={(
                 <TwoElementGuide
                     leftElement={<TextFilter
                         label="Search Text"
@@ -111,83 +80,28 @@ const Users: FC = () => {
                         setSelectedValue={setRoleFilter}
                     />
                     } />
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                {USER_SORT_COLUMNS.map(({ label, column }) => {
-                                    const active = sortColumn === column
-                                    const direction = sortDirection === SortDirection.Ascending ? 'asc' : 'desc'
-
-                                    return (
-                                        <TableCell key={column} sortDirection={active ? direction : false}>
-                                            <TableSortLabel
-                                                active={active}
-                                                direction={active ? direction : 'asc'}
-                                                onClick={() => handleSort(column)}
-                                                sx={(theme) => ({
-                                                    textDecoration: 'underline',
-                                                    textDecorationThickness: '1px',
-                                                    textUnderlineOffset: '0.2em',
-                                                    borderRadius: 1,
-                                                    px: 0.75,
-                                                    py: 0.25,
-                                                    mx: -0.75,
-                                                    my: -0.25,
-                                                    transition: theme.transitions.create([
-                                                        'background-color',
-                                                        'color',
-                                                        'text-shadow',
-                                                        'transform',
-                                                    ], {
-                                                        duration: theme.transitions.duration.shortest,
-                                                    }),
-                                                    '&:hover': {
-                                                        color: theme.palette.common.white,
-                                                        backgroundColor: alpha(theme.palette.common.white, 0.1),
-                                                        textShadow: `0 0 8px ${alpha(theme.palette.common.white, 0.4)}`,
-                                                    },
-                                                    '&:active': {
-                                                        color: theme.palette.common.white,
-                                                        backgroundColor: alpha(theme.palette.common.white, 0.18),
-                                                        transform: 'translateY(1px) scale(0.98)',
-                                                    },
-                                                    '&.Mui-focusVisible': {
-                                                        outline: `2px solid ${theme.palette.common.white}`,
-                                                        outlineOffset: 2,
-                                                    },
-                                                })}
-                                            >
-                                                {label}
-                                            </TableSortLabel>
-                                        </TableCell>
-                                    )
-                                })}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {paginationResult.Items.map((row, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>
-                                        <Link className="user-id-link" href={`/user/${row.Guid}`}>{row.Guid}</Link>
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.DisplayName}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.Email}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <Paginator
-                    paginationResult={paginationResult}
-                    setPage={setPage}
-                />
-            </Stack>
-        </>
+            )}
+            paginationResult={paginationResult}
+            setPage={setPage}
+        >
+            <SortableTableHead
+                columns={USER_SORT_COLUMNS}
+                onSort={handleSort}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+            />
+            <TableBody>
+                {paginationResult.Items.map(row => (
+                    <TableRow key={row.Guid}>
+                        <TableCell>
+                            <Link className="entity-id-link" href={`/user/${row.Guid}`}>{row.Guid}</Link>
+                        </TableCell>
+                        <TableCell>{row.DisplayName}</TableCell>
+                        <TableCell>{row.Email}</TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </PaginatedEntityList>
     )
 }
 

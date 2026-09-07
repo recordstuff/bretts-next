@@ -1,6 +1,6 @@
 'use client'
 
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined'
 import {
     Button,
     Dialog,
@@ -24,8 +24,10 @@ const YesNoDialog: FC<YesNoDialogProps> = ({ open, question, onNo, onYes }) => (
         aria-labelledby="yes-no-dialog-question"
     >
         <DialogTitle id="yes-no-dialog-question" sx={{ color: 'info.light' }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-                <HelpOutlineIcon color="info" />
+            <Stack direction="row" spacing={1.5} sx={{
+                alignItems: "center"
+            }}>
+                <HelpOutlinedIcon color="info" />
                 <span>{question}</span>
             </Stack>
         </DialogTitle>
