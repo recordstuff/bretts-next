@@ -3,6 +3,8 @@ services:
   react-app:
 # build from Dockerfile
     build: .
+# restart unless stopped for start on boot
+    restart: unless-stopped        
 # we need https. http is 3000
     ports:
     - 3000:3000
