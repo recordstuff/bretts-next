@@ -33,8 +33,8 @@ const User: FC = () => {
     const getAllRoles = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        setRoles(await roleClient.getAllRoles())
-
+        const allRoles = await roleClient.getAllRoles()
+        setRoles(allRoles)
         doneWaiting()
     }, [pleaseWait, doneWaiting])
 
@@ -43,8 +43,9 @@ const User: FC = () => {
 
         pleaseWait()
 
-        setUser(await userClient.getUser(id))
-
+        const loadedUser = await userClient.getUser(id)
+        setUser(loadedUser)
+        setSelectedRoles(loadedUser.Roles)
         doneWaiting()
     }, [id, pleaseWait, doneWaiting])
 
@@ -62,6 +63,8 @@ const User: FC = () => {
 
         setPageTitle(pageTitle)
         addBreadcrumb({ title: pageTitle, url })
+        // The response updates state after await; this rule misidentifies async loaders.
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- https://github.com/react/react/issues/34905
         getAllRoles()
         getUser()
     }, [id, setPageTitle, addBreadcrumb, getAllRoles, getUser])
@@ -93,7 +96,9 @@ const User: FC = () => {
                 const updatedUser = { ...user }
                 updatedUser.Roles = selectedRoles
 
-                setUser(await userClient.updateUser(updatedUser))
+                const savedUser = await userClient.updateUser(updatedUser)
+                setUser(savedUser)
+                setSelectedRoles(savedUser.Roles)
                 showSnackbar('This user was saved.', AppSnackbarSeverity.Success)
             }
 
@@ -151,7 +156,6 @@ const User: FC = () => {
             <ItemsSelector
                 label="Roles"
                 allItems={roles}
-                initiallySelectedItems={user.Roles}
                 selected={selectedRoles}
                 setSelected={setSelectedRoles}
             />

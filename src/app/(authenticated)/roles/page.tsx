@@ -46,6 +46,8 @@ const Roles: FC = () => {
     useEffect(() => {
         setPageTitle('Roles')
         firstBreadcrumb({ title: 'Roles', url: '/roles' })
+        // The response updates state after await; this rule misidentifies async loaders.
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- https://github.com/react/react/issues/34905
         getRoles()
     }, [setPageTitle, firstBreadcrumb, getRoles])
 
