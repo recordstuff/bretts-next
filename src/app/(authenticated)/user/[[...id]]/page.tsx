@@ -33,9 +33,10 @@ const User: FC = () => {
     const getAllRoles = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        setRoles(await roleClient.getAllRoles())
-
-        doneWaiting()
+        return roleClient.getAllRoles().then(allRoles => {
+            setRoles(allRoles)
+            doneWaiting()
+        })
     }, [pleaseWait, doneWaiting])
 
     const getUser = useCallback(async (): Promise<void> => {
@@ -43,9 +44,11 @@ const User: FC = () => {
 
         pleaseWait()
 
-        setUser(await userClient.getUser(id))
-
-        doneWaiting()
+        return userClient.getUser(id).then(loadedUser => {
+            setUser(loadedUser)
+            setSelectedRoles(loadedUser.Roles)
+            doneWaiting()
+        })
     }, [id, pleaseWait, doneWaiting])
 
     useEffect(() => {
@@ -93,7 +96,9 @@ const User: FC = () => {
                 const updatedUser = { ...user }
                 updatedUser.Roles = selectedRoles
 
-                setUser(await userClient.updateUser(updatedUser))
+                const savedUser = await userClient.updateUser(updatedUser)
+                setUser(savedUser)
+                setSelectedRoles(savedUser.Roles)
                 showSnackbar('This user was saved.', AppSnackbarSeverity.Success)
             }
 
@@ -151,7 +156,6 @@ const User: FC = () => {
             <ItemsSelector
                 label="Roles"
                 allItems={roles}
-                initiallySelectedItems={user.Roles}
                 selected={selectedRoles}
                 setSelected={setSelectedRoles}
             />

@@ -30,8 +30,10 @@ const Role: FC = () => {
         }
 
         pleaseWait()
-        setRole(await roleClient.getRole(id))
-        doneWaiting()
+        return roleClient.getRole(id).then(loadedRole => {
+            setRole(loadedRole)
+            doneWaiting()
+        })
     }, [id, pleaseWait, doneWaiting])
 
     useEffect(() => {

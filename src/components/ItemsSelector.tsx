@@ -1,55 +1,42 @@
 'use client'
 
-import { Dispatch, FC, MouseEvent, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 import { NameGuidPair } from '../models/NameGuidPair';
 import FilteredList from './FilteredList';
 import { Box, Button, Grid, Stack, Typography } from '@mui/material';
 
 export interface Props {
     allItems: NameGuidPair[]
-    initiallySelectedItems: NameGuidPair[]
     label: string
     selected: NameGuidPair[]
     setSelected: Dispatch<SetStateAction<NameGuidPair[]>>,
 }
 
-const ItemsSelector: FC<Props> = ({ allItems, initiallySelectedItems, label, selected, setSelected }) => {
+const ItemsSelector: FC<Props> = ({ allItems, label, selected, setSelected }) => {
 
-    const [available, setAvailable] = useState<NameGuidPair[]>([])
+    const available = allItems.filter(item => !selected.some(selection => selection.Guid === item.Guid))
 
-    const handleClick = (event: MouseEvent<HTMLElement>, source: NameGuidPair[], setSource: Dispatch<SetStateAction<NameGuidPair[]>>, destination: NameGuidPair[], setDestination: Dispatch<SetStateAction<NameGuidPair[]>>): void => {
+    const handleClickSelect = (event: MouseEvent<HTMLElement>): void => {
         const clickedName = event.currentTarget.textContent
-        const clicked = source.find(s => s.Name === clickedName)
+        const clicked = available.find(item => item.Name === clickedName)
 
         if (clicked === undefined) return
 
-        setSource(source.filter(s => s.Name !== clickedName))
-        setDestination([...destination, clicked]
+        setSelected([...selected, clicked]
             .sort((a, b) => a.Name.localeCompare(b.Name)))
     }
 
-    const handleClickSelect = (event: MouseEvent<HTMLElement>): void => {
-        handleClick(event, available, setAvailable, selected, setSelected)
-    }
-
     const handleClickDeselect = (event: MouseEvent<HTMLElement>): void => {
-        handleClick(event, selected, setSelected, available, setAvailable)
+        setSelected(selected.filter(item => item.Name !== event.currentTarget.textContent))
     }
 
     const handleClickSelectAll = (): void => {
-        setAvailable([])
         setSelected(allItems);
     }
 
     const handleClickDeselectAll = (): void => {
         setSelected([]);
-        setAvailable(allItems)
     }
-
-    useEffect(() => {
-        setSelected(initiallySelectedItems)
-        setAvailable(allItems.filter(ai => !initiallySelectedItems.some(isi => isi.Guid === ai.Guid)))
-    }, [allItems, initiallySelectedItems, setSelected])
 
     return (
         <Box

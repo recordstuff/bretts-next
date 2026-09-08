@@ -36,18 +36,17 @@ const Users: FC = () => {
     const getUsers = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        const response = await userClient.getUsers(
+        return userClient.getUsers(
             page,
             DEFAULT_PAGE_SIZE,
             searchText,
             roleFilter,
             sortColumn,
             sortDirection
-        )
-
-        setPaginationResult(response)
-
-        doneWaiting()
+        ).then(response => {
+            setPaginationResult(response)
+            doneWaiting()
+        })
     }, [page, searchText, roleFilter, sortColumn, sortDirection, pleaseWait, doneWaiting])
 
     useEffect(() => {

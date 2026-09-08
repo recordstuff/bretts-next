@@ -31,16 +31,16 @@ const Roles: FC = () => {
     const getRoles = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        const response = await roleClient.getRoles(
+        return roleClient.getRoles(
             page,
             DEFAULT_PAGE_SIZE,
             searchText,
             sortColumn,
             sortDirection
-        )
-
-        setPaginationResult(response)
-        doneWaiting()
+        ).then(response => {
+            setPaginationResult(response)
+            doneWaiting()
+        })
     }, [page, searchText, sortColumn, sortDirection, pleaseWait, doneWaiting])
 
     useEffect(() => {
