@@ -1,5 +1,5 @@
 import { Dispatch, FC, SetStateAction } from 'react';
-import { Grid, Pagination, Stack, Typography } from '@mui/material';
+import { Pagination, Stack, Typography } from '@mui/material';
 import { PaginationResult } from '../models/PaginationResult';
 
 export interface Props {
@@ -14,23 +14,16 @@ const Paginator: FC<Props> = ({ paginationResult, setPage }) => {
     }
 
     return (
-        <Stack sx={{
+        <Stack spacing={2} sx={{
             alignItems: 'center'
         }}>
-            <Grid>
-                <Typography>Page {paginationResult.Page} of {paginationResult.PageCount}</Typography>
-            </Grid>
-            <Grid
-                sx={{
-                    paddingTop: 2
-                }}>
-                <Pagination
-                    count={paginationResult.PageCount}
-                    showFirstButton
-                    showLastButton
-                    onChange={handleChange}
-                />
-            </Grid>
+            <Typography>Page {paginationResult.Page} of {paginationResult.PageCount}</Typography>
+            <Pagination
+                count={paginationResult.PageCount}
+                showFirstButton
+                showLastButton
+                onChange={handleChange}
+            />
         </Stack>
     );
 }

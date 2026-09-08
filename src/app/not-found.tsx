@@ -1,9 +1,9 @@
-import { Grid, Typography } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import { FC } from "react"
 
 const NotFound: FC = () => {
   return (
-    <Grid
+    <Stack
       sx={{
         margin: 4
       }}>
@@ -11,7 +11,7 @@ const NotFound: FC = () => {
       <Typography sx={{
         marginBottom: "16px"
       }}>The page was not found.</Typography>
-    </Grid>
+    </Stack>
   );
 }
 

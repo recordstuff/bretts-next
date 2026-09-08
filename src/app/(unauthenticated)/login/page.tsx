@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, Grid, Link, Paper, Stack, TextField } from "@mui/material"
+import { Box, Button, Link, Paper, Stack, TextField } from "@mui/material"
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react"
 import { HTTP_STATUS_CODES, isHttpStatusError } from "../../../clients/HttpClient"
 import { jwtUtil } from "../../../helpers/JwtUtil"
@@ -92,66 +92,58 @@ const Layout: FC = () => {
                     borderColor: 'primary.main',
                     transform: { xl: 'translateY(-4rem)' },
                 }}>
-                <Stack>
-                    <Grid>
+                <Stack spacing={2}>
+                    <Box>
                         This is a React sample using NextJS.  Log in with Admin and User rights to see all the options including Users CRUD operations.
-                    </Grid>
-                    <Grid>
-                        <Box
-                            role="group"
-                            aria-label="Populate with Credentials"
-                            sx={{
-                                display: 'grid',
-                                gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
-                            }}>
-                            <Button onClick={populateWithAdminAndUserCreds}> Admin and User rights</Button>
-                            <Button onClick={populateWithAdminCreds}>Admin rights only</Button>
-                            <Button onClick={populateWithUserCreds}>User rights only</Button>
-                        </Box>
-                    </Grid>
-                    <Grid>
-                        <TextField
-                            fullWidth
-                            name="Email"
-                            label="Email"
-                            type="email"
-                            value={userCredentials.Email}
-                            onChange={credentialsChanged}
-                            required
-                            error={useErrorCondition && userCredentials.Email.length === 0}
-                            helperText={useErrorCondition && userCredentials.Email.length === 0 && "Email cannot be blank."}
-                            slotProps={{
-                                inputLabel: {shrink: true}
-                            }}
-                        />
-                    </Grid>
-                    <Grid>
-                        <TextField
-                            fullWidth
-                            name="Password"
-                            label="Password"
-                            type="password"
-                            value={userCredentials.Password}
-                            onChange={credentialsChanged}
-                            required
-                            error={useErrorCondition && userCredentials.Password.length === 0}
-                            helperText={useErrorCondition && userCredentials.Password.length === 0 && "Password cannot be blank."}
-                            slotProps={{
-                                inputLabel: {shrink: true}
-                            }}
-                        />
-                    </Grid>
-                    <Grid>
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            color="primary"
-                            onClick={login}
-                            disabled={useErrorCondition && (userCredentials.Email.length === 0 || userCredentials.Password.length === 0)}>
-                            Login
-                        </Button>
-                    </Grid>
-                    <Grid sx={{textAlign: 'right'}}>
+                    </Box>
+                    <Box
+                        role="group"
+                        aria-label="Populate with Credentials"
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+                        }}>
+                        <Button onClick={populateWithAdminAndUserCreds}> Admin and User rights</Button>
+                        <Button onClick={populateWithAdminCreds}>Admin rights only</Button>
+                        <Button onClick={populateWithUserCreds}>User rights only</Button>
+                    </Box>
+                    <TextField
+                        fullWidth
+                        name="Email"
+                        label="Email"
+                        type="email"
+                        value={userCredentials.Email}
+                        onChange={credentialsChanged}
+                        required
+                        error={useErrorCondition && userCredentials.Email.length === 0}
+                        helperText={useErrorCondition && userCredentials.Email.length === 0 && "Email cannot be blank."}
+                        slotProps={{
+                            inputLabel: {shrink: true}
+                        }}
+                    />
+                    <TextField
+                        fullWidth
+                        name="Password"
+                        label="Password"
+                        type="password"
+                        value={userCredentials.Password}
+                        onChange={credentialsChanged}
+                        required
+                        error={useErrorCondition && userCredentials.Password.length === 0}
+                        helperText={useErrorCondition && userCredentials.Password.length === 0 && "Password cannot be blank."}
+                        slotProps={{
+                            inputLabel: {shrink: true}
+                        }}
+                    />
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        color="primary"
+                        onClick={login}
+                        disabled={useErrorCondition && (userCredentials.Email.length === 0 || userCredentials.Password.length === 0)}>
+                        Login
+                    </Button>
+                    <Box sx={{textAlign: 'right'}}>
                         <Link
                             href="https://brettdrake.org/"
                             target="_blank"
@@ -159,7 +151,7 @@ const Layout: FC = () => {
                             color="primary">
                             brettdrake.org
                         </Link>
-                    </Grid>
+                    </Box>
                 </Stack>
             </Paper>
         </Box>
