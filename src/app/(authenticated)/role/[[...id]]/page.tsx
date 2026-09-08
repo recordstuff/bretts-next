@@ -30,10 +30,9 @@ const Role: FC = () => {
         }
 
         pleaseWait()
-        return roleClient.getRole(id).then(loadedRole => {
-            setRole(loadedRole)
-            doneWaiting()
-        })
+        const loadedRole = await roleClient.getRole(id)
+        setRole(loadedRole)
+        doneWaiting()
     }, [id, pleaseWait, doneWaiting])
 
     useEffect(() => {
@@ -47,6 +46,8 @@ const Role: FC = () => {
 
         setPageTitle(pageTitle)
         addBreadcrumb({ title: pageTitle, url })
+        // The response updates state after await; this rule misidentifies async loaders.
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- https://github.com/react/react/issues/34905
         getRole()
     }, [id, isEdit, setPageTitle, addBreadcrumb, getRole])
 

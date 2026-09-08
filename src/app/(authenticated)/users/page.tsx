@@ -36,22 +36,24 @@ const Users: FC = () => {
     const getUsers = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        return userClient.getUsers(
+        const response = await userClient.getUsers(
             page,
             DEFAULT_PAGE_SIZE,
             searchText,
             roleFilter,
             sortColumn,
             sortDirection
-        ).then(response => {
-            setPaginationResult(response)
-            doneWaiting()
-        })
+        )
+
+        setPaginationResult(response)
+        doneWaiting()
     }, [page, searchText, roleFilter, sortColumn, sortDirection, pleaseWait, doneWaiting])
 
     useEffect(() => {
         setPageTitle('Users')
         firstBreadcrumb({ title: 'Users', url: '/users' })
+        // The response updates state after await; this rule misidentifies async loaders.
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- https://github.com/react/react/issues/34905
         getUsers()
     }, [setPageTitle, firstBreadcrumb, getUsers])
 

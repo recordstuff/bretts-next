@@ -31,21 +31,23 @@ const Roles: FC = () => {
     const getRoles = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        return roleClient.getRoles(
+        const response = await roleClient.getRoles(
             page,
             DEFAULT_PAGE_SIZE,
             searchText,
             sortColumn,
             sortDirection
-        ).then(response => {
-            setPaginationResult(response)
-            doneWaiting()
-        })
+        )
+
+        setPaginationResult(response)
+        doneWaiting()
     }, [page, searchText, sortColumn, sortDirection, pleaseWait, doneWaiting])
 
     useEffect(() => {
         setPageTitle('Roles')
         firstBreadcrumb({ title: 'Roles', url: '/roles' })
+        // The response updates state after await; this rule misidentifies async loaders.
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- https://github.com/react/react/issues/34905
         getRoles()
     }, [setPageTitle, firstBreadcrumb, getRoles])
 

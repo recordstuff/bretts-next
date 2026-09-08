@@ -33,10 +33,9 @@ const User: FC = () => {
     const getAllRoles = useCallback(async (): Promise<void> => {
         pleaseWait()
 
-        return roleClient.getAllRoles().then(allRoles => {
-            setRoles(allRoles)
-            doneWaiting()
-        })
+        const allRoles = await roleClient.getAllRoles()
+        setRoles(allRoles)
+        doneWaiting()
     }, [pleaseWait, doneWaiting])
 
     const getUser = useCallback(async (): Promise<void> => {
@@ -44,11 +43,10 @@ const User: FC = () => {
 
         pleaseWait()
 
-        return userClient.getUser(id).then(loadedUser => {
-            setUser(loadedUser)
-            setSelectedRoles(loadedUser.Roles)
-            doneWaiting()
-        })
+        const loadedUser = await userClient.getUser(id)
+        setUser(loadedUser)
+        setSelectedRoles(loadedUser.Roles)
+        doneWaiting()
     }, [id, pleaseWait, doneWaiting])
 
     useEffect(() => {
@@ -65,6 +63,8 @@ const User: FC = () => {
 
         setPageTitle(pageTitle)
         addBreadcrumb({ title: pageTitle, url })
+        // The response updates state after await; this rule misidentifies async loaders.
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- https://github.com/react/react/issues/34905
         getAllRoles()
         getUser()
     }, [id, setPageTitle, addBreadcrumb, getAllRoles, getUser])
