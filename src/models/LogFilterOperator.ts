@@ -1,14 +1,14 @@
 export enum LogFilterOperator {
-    Exists,
-    DoesNotExist,
-    Equals,
-    DoesNotEqual,
-    Contains,
-    DoesNotContain,
-    GreaterThan,
-    GreaterThanOrEqual,
-    LessThan,
-    LessThanOrEqual,
+    Exists = 'Exists',
+    DoesNotExist = 'DoesNotExist',
+    Equals = 'Equals',
+    DoesNotEqual = 'DoesNotEqual',
+    Contains = 'Contains',
+    DoesNotContain = 'DoesNotContain',
+    GreaterThan = 'GreaterThan',
+    GreaterThanOrEqual = 'GreaterThanOrEqual',
+    LessThan = 'LessThan',
+    LessThanOrEqual = 'LessThanOrEqual',
 }
 
 export const logFilterNeedsValue = (operator: LogFilterOperator): boolean => {

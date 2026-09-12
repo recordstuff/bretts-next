@@ -1,13 +1,13 @@
 'use client'
 
-import { Dispatch, JSX, SetStateAction, useId } from 'react';
+import { JSX, useId } from 'react';
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { NameValuePair } from '../models/NameValuePair';
 
 export interface Props<T> {
     label: string,
     options: NameValuePair<T>[],
-    setSelectedValue: Dispatch<SetStateAction<T>>,
+    setSelectedValue: (value: T) => void,
     selectedValue: T,
 }
 

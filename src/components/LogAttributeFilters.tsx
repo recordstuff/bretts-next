@@ -79,7 +79,7 @@ const LogAttributeFilters: FC<LogAttributeFiltersProps> = ({ attributes, filters
                             label="Operator"
                             labelId={`${operatorLabelId}-${index}`}
                             onChange={(event: SelectChangeEvent) => {
-                                const operator = Number(event.target.value) as LogFilterOperator
+                                const operator = event.target.value as LogFilterOperator
                                 let value = filter.Value
                                 if (!logFilterNeedsValue(operator)) {
                                     value = null

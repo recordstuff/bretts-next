@@ -1,3 +1,5 @@
+import { LogLevel } from './LogLevel'
+
 export interface LogEntry {
     Id: number
     Message: string | null
@@ -15,7 +17,7 @@ export const emptyLogEntry = (): LogEntry => ({
     Id: 0,
     Message: '',
     MessageTemplate: '',
-    Level: 'Information',
+    Level: LogLevel.Information,
     TimeStamp: new Date().toISOString(),
     Exception: '',
     LogEvent: '',

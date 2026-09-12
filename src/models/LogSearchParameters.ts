@@ -1,4 +1,5 @@
 import { LogAttributeFilter } from './LogAttributeFilter'
+import { SortDirection } from './SortDirection'
 
 export interface LogSearchParameters {
     Page: number
@@ -7,6 +8,6 @@ export interface LogSearchParameters {
     From: string | null
     To: string | null
     Level: string | null
-    NewestFirst: boolean
+    SortDirection: SortDirection
     AttributeFilters: LogAttributeFilter[]
 }

@@ -17,8 +17,8 @@ const toLocalDateTime = (value: string | null): string => {
     }
 
     const date = new Date(value)
-    const timezoneOffset = date.getTimezoneOffset() * 60_000
-    return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 16)
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+    return date.toISOString().slice(0, 16)
 }
 
 const Log: FC = () => {
@@ -56,15 +56,17 @@ const Log: FC = () => {
     }, [id, isEdit, setPageTitle, addBreadcrumb, getLog])
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-        const updatedLog = { ...log }
-        const property = event.target.name as keyof LogEntry
-        if (property === 'TimeStamp') {
-            updatedLog.TimeStamp = new Date(event.target.value).toISOString()
+        let value: string | null = event.target.value
+        if (event.target.name === 'TimeStamp') {
+            if (value.length === 0) {
+                value = null
+            }
+            else {
+                value = new Date(value).toISOString()
+            }
         }
-        else {
-            updatedLog[property] = event.target.value as never
-        }
-        setLog(updatedLog)
+
+        setLog(currentLog => ({ ...currentLog, [event.target.name]: value }))
     }
 
     const upsert = async (): Promise<void> => {

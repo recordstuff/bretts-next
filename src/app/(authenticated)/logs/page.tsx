@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, FormControl, InputLabel, MenuItem, Select, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material'
+import { Box, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material'
 import Link from 'next/link'
 import LogAttributeFilters from '@/components/LogAttributeFilters'
 import { DEFAULT_PAGE_SIZE } from '@/constants/pagination'
@@ -13,8 +13,19 @@ import { logClient } from '@/clients/LogClient'
 import { LogAttributeFilter } from '@/models/LogAttributeFilter'
 import { LogEntry } from '@/models/LogEntry'
 import { logFilterNeedsValue } from '@/models/LogFilterOperator'
+import { SortDirection } from '@/models/SortDirection'
+import { LogLevel } from '@/models/LogLevel'
+import OptionFilter from '@/components/OptionFilter'
 
-const LEVELS = ['Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal']
+const LOG_LEVEL_OPTIONS = [
+    { Name: 'Any', Value: '' },
+    ...Object.values(LogLevel).map(logLevel => ({ Name: logLevel, Value: logLevel })),
+]
+
+const LOG_ORDER_OPTIONS = [
+    { Name: 'Newest first', Value: SortDirection.Descending },
+    { Name: 'Oldest first', Value: SortDirection.Ascending },
+]
 
 const Logs: FC = () => {
     const [paginationResult, setPaginationResult] = useState<PaginationResult<LogEntry>>(emptyPaginationResult())
@@ -23,7 +34,7 @@ const Logs: FC = () => {
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
     const [level, setLevel] = useState('')
-    const [newestFirst, setNewestFirst] = useState(true)
+    const [sortDirection, setSortDirection] = useState(SortDirection.Descending)
     const [attributes, setAttributes] = useState<string[]>([])
     const [attributeFilters, setAttributeFilters] = useState<LogAttributeFilter[]>([])
     const { actions: { pleaseWait, doneWaiting } } = useContext(PleaseWaitContext)
@@ -64,12 +75,12 @@ const Logs: FC = () => {
             From: fromValue,
             To: toValue,
             Level: levelValue,
-            NewestFirst: newestFirst,
+            SortDirection: sortDirection,
             AttributeFilters: completeAttributeFilters,
         })
         setPaginationResult(response)
         doneWaiting()
-    }, [page, searchText, from, to, level, newestFirst, attributeFilters, pleaseWait, doneWaiting])
+    }, [page, searchText, from, to, level, sortDirection, attributeFilters, pleaseWait, doneWaiting])
 
     useEffect(() => {
         setPageTitle('Log Viewer')
@@ -83,13 +94,14 @@ const Logs: FC = () => {
         getLogs()
     }, [getLogs])
 
-    const filtersChanged = (): void => {
+    const updateLevel = (value: string): void => {
+        setLevel(value)
         setPage(1)
     }
 
-    let orderValue = 'oldest'
-    if (newestFirst) {
-        orderValue = 'newest'
+    const updateSortDirection = (value: SortDirection): void => {
+        setSortDirection(value)
+        setPage(1)
     }
 
     return (
@@ -102,45 +114,33 @@ const Logs: FC = () => {
                         <TextField
                             fullWidth
                             label="Text search"
-                            onChange={event => { setSearchText(event.target.value); filtersChanged() }}
+                            onChange={event => { setSearchText(event.target.value); setPage(1) }}
                             value={searchText}
                         />
-                        <FormControl fullWidth>
-                            <InputLabel id="log-level-label">Level</InputLabel>
-                            <Select
-                                label="Level"
-                                labelId="log-level-label"
-                                onChange={event => { setLevel(event.target.value); filtersChanged() }}
-                                value={level}
-                            >
-                                <MenuItem value="">Any</MenuItem>
-                                {LEVELS.map(logLevel => <MenuItem key={logLevel} value={logLevel}>{logLevel}</MenuItem>)}
-                            </Select>
-                        </FormControl>
-                        <FormControl fullWidth>
-                            <InputLabel id="log-sort-label">Order</InputLabel>
-                            <Select
-                                label="Order"
-                                labelId="log-sort-label"
-                                onChange={event => { setNewestFirst(event.target.value === 'newest'); filtersChanged() }}
-                                value={orderValue}
-                            >
-                                <MenuItem value="newest">Newest first</MenuItem>
-                                <MenuItem value="oldest">Oldest first</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <OptionFilter
+                            label="Level"
+                            options={LOG_LEVEL_OPTIONS}
+                            selectedValue={level}
+                            setSelectedValue={updateLevel}
+                        />
+                        <OptionFilter
+                            label="Order"
+                            options={LOG_ORDER_OPTIONS}
+                            selectedValue={sortDirection}
+                            setSelectedValue={updateSortDirection}
+                        />
                     </Box>
                     <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
                         <TextField
                             label="From"
-                            onChange={event => { setFrom(event.target.value); filtersChanged() }}
+                            onChange={event => { setFrom(event.target.value); setPage(1) }}
                             slotProps={{ inputLabel: { shrink: true } }}
                             type="datetime-local"
                             value={from}
                         />
                         <TextField
                             label="To"
-                            onChange={event => { setTo(event.target.value); filtersChanged() }}
+                            onChange={event => { setTo(event.target.value); setPage(1) }}
                             slotProps={{ inputLabel: { shrink: true } }}
                             type="datetime-local"
                             value={to}
@@ -149,7 +149,7 @@ const Logs: FC = () => {
                     <LogAttributeFilters
                         attributes={attributes}
                         filters={attributeFilters}
-                        onChange={filters => { setAttributeFilters(filters); filtersChanged() }}
+                        onChange={filters => { setAttributeFilters(filters); setPage(1) }}
                     />
                 </Box>
             )}
