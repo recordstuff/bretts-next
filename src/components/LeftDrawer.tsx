@@ -54,11 +54,11 @@ const menuOptions: DrawerMenuItem[] = [
     },
     divider,
     {
-        Text: "Logs",
+        Text: "Log",
         Route: "/logs",
         Icon: SubjectIcon,
         Role: JwtRole.Admin,
-        Breadcrumb: { title: "Logs", url: "/logs" },
+        Breadcrumb: { title: "Log", url: "/logs" },
         ChildRoutes: ['/log']
     },
     {

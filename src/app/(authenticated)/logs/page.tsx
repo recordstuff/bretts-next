@@ -89,8 +89,8 @@ const Logs: FC = () => {
     }, [page, searchText, from, to, level, sortColumn, sortDirection, attributeFilters, waitFor])
 
     useEffect(() => {
-        setPageTitle('Logs')
-        firstBreadcrumb({ title: 'Logs', url: '/logs' })
+        setPageTitle('Log')
+        firstBreadcrumb({ title: 'Log', url: '/logs' })
         logClient.getAttributes().then(setAttributes)
     }, [setPageTitle, firstBreadcrumb])
 
