@@ -122,7 +122,7 @@ const Log: FC = () => {
 
     return (
         <EntityForm entityName="log entry" isEdit={isEdit} onCancel={handleCancel} onDelete={handleDelete} onSave={upsert}>
-            {isEdit && <TextField disabled fullWidth label="Identifier" value={log.Guid} />}
+            {isEdit && <TextField disabled fullWidth label="Id" value={log.Guid} />}
             <TextField fullWidth label="Timestamp" name="TimeStamp" onChange={handleChange} slotProps={{ inputLabel: { shrink: true } }} type="datetime-local" value={toLocalDateTime(log.TimeStamp)} />
             <OptionFilter label="Level" options={LOG_DETAIL_LEVEL_OPTIONS} selectedValue={selectedLevel} setSelectedValue={updateLevel} />
             <TextField fullWidth label="Message" multiline name="Message" onChange={handleChange} value={log.Message ?? ''} />

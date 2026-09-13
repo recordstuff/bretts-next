@@ -9,10 +9,11 @@ interface TableSort<TSortColumn> {
 
 export const useTableSort = <TSortColumn>(
     initialSortColumn: TSortColumn,
-    setPage: Dispatch<SetStateAction<number>>
+    setPage: Dispatch<SetStateAction<number>>,
+    initialSortDirection: SortDirection = SortDirection.Ascending
 ): TableSort<TSortColumn> => {
     const [sortColumn, setSortColumn] = useState<TSortColumn>(initialSortColumn)
-    const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Ascending)
+    const [sortDirection, setSortDirection] = useState<SortDirection>(initialSortDirection)
 
     const handleSort = (column: TSortColumn): void => {
         setPage(1)
