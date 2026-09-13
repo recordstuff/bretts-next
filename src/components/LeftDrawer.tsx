@@ -12,6 +12,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import TableRowsIcon from '@mui/icons-material/TableRows';
+import SubjectIcon from '@mui/icons-material/Subject';
 import { DrawerMenuItem, MenuOption, divider } from "../models/MenuOption";
 import { JwtField, JwtRole } from "../models/Jwt";
 import { jwtUtil } from "../helpers/JwtUtil"
@@ -52,6 +53,14 @@ const menuOptions: DrawerMenuItem[] = [
         Breadcrumb: { title: "Bacon Ipsum", url: "/baconipsum" },
     },
     divider,
+    {
+        Text: "Log Viewer",
+        Route: "/logs",
+        Icon: SubjectIcon,
+        Role: JwtRole.Admin,
+        Breadcrumb: { title: "Log Viewer", url: "/logs" },
+        ChildRoutes: ['/log']
+    },
     {
         Text: "Users",
         Route: "/users",
