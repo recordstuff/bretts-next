@@ -15,7 +15,10 @@ function OptionFilter<T>({ options, label, setSelectedValue, selectedValue }: Pr
     const labelId = useId();
 
     const handleChange = (event: SelectChangeEvent) => {
-        setSelectedValue(event.target.value as T)
+        const selectedOption = options.find(option => `${option.Value}` === event.target.value)
+        if (selectedOption !== undefined) {
+            setSelectedValue(selectedOption.Value)
+        }
     }
 
     return (

@@ -5,8 +5,11 @@ import EntityForm from '@/components/EntityForm'
 import { LeftDrawerContext } from '@/components/LeftDrawerProvider'
 import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
-import { emptyLogEntry, LogEntry } from '@/models/LogEntry'
+import { emptyLogDetail, LogDetail } from '@/models/LogDetail'
+import { LOG_EVENT_LEVEL_OPTIONS, LogEventLevel } from '@/models/LogEventLevel'
+import { NameValuePair } from '@/models/NameValuePair'
 import { logClient } from '@/clients/LogClient'
+import OptionFilter from '@/components/OptionFilter'
 import { useAppSnackbar } from '@/components/AppSnackbarProvider'
 import { useParams, useRouter } from 'next/navigation'
 import { ChangeEvent, FC, useCallback, useContext, useEffect, useState } from 'react'
@@ -21,8 +24,13 @@ const toLocalDateTime = (value: string | null): string => {
     return date.toISOString().slice(0, 16)
 }
 
+const LOG_DETAIL_LEVEL_OPTIONS: NameValuePair<LogEventLevel | ''>[] = [
+    { Name: 'None', Value: '' },
+    ...LOG_EVENT_LEVEL_OPTIONS,
+]
+
 const Log: FC = () => {
-    const [log, setLog] = useState<LogEntry>(emptyLogEntry())
+    const [log, setLog] = useState<LogDetail>(emptyLogDetail())
     const { showSnackbar } = useAppSnackbar()
     const { actions: { pleaseWait, doneWaiting } } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
@@ -78,7 +86,7 @@ const Log: FC = () => {
         else {
             const insertedLog = await logClient.insertLog(log)
             showSnackbar('This log entry was created.', AppSnackbarSeverity.Success)
-            router.push(`/log/${insertedLog.Id}`)
+            router.push(`/log/${insertedLog.Guid}`)
         }
         doneWaiting()
     }
@@ -102,11 +110,25 @@ const Log: FC = () => {
         router.push('/logs')
     }
 
+    const updateLevel = (level: LogEventLevel | ''): void => {
+        if (level === '') {
+            setLog(currentLog => ({ ...currentLog, Level: null }))
+            return
+        }
+
+        setLog(currentLog => ({ ...currentLog, Level: level }))
+    }
+
+    let selectedLevel: LogEventLevel | '' = ''
+    if (log.Level !== null) {
+        selectedLevel = log.Level
+    }
+
     return (
         <EntityForm entityName="log entry" isEdit={isEdit} onCancel={handleCancel} onDelete={handleDelete} onSave={upsert}>
-            {isEdit && <TextField disabled fullWidth label="Id" value={log.Id} />}
+            {isEdit && <TextField disabled fullWidth label="Identifier" value={log.Guid} />}
             <TextField fullWidth label="Timestamp" name="TimeStamp" onChange={handleChange} slotProps={{ inputLabel: { shrink: true } }} type="datetime-local" value={toLocalDateTime(log.TimeStamp)} />
-            <TextField fullWidth label="Level" name="Level" onChange={handleChange} value={log.Level ?? ''} />
+            <OptionFilter label="Level" options={LOG_DETAIL_LEVEL_OPTIONS} selectedValue={selectedLevel} setSelectedValue={updateLevel} />
             <TextField fullWidth label="Message" multiline name="Message" onChange={handleChange} value={log.Message ?? ''} />
             <TextField fullWidth label="Message Template" multiline name="MessageTemplate" onChange={handleChange} value={log.MessageTemplate ?? ''} />
             <TextField fullWidth label="Exception" minRows={3} multiline name="Exception" onChange={handleChange} value={log.Exception ?? ''} />
