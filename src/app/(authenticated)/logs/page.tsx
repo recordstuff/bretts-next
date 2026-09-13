@@ -21,8 +21,8 @@ import OptionFilter from '@/components/OptionFilter'
 import SortableTableHead from '@/components/SortableTableHead'
 import { useTableSort } from '@/hooks/useTableSort'
 
-const LOG_LEVEL_OPTIONS: NameValuePair<LogEventLevel | ''>[] = [
-    { Name: 'Any', Value: '' },
+const LOG_LEVEL_OPTIONS: NameValuePair<LogEventLevel | null>[] = [
+    { Name: 'Any', Value: null },
     ...LOG_EVENT_LEVEL_OPTIONS,
 ]
 
@@ -40,7 +40,7 @@ const Logs: FC = () => {
     const [searchText, setSearchText] = useState('')
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
-    const [level, setLevel] = useState<LogEventLevel | ''>('')
+    const [level, setLevel] = useState<LogEventLevel | null>(null)
     const { handleSort, sortColumn, sortDirection } = useTableSort(
         LogsSortColumn.TimeStamp,
         setPage,
@@ -54,7 +54,6 @@ const Logs: FC = () => {
     const getLogs = useCallback(async (): Promise<void> => {
         let fromValue = null
         let toValue = null
-        let levelValue = null
         let searchTextValue = null
 
         if (from.length > 0) {
@@ -62,9 +61,6 @@ const Logs: FC = () => {
         }
         if (to.length > 0) {
             toValue = new Date(to).toISOString()
-        }
-        if (level !== '') {
-            levelValue = level
         }
         if (searchText.trim().length > 0) {
             searchTextValue = searchText.trim()
@@ -84,7 +80,7 @@ const Logs: FC = () => {
                 SearchText: searchTextValue,
                 From: fromValue,
                 To: toValue,
-                Level: levelValue,
+                Level: level,
                 SortColumn: sortColumn,
                 SortDirection: sortDirection,
                 AttributeFilters: completeAttributeFilters,
@@ -93,8 +89,8 @@ const Logs: FC = () => {
     }, [page, searchText, from, to, level, sortColumn, sortDirection, attributeFilters, waitFor])
 
     useEffect(() => {
-        setPageTitle('Log Viewer')
-        firstBreadcrumb({ title: 'Log Viewer', url: '/logs' })
+        setPageTitle('Logs')
+        firstBreadcrumb({ title: 'Logs', url: '/logs' })
         logClient.getAttributes().then(setAttributes)
     }, [setPageTitle, firstBreadcrumb])
 
@@ -104,7 +100,7 @@ const Logs: FC = () => {
         getLogs()
     }, [getLogs])
 
-    const updateLevel = (value: LogEventLevel | ''): void => {
+    const updateLevel = (value: LogEventLevel | null): void => {
         setLevel(value)
         setPage(1)
     }
