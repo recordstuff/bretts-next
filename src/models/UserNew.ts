@@ -1,5 +1,5 @@
-import { UserDetail } from "./UserDetail";
+import { UserInput } from './UserInput'
 
-export interface UserNew extends UserDetail {
-    Password: string,
+export interface UserNew extends UserInput {
+    Password: string
 }

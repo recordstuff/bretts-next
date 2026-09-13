@@ -38,11 +38,10 @@ const Logs: FC = () => {
     const [sortDirection, setSortDirection] = useState(SortDirection.Descending)
     const [attributes, setAttributes] = useState<string[]>([])
     const [attributeFilters, setAttributeFilters] = useState<LogAttributeFilter[]>([])
-    const { actions: { pleaseWait, doneWaiting } } = useContext(PleaseWaitContext)
+    const { actions: { waitFor } } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     const getLogs = useCallback(async (): Promise<void> => {
-        pleaseWait()
         let fromValue = null
         let toValue = null
         let levelValue = null
@@ -69,19 +68,18 @@ const Logs: FC = () => {
             return filter.Value !== null && filter.Value.trim().length > 0
         })
 
-        const response = await logClient.getLogs({
-            Page: page,
-            PageSize: DEFAULT_PAGE_SIZE,
-            SearchText: searchTextValue,
-            From: fromValue,
-            To: toValue,
-            Level: levelValue,
-            SortDirection: sortDirection,
-            AttributeFilters: completeAttributeFilters,
-        })
+        const response = await waitFor(() => logClient.getLogs({
+                Page: page,
+                PageSize: DEFAULT_PAGE_SIZE,
+                SearchText: searchTextValue,
+                From: fromValue,
+                To: toValue,
+                Level: levelValue,
+                SortDirection: sortDirection,
+                AttributeFilters: completeAttributeFilters,
+            }))
         setPaginationResult(response)
-        doneWaiting()
-    }, [page, searchText, from, to, level, sortDirection, attributeFilters, pleaseWait, doneWaiting])
+    }, [page, searchText, from, to, level, sortDirection, attributeFilters, waitFor])
 
     useEffect(() => {
         setPageTitle('Log Viewer')

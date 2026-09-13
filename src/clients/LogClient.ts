@@ -1,6 +1,7 @@
 import { HttpClient } from './HttpClient'
 import { LogDetail } from '@/models/LogDetail'
 import { LogSearchParameters } from '@/models/LogSearchParameters'
+import { LogNew } from '@/models/LogNew'
 import { LogSummary } from '@/models/LogSummary'
 import { PaginationResult } from '@/models/PaginationResult'
 
@@ -21,8 +22,8 @@ class LogClient extends HttpClient {
         return this.get<LogDetail>(`log/${guid}`)
     }
 
-    public insertLog(log: LogDetail): Promise<LogDetail> {
-        return this.post<LogDetail, LogDetail>('insert', log)
+    public insertLog(log: LogNew): Promise<LogDetail> {
+        return this.post<LogNew, LogDetail>('insert', log)
     }
 
     public updateLog(log: LogDetail): Promise<LogDetail> {

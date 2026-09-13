@@ -7,6 +7,7 @@ import { PleaseWaitContext } from '@/components/PleaseWaitProvider'
 import { AppSnackbarSeverity } from '@/models/AppSnackbarState'
 import { emptyLogDetail, LogDetail } from '@/models/LogDetail'
 import { LOG_EVENT_LEVEL_OPTIONS, LogEventLevel } from '@/models/LogEventLevel'
+import { toLogNew } from '@/models/LogNew'
 import { NameValuePair } from '@/models/NameValuePair'
 import { logClient } from '@/clients/LogClient'
 import OptionFilter from '@/components/OptionFilter'
@@ -32,9 +33,10 @@ const LOG_DETAIL_LEVEL_OPTIONS: NameValuePair<LogEventLevel | ''>[] = [
 const Log: FC = () => {
     const [log, setLog] = useState<LogDetail>(emptyLogDetail())
     const { showSnackbar } = useAppSnackbar()
-    const { actions: { pleaseWait, doneWaiting } } = useContext(PleaseWaitContext)
+    const { actions: { waitFor } } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
-    const { id } = useParams<{ id: string }>()
+    const { id: idSegments } = useParams<{ id?: string[] }>()
+    const id = idSegments?.[0]
     const router = useRouter()
     const isEdit = id !== undefined
 
@@ -43,10 +45,8 @@ const Log: FC = () => {
             return
         }
 
-        pleaseWait()
-        setLog(await logClient.getLog(id))
-        doneWaiting()
-    }, [id, pleaseWait, doneWaiting])
+        setLog(await waitFor(() => logClient.getLog(id)))
+    }, [id, waitFor])
 
     useEffect(() => {
         let pageTitle = 'Add Log'
@@ -78,17 +78,15 @@ const Log: FC = () => {
     }
 
     const upsert = async (): Promise<void> => {
-        pleaseWait()
         if (isEdit) {
-            setLog(await logClient.updateLog(log))
+            setLog(await waitFor(() => logClient.updateLog(log)))
             showSnackbar('This log entry was saved.', AppSnackbarSeverity.Success)
         }
         else {
-            const insertedLog = await logClient.insertLog(log)
+            const insertedLog = await waitFor(() => logClient.insertLog(toLogNew(log)))
             showSnackbar('This log entry was created.', AppSnackbarSeverity.Success)
             router.push(`/log/${insertedLog.Guid}`)
         }
-        doneWaiting()
     }
 
     const handleCancel = async (): Promise<void> => {
@@ -103,9 +101,7 @@ const Log: FC = () => {
         if (id === undefined) {
             return
         }
-        pleaseWait()
-        await logClient.deleteLog(id)
-        doneWaiting()
+        await waitFor(() => logClient.deleteLog(id))
         showSnackbar('This log entry was deleted.', AppSnackbarSeverity.Success)
         router.push('/logs')
     }

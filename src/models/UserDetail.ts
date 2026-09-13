@@ -1,9 +1,7 @@
-import { NameGuidPair } from "./NameGuidPair";
-import { UserSummary } from "./UserSummary";
+import { UserInput } from './UserInput'
 
-export interface UserDetail extends UserSummary {
-    Phone: string | null,
-    Roles: NameGuidPair[]
+export interface UserDetail extends UserInput {
+    Guid: string
 }
 
 export const emptyUserDetail = (): UserDetail => ({

@@ -18,9 +18,10 @@ const emptyRole = (): NameGuidPair => ({ Guid: '', Name: '' })
 const Role: FC = () => {
     const [role, setRole] = useState<NameGuidPair>(emptyRole())
     const { showSnackbar } = useAppSnackbar()
-    const { actions: { clearAllWaits, pleaseWait, doneWaiting } } = useContext(PleaseWaitContext)
+    const { actions: { waitFor } } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
-    const { id } = useParams<{ id: string }>()
+    const { id: idSegments } = useParams<{ id?: string[] }>()
+    const id = idSegments?.[0]
     const router = useRouter()
     const isEdit = id !== undefined
 
@@ -29,11 +30,9 @@ const Role: FC = () => {
             return
         }
 
-        pleaseWait()
-        const loadedRole = await roleClient.getRole(id)
+        const loadedRole = await waitFor(() => roleClient.getRole(id))
         setRole(loadedRole)
-        doneWaiting()
-    }, [id, pleaseWait, doneWaiting])
+    }, [id, waitFor])
 
     useEffect(() => {
         let pageTitle = 'Add Role'
@@ -63,12 +62,10 @@ const Role: FC = () => {
             return
         }
 
-        pleaseWait()
-
         try {
             if (!isEdit) {
                 const newRole: RoleNew = { Name: roleName }
-                const roleDetail = await roleClient.insertRole(newRole)
+                const roleDetail = await waitFor(() => roleClient.insertRole(newRole))
 
                 showSnackbar('This role was created.', AppSnackbarSeverity.Success)
                 router.push(`/role/${roleDetail.Guid}`)
@@ -76,15 +73,11 @@ const Role: FC = () => {
             else {
                 const updatedRole = { ...role, Name: roleName }
 
-                setRole(await roleClient.updateRole(updatedRole))
+                setRole(await waitFor(() => roleClient.updateRole(updatedRole)))
                 showSnackbar('This role was saved.', AppSnackbarSeverity.Success)
             }
-
-            doneWaiting()
         }
         catch (exception: unknown) {
-            clearAllWaits()
-
             if (isHttpStatusError(exception, HTTP_STATUS_CODES.CONFLICT)) {
                 showSnackbar('A role with this name already exists.', AppSnackbarSeverity.Warning)
                 return
@@ -108,17 +101,12 @@ const Role: FC = () => {
             return
         }
 
-        pleaseWait()
-
         try {
-            await roleClient.deleteRole(id)
-            doneWaiting()
+            await waitFor(() => roleClient.deleteRole(id))
             showSnackbar('This role was deleted.', AppSnackbarSeverity.Success)
             router.push('/roles')
         }
         catch (exception: unknown) {
-            clearAllWaits()
-
             if (isHttpStatusError(exception, HTTP_STATUS_CODES.CONFLICT)) {
                 showSnackbar('This role is assigned to one or more users and cannot be deleted.', AppSnackbarSeverity.Warning)
                 return
