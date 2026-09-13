@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material'
+import { Box, TableBody, TableCell, TableRow, TextField } from '@mui/material'
 import Link from 'next/link'
 import LogAttributeFilters from '@/components/LogAttributeFilters'
 import { DEFAULT_PAGE_SIZE } from '@/constants/pagination'
@@ -15,18 +15,24 @@ import { getLogEventLevelName, LOG_EVENT_LEVEL_OPTIONS, LogEventLevel } from '@/
 import { logFilterNeedsValue } from '@/models/LogFilterOperator'
 import { LogSummary } from '@/models/LogSummary'
 import { NameValuePair } from '@/models/NameValuePair'
+import { LogsSortColumn } from '@/models/LogsSortColumn'
 import { SortDirection } from '@/models/SortDirection'
 import OptionFilter from '@/components/OptionFilter'
+import SortableTableHead from '@/components/SortableTableHead'
+import { useTableSort } from '@/hooks/useTableSort'
 
 const LOG_LEVEL_OPTIONS: NameValuePair<LogEventLevel | ''>[] = [
     { Name: 'Any', Value: '' },
     ...LOG_EVENT_LEVEL_OPTIONS,
 ]
 
-const LOG_ORDER_OPTIONS = [
-    { Name: 'Newest first', Value: SortDirection.Descending },
-    { Name: 'Oldest first', Value: SortDirection.Ascending },
-]
+const LOG_SORT_COLUMNS = [
+    { label: 'Id', column: LogsSortColumn.Id },
+    { label: 'Timestamp', column: LogsSortColumn.TimeStamp },
+    { label: 'Level', column: LogsSortColumn.Level },
+    { label: 'Message', column: LogsSortColumn.Message },
+    { label: 'Source', column: LogsSortColumn.SourceContext },
+] as const
 
 const Logs: FC = () => {
     const [paginationResult, setPaginationResult] = useState<PaginationResult<LogSummary>>(emptyPaginationResult())
@@ -35,7 +41,11 @@ const Logs: FC = () => {
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
     const [level, setLevel] = useState<LogEventLevel | ''>('')
-    const [sortDirection, setSortDirection] = useState(SortDirection.Descending)
+    const { handleSort, sortColumn, sortDirection } = useTableSort(
+        LogsSortColumn.TimeStamp,
+        setPage,
+        SortDirection.Descending
+    )
     const [attributes, setAttributes] = useState<string[]>([])
     const [attributeFilters, setAttributeFilters] = useState<LogAttributeFilter[]>([])
     const { actions: { waitFor } } = useContext(PleaseWaitContext)
@@ -75,11 +85,12 @@ const Logs: FC = () => {
                 From: fromValue,
                 To: toValue,
                 Level: levelValue,
+                SortColumn: sortColumn,
                 SortDirection: sortDirection,
                 AttributeFilters: completeAttributeFilters,
             }))
         setPaginationResult(response)
-    }, [page, searchText, from, to, level, sortDirection, attributeFilters, waitFor])
+    }, [page, searchText, from, to, level, sortColumn, sortDirection, attributeFilters, waitFor])
 
     useEffect(() => {
         setPageTitle('Log Viewer')
@@ -98,18 +109,13 @@ const Logs: FC = () => {
         setPage(1)
     }
 
-    const updateSortDirection = (value: SortDirection): void => {
-        setSortDirection(value)
-        setPage(1)
-    }
-
     return (
         <PaginatedEntityList
             addHref="/log"
             addLabel="Add Log"
             filters={(
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr' } }}>
+                    <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' } }}>
                         <TextField
                             fullWidth
                             label="Text search"
@@ -121,12 +127,6 @@ const Logs: FC = () => {
                             options={LOG_LEVEL_OPTIONS}
                             selectedValue={level}
                             setSelectedValue={updateLevel}
-                        />
-                        <OptionFilter
-                            label="Order"
-                            options={LOG_ORDER_OPTIONS}
-                            selectedValue={sortDirection}
-                            setSelectedValue={updateSortDirection}
                         />
                     </Box>
                     <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
@@ -155,15 +155,12 @@ const Logs: FC = () => {
             paginationResult={paginationResult}
             setPage={setPage}
         >
-            <TableHead>
-                <TableRow>
-                    <TableCell>Identifier</TableCell>
-                    <TableCell>Timestamp</TableCell>
-                    <TableCell>Level</TableCell>
-                    <TableCell>Message</TableCell>
-                    <TableCell>Source</TableCell>
-                </TableRow>
-            </TableHead>
+            <SortableTableHead
+                columns={LOG_SORT_COLUMNS}
+                onSort={handleSort}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+            />
             <TableBody>
                 {paginationResult.Items.map(log => (
                     <TableRow key={log.Guid}>
