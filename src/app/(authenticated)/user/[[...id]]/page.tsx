@@ -23,31 +23,26 @@ const User: FC = () => {
     const [password, setPassword] = useState<string>('')
     const [selectedRoles, setSelectedRoles] = useState<NameGuidPair[]>([])
     const {showSnackbar} = useAppSnackbar()
-    const { actions: {clearAllWaits, pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
+    const { actions: {waitFor} } = useContext(PleaseWaitContext)
     const { addBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
-    const { id } = useParams<{id: string}>()
+    const { id: idSegments } = useParams<{id?: string[]}>()
+    const id = idSegments?.[0]
     const router = useRouter()
     const isEdit = id !== undefined
 
     const getAllRoles = useCallback(async (): Promise<void> => {
-        pleaseWait()
-
-        const allRoles = await roleClient.getAllRoles()
+        const allRoles = await waitFor(() => roleClient.getAllRoles())
         setRoles(allRoles)
-        doneWaiting()
-    }, [pleaseWait, doneWaiting])
+    }, [waitFor])
 
     const getUser = useCallback(async (): Promise<void> => {
         if (id === undefined) return
 
-        pleaseWait()
-
-        const loadedUser = await userClient.getUser(id)
+        const loadedUser = await waitFor(() => userClient.getUser(id))
         setUser(loadedUser)
         setSelectedRoles(loadedUser.Roles)
-        doneWaiting()
-    }, [id, pleaseWait, doneWaiting])
+    }, [id, waitFor])
 
     useEffect(() => {
         let pageTitle
@@ -81,14 +76,17 @@ const User: FC = () => {
     }
 
     const upsert = async (): Promise<void> => {
-        pleaseWait()
-
         try {
             if (!isEdit) {
-                const newUser: UserNew = { ...user, Password: password }
-                newUser.Roles = selectedRoles
+                const newUser: UserNew = {
+                    DisplayName: user.DisplayName,
+                    Email: user.Email,
+                    Password: password,
+                    Phone: user.Phone,
+                    Roles: selectedRoles,
+                }
 
-                const userDetail = await userClient.insertUser(newUser)
+                const userDetail = await waitFor(() => userClient.insertUser(newUser))
                 showSnackbar('This user was created.', AppSnackbarSeverity.Success)
                 router.push(`/user/${userDetail.Guid}`)
             }
@@ -96,17 +94,13 @@ const User: FC = () => {
                 const updatedUser = { ...user }
                 updatedUser.Roles = selectedRoles
 
-                const savedUser = await userClient.updateUser(updatedUser)
+                const savedUser = await waitFor(() => userClient.updateUser(updatedUser))
                 setUser(savedUser)
                 setSelectedRoles(savedUser.Roles)
                 showSnackbar('This user was saved.', AppSnackbarSeverity.Success)
             }
-
-            doneWaiting()
         }
         catch (ex: unknown) {
-            clearAllWaits()
-
             if (isHttpStatusError(ex, HTTP_STATUS_CODES.CONFLICT)) {
                 showSnackbar('A user with this email already exists.', AppSnackbarSeverity.Warning)
                 return
@@ -130,11 +124,7 @@ const User: FC = () => {
             return
         }
 
-        pleaseWait()
-
-        await userClient.deleteUser(id)
-
-        doneWaiting()
+        await waitFor(() => userClient.deleteUser(id))
 
         showSnackbar('This user was deleted.', AppSnackbarSeverity.Success)
         router.push('/users')

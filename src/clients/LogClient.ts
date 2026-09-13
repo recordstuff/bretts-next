@@ -1,6 +1,8 @@
 import { HttpClient } from './HttpClient'
-import { LogEntry } from '@/models/LogEntry'
+import { LogDetail } from '@/models/LogDetail'
 import { LogSearchParameters } from '@/models/LogSearchParameters'
+import { LogNew } from '@/models/LogNew'
+import { LogSummary } from '@/models/LogSummary'
 import { PaginationResult } from '@/models/PaginationResult'
 
 class LogClient extends HttpClient {
@@ -8,28 +10,28 @@ class LogClient extends HttpClient {
         super('log')
     }
 
-    public getLogs(searchParameters: LogSearchParameters): Promise<PaginationResult<LogEntry>> {
-        return this.post<LogSearchParameters, PaginationResult<LogEntry>>('logs', searchParameters)
+    public getLogs(searchParameters: LogSearchParameters): Promise<PaginationResult<LogSummary>> {
+        return this.post<LogSearchParameters, PaginationResult<LogSummary>>('logs', searchParameters)
     }
 
     public getAttributes(): Promise<string[]> {
         return this.get<string[]>('attributes')
     }
 
-    public getLog(id: string): Promise<LogEntry> {
-        return this.get<LogEntry>(`log/${id}`)
+    public getLog(guid: string): Promise<LogDetail> {
+        return this.get<LogDetail>(`log/${guid}`)
     }
 
-    public insertLog(log: LogEntry): Promise<LogEntry> {
-        return this.post<LogEntry, LogEntry>('insert', log)
+    public insertLog(log: LogNew): Promise<LogDetail> {
+        return this.post<LogNew, LogDetail>('insert', log)
     }
 
-    public updateLog(log: LogEntry): Promise<LogEntry> {
-        return this.post<LogEntry, LogEntry>('update', log)
+    public updateLog(log: LogDetail): Promise<LogDetail> {
+        return this.post<LogDetail, LogDetail>('update', log)
     }
 
-    public deleteLog(id: string): Promise<boolean> {
-        return this.delete(`delete/${id}`)
+    public deleteLog(guid: string): Promise<boolean> {
+        return this.delete(`delete/${guid}`)
     }
 }
 

@@ -11,15 +11,16 @@ import { emptyPaginationResult, PaginationResult } from '@/models/PaginationResu
 import { FC, useCallback, useContext, useEffect, useState } from 'react'
 import { logClient } from '@/clients/LogClient'
 import { LogAttributeFilter } from '@/models/LogAttributeFilter'
-import { LogEntry } from '@/models/LogEntry'
+import { getLogEventLevelName, LOG_EVENT_LEVEL_OPTIONS, LogEventLevel } from '@/models/LogEventLevel'
 import { logFilterNeedsValue } from '@/models/LogFilterOperator'
+import { LogSummary } from '@/models/LogSummary'
+import { NameValuePair } from '@/models/NameValuePair'
 import { SortDirection } from '@/models/SortDirection'
-import { LogLevel } from '@/models/LogLevel'
 import OptionFilter from '@/components/OptionFilter'
 
-const LOG_LEVEL_OPTIONS = [
+const LOG_LEVEL_OPTIONS: NameValuePair<LogEventLevel | ''>[] = [
     { Name: 'Any', Value: '' },
-    ...Object.values(LogLevel).map(logLevel => ({ Name: logLevel, Value: logLevel })),
+    ...LOG_EVENT_LEVEL_OPTIONS,
 ]
 
 const LOG_ORDER_OPTIONS = [
@@ -28,20 +29,19 @@ const LOG_ORDER_OPTIONS = [
 ]
 
 const Logs: FC = () => {
-    const [paginationResult, setPaginationResult] = useState<PaginationResult<LogEntry>>(emptyPaginationResult())
+    const [paginationResult, setPaginationResult] = useState<PaginationResult<LogSummary>>(emptyPaginationResult())
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
-    const [level, setLevel] = useState('')
+    const [level, setLevel] = useState<LogEventLevel | ''>('')
     const [sortDirection, setSortDirection] = useState(SortDirection.Descending)
     const [attributes, setAttributes] = useState<string[]>([])
     const [attributeFilters, setAttributeFilters] = useState<LogAttributeFilter[]>([])
-    const { actions: { pleaseWait, doneWaiting } } = useContext(PleaseWaitContext)
+    const { actions: { waitFor } } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     const getLogs = useCallback(async (): Promise<void> => {
-        pleaseWait()
         let fromValue = null
         let toValue = null
         let levelValue = null
@@ -53,7 +53,7 @@ const Logs: FC = () => {
         if (to.length > 0) {
             toValue = new Date(to).toISOString()
         }
-        if (level.length > 0) {
+        if (level !== '') {
             levelValue = level
         }
         if (searchText.trim().length > 0) {
@@ -68,19 +68,18 @@ const Logs: FC = () => {
             return filter.Value !== null && filter.Value.trim().length > 0
         })
 
-        const response = await logClient.getLogs({
-            Page: page,
-            PageSize: DEFAULT_PAGE_SIZE,
-            SearchText: searchTextValue,
-            From: fromValue,
-            To: toValue,
-            Level: levelValue,
-            SortDirection: sortDirection,
-            AttributeFilters: completeAttributeFilters,
-        })
+        const response = await waitFor(() => logClient.getLogs({
+                Page: page,
+                PageSize: DEFAULT_PAGE_SIZE,
+                SearchText: searchTextValue,
+                From: fromValue,
+                To: toValue,
+                Level: levelValue,
+                SortDirection: sortDirection,
+                AttributeFilters: completeAttributeFilters,
+            }))
         setPaginationResult(response)
-        doneWaiting()
-    }, [page, searchText, from, to, level, sortDirection, attributeFilters, pleaseWait, doneWaiting])
+    }, [page, searchText, from, to, level, sortDirection, attributeFilters, waitFor])
 
     useEffect(() => {
         setPageTitle('Log Viewer')
@@ -94,7 +93,7 @@ const Logs: FC = () => {
         getLogs()
     }, [getLogs])
 
-    const updateLevel = (value: string): void => {
+    const updateLevel = (value: LogEventLevel | ''): void => {
         setLevel(value)
         setPage(1)
     }
@@ -158,7 +157,7 @@ const Logs: FC = () => {
         >
             <TableHead>
                 <TableRow>
-                    <TableCell>Id</TableCell>
+                    <TableCell>Identifier</TableCell>
                     <TableCell>Timestamp</TableCell>
                     <TableCell>Level</TableCell>
                     <TableCell>Message</TableCell>
@@ -167,10 +166,10 @@ const Logs: FC = () => {
             </TableHead>
             <TableBody>
                 {paginationResult.Items.map(log => (
-                    <TableRow key={log.Id}>
-                        <TableCell><Link className="entity-id-link" href={`/log/${log.Id}`}>{log.Id}</Link></TableCell>
+                    <TableRow key={log.Guid}>
+                        <TableCell><Link className="entity-id-link" href={`/log/${log.Guid}`}>{log.Guid}</Link></TableCell>
                         <TableCell>{log.TimeStamp}</TableCell>
-                        <TableCell>{log.Level}</TableCell>
+                        <TableCell>{getLogEventLevelName(log.Level)}</TableCell>
                         <TableCell>{log.Message}</TableCell>
                         <TableCell>{log.SourceContext}</TableCell>
                     </TableRow>

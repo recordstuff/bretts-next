@@ -25,23 +25,20 @@ const Roles: FC = () => {
     const [page, setPage] = useState(1)
     const [searchText, setSearchText] = useState('')
     const { handleSort, sortColumn, sortDirection } = useTableSort(RolesSortColumn.Name, setPage)
-    const { actions: { pleaseWait, doneWaiting } } = useContext(PleaseWaitContext)
+    const { actions: { waitFor } } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     const getRoles = useCallback(async (): Promise<void> => {
-        pleaseWait()
-
-        const response = await roleClient.getRoles(
+        const response = await waitFor(() => roleClient.getRoles(
             page,
             DEFAULT_PAGE_SIZE,
             searchText,
             sortColumn,
             sortDirection
-        )
+        ))
 
         setPaginationResult(response)
-        doneWaiting()
-    }, [page, searchText, sortColumn, sortDirection, pleaseWait, doneWaiting])
+    }, [page, searchText, sortColumn, sortDirection, waitFor])
 
     useEffect(() => {
         setPageTitle('Roles')

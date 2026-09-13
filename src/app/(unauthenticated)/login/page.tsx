@@ -17,7 +17,7 @@ const Layout: FC = () => {
     const [useErrorCondition, setUseErrorCondition] = useState<boolean>(false)
     const {showSnackbar, closeSnackbar} = useAppSnackbar()
     const router = useRouter()
-    const { actions: {pleaseWait, doneWaiting, clearAllWaits} } = useContext(PleaseWaitContext)
+    const { actions: {waitFor} } = useContext(PleaseWaitContext)
 
     const login = async (): Promise<void> => {
         try {
@@ -25,20 +25,15 @@ const Layout: FC = () => {
 
             if (userCredentials.Email.length === 0 || userCredentials.Password.length === 0) return
 
-            pleaseWait()
-
-            const result = await userClient.login(userCredentials)
+            const result = await waitFor(() => userClient.login(userCredentials))
 
             jwtUtil.token = result.Token
-
-            doneWaiting()
 
             if (!jwtUtil.isExpired) {
                 router.push('/')
             }
         }
         catch (ex: unknown) {
-            clearAllWaits()
             if (isHttpStatusError(ex, HTTP_STATUS_CODES.UNAUTHORIZED)) {
                 showSnackbar('The Email or Password was incorrect.', AppSnackbarSeverity.Warning)
                 return

@@ -49,7 +49,10 @@ abstract class HttpBase {
     }
 
     private onResponseError = (error: AxiosError): Promise<AxiosError> => {
-        if (isHttpStatusError(error, HTTP_STATUS_CODES.FORBIDDEN)) {
+        const authenticationFailed = isHttpStatusError(error, HTTP_STATUS_CODES.UNAUTHORIZED)
+            || isHttpStatusError(error, HTTP_STATUS_CODES.FORBIDDEN)
+
+        if (authenticationFailed && window.location.pathname !== '/login') {
             // Reload to clear the root error boundary and protected state after access is denied.
             // eslint-disable-next-line @next/next/no-location-assign-relative-destination
             window.location.href = '/login'

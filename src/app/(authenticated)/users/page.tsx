@@ -30,24 +30,21 @@ const Users: FC = () => {
     const [searchText, setSearchText] = useState('')
     const [roleFilter, setRoleFilter] = useState<JwtRole>(JwtRole.Any)
     const { handleSort, sortColumn, sortDirection } = useTableSort(UsersSortColumn.DisplayName, setPage)
-    const { actions: {pleaseWait, doneWaiting} } = useContext(PleaseWaitContext)
+    const { actions: {waitFor} } = useContext(PleaseWaitContext)
     const { firstBreadcrumb, setPageTitle } = useContext(LeftDrawerContext)
 
     const getUsers = useCallback(async (): Promise<void> => {
-        pleaseWait()
-
-        const response = await userClient.getUsers(
+        const response = await waitFor(() => userClient.getUsers(
             page,
             DEFAULT_PAGE_SIZE,
             searchText,
             roleFilter,
             sortColumn,
             sortDirection
-        )
+        ))
 
         setPaginationResult(response)
-        doneWaiting()
-    }, [page, searchText, roleFilter, sortColumn, sortDirection, pleaseWait, doneWaiting])
+    }, [page, searchText, roleFilter, sortColumn, sortDirection, waitFor])
 
     useEffect(() => {
         setPageTitle('Users')

@@ -1,4 +1,5 @@
 import { LogAttributeFilter } from './LogAttributeFilter'
+import { LogEventLevel } from './LogEventLevel'
 import { SortDirection } from './SortDirection'
 
 export interface LogSearchParameters {
@@ -7,7 +8,7 @@ export interface LogSearchParameters {
     SearchText: string | null
     From: string | null
     To: string | null
-    Level: string | null
+    Level: LogEventLevel | null
     SortDirection: SortDirection
     AttributeFilters: LogAttributeFilter[]
 }
